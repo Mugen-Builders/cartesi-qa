@@ -3,18 +3,10 @@
 Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations.
 
 > **Note:** manual chaos testing finds things CI rarely exercises — partial shutdowns, recovery ordering, resync edge cases.
+>
+> **CI coverage:** `TestRestart` and `TestSnapshotPolicy` exist in the integration suite but run **only when the test framework manages the node directly** (`isNodeSelfManaged()`). In the standard compose-based CI run these tests are skipped. Treat all entries here as active until CI's compose run is confirmed to execute them.
 
 ---
-
-## SP-001 — Clean restart preserves state
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** headline operator flow.
-- **Steps:**
-  1. Run node, process some inputs.
-  2. Stop cleanly and restart.
-- **Expected:** node resumes at the correct state. No re-processing, no data loss.
 
 ## SP-002 — Hard-kill all containers mid-execution
 
@@ -52,7 +44,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Track:** B
 - **Risk:** H
-- **Why-not-CI:** previous cycle found this relates to a known issue; re-verify each release.
+- **Why-not-CI:** resync under real chain conditions; catch-up behavior not exercised in CI.
 - **Steps:**
   1. Run node, let it claim several epochs.
   2. Stop the claimer specifically, let >5 more epochs pass.

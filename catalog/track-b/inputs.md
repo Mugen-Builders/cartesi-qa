@@ -6,18 +6,6 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ---
 
-## INP-001 — Smoke: one deposit of each token type
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** headline user flow; want a human to confirm the round-trip each release.
-- **Steps:**
-  1. Deposit ETH.
-  2. Deposit an ERC20.
-  3. Deposit an ERC721.
-  4. Deposit an ERC1155 (single).
-- **Expected:** all four deposits appear as accepted inputs in the node.
-
 ## INP-002 — Deposit with massive `execLayerData`
 
 - **Track:** B

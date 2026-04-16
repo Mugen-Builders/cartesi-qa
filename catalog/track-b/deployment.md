@@ -6,16 +6,6 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 
 ---
 
-## DEP-001 — Smoke: deploy to one live testnet
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** real-testnet sanity per release. Rotate which testnet based on what's most relevant.
-- **Steps:**
-  1. Deploy to the chosen testnet (Base Sepolia, Optimism Sepolia, or Arbitrum Sepolia).
-  2. Confirm app is reachable and processes a test input.
-- **Expected:** deployment completes, app responds to inputs.
-
 ## DEP-002 — Deploy to local Anvil
 
 - **Track:** B
@@ -34,15 +24,6 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   1. Build the same app on two different machines.
   2. Compare `cartesi hash` output.
 - **Expected:** identical hashes.
-
-## DEP-004 — Self-hosted deployment on testnet
-
-- **Track:** B
-- **Risk:** M
-- **Why-not-CI:** operator flow; must be run manually.
-- **Steps:**
-  1. Complete a self-hosted deployment on a public testnet.
-- **Expected:** all services boot, app is reachable, node processes inputs.
 
 ---
 

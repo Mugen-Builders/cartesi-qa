@@ -42,10 +42,10 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Track:** B
 - **Risk:** H
-- **Why-not-CI:** startup validation should be clear; previous cycle found the error message lacked timestamp and log level.
+- **Why-not-CI:** startup validation clarity; CI doesn't test mismatched chain IDs.
 - **Steps:**
   1. Start node with a `CARTESI_BLOCKCHAIN_ID` that does not match the connected RPC.
-- **Expected:** evm-reader fails at startup with a clearly formatted error naming both chain IDs. Message should include timestamp and log level (this was a finding in a prior cycle — re-verify).
+- **Expected:** evm-reader fails at startup with a clearly formatted error naming both chain IDs, including timestamp and log level. (See `../regression-watch.md` RW-003 for the specific prior-cycle finding.)
 
 ## CFG-005 — Invalid `CARTESI_DATABASE_CONNECTION`
 
@@ -64,7 +64,37 @@ Tests for environment variables, startup validation, and feature flags.
 - **Steps:**
   1. Set a non-default polling interval.
   2. Observe advancer logs and measure effective interval.
-- **Expected:** configured interval is respected. Also verify: does the default match what `--help` claims? (Previous cycle found a discrepancy.)
+- **Expected:** configured interval is respected. Also verify: does the effective interval match what `--help` claims? (See `../regression-watch.md` RW-004 for the specific prior-cycle discrepancy.)
+
+## CFG-007 — `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES` limits WS reconnect attempts
+
+- **Track:** B
+- **Risk:** M
+- **Why-not-CI:** real network failure simulation; CI doesn't drop the WS endpoint.
+- **Steps:**
+  1. Set `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1`.
+  2. Start the node, then kill the WS endpoint.
+- **Expected:** evm-reader retries once, logs a clear failure message after exhausting retries. No panic. Document the log format.
+
+## CFG-008 — `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` controls retry delay
+
+- **Track:** B
+- **Risk:** L
+- **Why-not-CI:** timing-dependent; CI doesn't simulate WS outages.
+- **Steps:**
+  1. Set a short `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` (e.g., 2s).
+  2. Interrupt the WS connection and observe reconnect timing in logs.
+- **Expected:** reconnect attempts happen at the configured interval, not the default.
+
+## CFG-009 — `CARTESI_AUTH_KIND=private-key` explicit auth path
+
+- **Track:** B
+- **Risk:** L
+- **Why-not-CI:** explicit flag validation; confirm the private-key auth path is used for claim signing when set explicitly (vs. implicit default).
+- **Steps:**
+  1. Start node with `CARTESI_AUTH_KIND=private-key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.
+  2. Observe claim submission.
+- **Expected:** claimer signs and submits claims normally. No auth errors in logs.
 
 ---
 

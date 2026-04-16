@@ -2,15 +2,25 @@
 
 The catalog is the master list of all known manual tests, organized by component. Each file covers one component area.
 
+## Structure
+
+| Path | Contents |
+|---|---|
+| `track-a.md` | All Track A (smoke) tests in a single runnable checklist |
+| `track-b/` | Track B (deep validation) tests, one file per component |
+| `regression-watch.md` | Ephemeral list of known open issues to re-check next cycle |
+
+Track A is intentionally allowed to overlap with CI — it exists for human confirmation on a real release, not to cover gaps. Track B must not duplicate what CI already asserts; the filter is in the root README. `regression-watch.md` is not a test file — it holds specific questions from prior cycles. Entries are removed when confirmed fixed.
+
 ## What goes in the catalog
 
-Specific, repeatable, pre-written tests. Each entry says: *do this exact thing, expect this exact result.* These populate Track A (smoke) and Track B (deep validation) in each cycle.
+Specific, repeatable, pre-written tests. Each entry says: *do this exact thing, expect this exact result.*
 
-## What does NOT go in the catalog
+## What does NOT go in track B
 
+- Anything the CI integration suite already asserts on Anvil (check `test/integration/` before adding)
 - Exploratory missions (those go in `charters/`)
-- One-off experiments (either promote to a real catalog entry or discard)
-- Tests fully covered by CI (the one filter — see root README)
+- One-shot regression checks for open bugs (those go in `regression-watch.md`, not here)
 
 ## Entry format
 
@@ -25,20 +35,22 @@ Every test entry includes:
 - **Expected** — what should happen
 - **Environments** — where this test applies (self-hosted, fly.io, specific testnets)
 
-## Files
+## Track B component files
 
 | File | Component |
 |---|---|
-| `cli.md` | Cartesi CLI commands (build, run, deposit, send, etc.) |
-| `inputs.md` | Input handling (generic, ETH, ERC20, ERC721, ERC1155) |
-| `outputs.md` | VM outputs (notices, vouchers, reports, inspect) |
-| `egress.md` | Voucher execution, notice validation, L1 interaction |
-| `configuration.md` | Environment variables, startup validation, feature flags |
-| `state-persistence.md` | Snapshots, restarts, recovery, reorgs |
-| `multi-app.md` | Multi-application scheduling, consensus modes |
-| `inspect-service.md` | Inspect API boundaries, concurrency |
-| `services.md` | Individual service behavior (advancer, claimer, evm-reader, validator) |
-| `deployment.md` | Cross-environment deploys (self-hosted, fly.io, testnets) |
+| `track-b/cli.md` | Cartesi CLI commands (build, run, deposit, send, etc.) |
+| `track-b/inputs.md` | Input handling (generic, ETH, ERC20, ERC721, ERC1155) |
+| `track-b/outputs.md` | VM outputs (notices, vouchers, reports, inspect) |
+| `track-b/egress.md` | Voucher execution, notice validation, L1 interaction |
+| `track-b/configuration.md` | Environment variables, startup validation, feature flags |
+| `track-b/state-persistence.md` | Snapshots, restarts, recovery, reorgs |
+| `track-b/multi-app.md` | Multi-application scheduling, consensus modes |
+| `track-b/inspect-service.md` | Inspect API boundaries, concurrency |
+| `track-b/services.md` | Individual service behavior (advancer, claimer, evm-reader, validator) |
+| `track-b/deployment.md` | Cross-environment deploys (self-hosted, fly.io, testnets) |
+| `track-b/jsonrpc-api.md` | JSON-RPC API edge cases, pagination, error code conformance |
+| `track-b/internal-cli.md` | Operator CLI (`cartesi-rollups-cli`): db, app lifecycle, on-chain ops |
 
 ## Growing and pruning the catalog
 

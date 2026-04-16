@@ -6,17 +6,6 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 
 ---
 
-## EGR-001 — Smoke: validate notice + execute voucher on testnet
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** real L1 interaction per release.
-- **Steps:**
-  1. Generate a notice and a voucher via normal input processing.
-  2. Validate the notice on-chain (block: `finalized`).
-  3. Execute the voucher on-chain.
-- **Expected:** both on-chain interactions succeed. Voucher executor receives expected effect.
-
 ## EGR-002 — Execute same voucher twice
 
 - **Track:** B
@@ -27,14 +16,15 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
   2. Attempt to execute the same voucher again.
 - **Expected:** second attempt reverts with a clear reason.
 
-## EGR-003 — Validate notice with `block: latest` vs `finalized`
+## EGR-003 — Validate notice and execute voucher with `block: latest` vs `finalized`
 
 - **Track:** B
 - **Risk:** M
-- **Why-not-CI:** behavior differs by mode; needs human check on both.
+- **Why-not-CI:** behavior differs by mode; needs human check on both. Applies to both notice validation and voucher execution — confirm both operations work in each mode.
 - **Steps:**
   1. Validate the same notice once with `block: latest` and once with `block: finalized`.
-- **Expected:** both succeed under expected conditions. Document any latency difference.
+  2. Execute a voucher with `block: latest` and then with `block: finalized`.
+- **Expected:** all four calls succeed under expected conditions. Document any latency difference between modes.
 
 ## EGR-004 — Execute with insufficient L1 gas
 
@@ -44,6 +34,16 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 - **Steps:**
   1. Execute a voucher with a gas limit set below what's needed.
 - **Expected:** clean revert; no inconsistent state on the node.
+
+## EGR-005 — Withdraw more than available balance
+
+- **Track:** B
+- **Risk:** M
+- **Why-not-CI:** on-chain revert handling; real L1 state required.
+- **Steps:**
+  1. Generate a withdrawal voucher for an amount exceeding the app contract's balance.
+  2. Execute the voucher on-chain.
+- **Expected:** transaction reverts cleanly on L1. Node records the failed execution without inconsistent state.
 
 ---
 

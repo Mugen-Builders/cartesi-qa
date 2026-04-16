@@ -45,18 +45,5 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
   1. Run `cartesi create myapp --branch nonexistent-branch-xyz`.
 - **Expected:** clear message that the branch was not found. Not a generic git error.
 
-## CLI-005 — Smoke: `cartesi create` → `build` → `run`
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** this is the headline user experience; even if CI covers it, we want a human to confirm the flow feels right each release.
-- **Steps:**
-  1. `cartesi create smoketest`
-  2. `cd smoketest && cartesi build`
-  3. `cartesi run`
-- **Expected:** each step completes without error. `cartesi run` boots a local node reachable on default ports.
-
----
-
 <!-- Add more entries as the team identifies manual-worthy CLI tests.
      Remember the filter: if CI covers it, don't add it here. -->

@@ -2,24 +2,15 @@
 
 Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
+> **CI covers:** `TestEchoAuthorityLifecycle` and its PRT variant verify that a normal accepted input produces exactly one voucher, one delegatecall voucher, and one notice, that Merkle proofs are generated, and that the voucher executes and the notice validates on-chain — all on Anvil. Manual tests here focus on boundary sizes, error paths, and diagnostic visibility that CI's echo-dapp does not exercise.
+
 ---
-
-## OUT-001 — Smoke: generate one notice, one voucher
-
-- **Track:** A
-- **Risk:** H
-- **Why-not-CI:** headline flow; human confirmation per release.
-- **Steps:**
-  1. Send an input that causes the app to emit a notice.
-  2. Send an input that causes the app to emit a voucher.
-  3. Confirm both appear in the node's output storage.
-- **Expected:** both outputs present and queryable.
 
 ## OUT-002 — Oversized notice (>2MB)
 
 - **Track:** B
 - **Risk:** M
-- **Why-not-CI:** boundary behavior; past cycles found the error path emits specific codes (`IOCTL_ROLLUP_WRITE_NOTICE` -105) worth re-verifying.
+- **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
 - **Steps:**
   1. From inside the VM, emit a notice larger than 2MB.
 - **Expected:** emission fails with a clear error. HTTP 400 returned. Advancer marks the input rejected. Node does not crash.
