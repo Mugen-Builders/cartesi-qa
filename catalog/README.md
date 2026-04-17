@@ -28,7 +28,6 @@ Every test entry includes:
 
 - **ID** — stable identifier, e.g. `CLI-001`, `INP-014`
 - **Name** — short descriptive name
-- **Track** — A or B
 - **Risk** — H / M / L (impact × likelihood)
 - **Why-not-CI** — one-line justification for being a manual test
 - **Steps** — numbered, reproducible

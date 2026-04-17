@@ -8,7 +8,6 @@ Tests for running multiple applications on a single node, consensus modes (Autho
 
 ---## MA-002 — Heavy app does not starve light app
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
 - **Steps:**
@@ -18,7 +17,6 @@ Tests for running multiple applications on a single node, consensus modes (Autho
 
 ## MA-003 — Restart with multiple apps, many pending inputs
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** restart processing order under real workloads; CI's restart tests use small input counts.
 - **Steps:**

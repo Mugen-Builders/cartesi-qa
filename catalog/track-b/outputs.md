@@ -8,7 +8,6 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ## OUT-002 — Oversized notice (>2MB)
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
 - **Steps:**
@@ -17,7 +16,6 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ## OUT-003 — Boundary notice (exactly 2MB)
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** classic off-by-one territory.
 - **Steps:**
@@ -26,7 +24,6 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ## OUT-004 — Voucher with invalid destination
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** execution failure handling on-chain; needs real testnet.
 - **Steps:**
@@ -36,7 +33,6 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ## OUT-005 — Report during advance and during inspect
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** diagnostic visibility; confirm reports surface in both contexts.
 - **Steps:**

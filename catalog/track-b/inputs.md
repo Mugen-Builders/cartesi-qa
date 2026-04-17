@@ -8,7 +8,6 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ## INP-002 — Deposit with massive `execLayerData`
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
 - **Steps:**
@@ -18,7 +17,6 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ## INP-003 — Malformed / empty payload
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** error-handling UX; node should not crash on garbage input.
 - **Steps:**
@@ -28,7 +26,6 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ## INP-004 — Same-block inputs from multiple wallets
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** ordering under real mempool conditions differs from deterministic CI.
 - **Steps:**
@@ -37,7 +34,6 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ## INP-005 — ERC721 with malformed metadata
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.
 - **Steps:**

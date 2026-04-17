@@ -8,7 +8,6 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 
 ## DEP-002 — Deploy to local Anvil
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** local-devnet path that developers use constantly.
 - **Steps:**
@@ -17,7 +16,6 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 
 ## DEP-003 — Machine hash matches across environments
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** determinism verification across build environments.
 - **Steps:**

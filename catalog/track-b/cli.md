@@ -8,7 +8,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 
 ## CLI-001 — `cartesi doctor` with Docker stopped
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** error message clarity is a UX concern; CI usually runs with Docker up.
 - **Steps:**
@@ -18,7 +17,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 
 ## CLI-002 — `cartesi build` with missing dependencies
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** CI environments come pre-provisioned; users don't. Error should point at the missing thing clearly.
 - **Steps:**
@@ -28,7 +26,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 
 ## CLI-003 — Version mismatch (CLI vs Node)
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** version compatibility bugs show up across releases in the wild.
 - **Steps:**
@@ -38,7 +35,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 
 ## CLI-004 — `cartesi create --branch` with invalid branch
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** network-dependent error path, UX-sensitive.
 - **Steps:**

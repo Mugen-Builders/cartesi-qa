@@ -6,7 +6,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-002 — POST /inspect with payload at 2MB boundary
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** boundary behavior.
 - **Steps:**
@@ -15,7 +14,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-003 — POST /inspect exceeding 2MB
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** error path behavior under HTTP; boundary test.
 - **Steps:**
@@ -24,7 +22,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-004 — Concurrent inspects up to limit
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** concurrency under real HTTP conditions.
 - **Steps:**
@@ -33,7 +30,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-005 — Inspect while advance is processing
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** queueing behavior under interleaved load.
 - **Steps:**
@@ -43,7 +39,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-006 — Inspect by 0x address vs app name
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** parity between addressing modes.
 - **Steps:**
@@ -52,7 +47,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-007 — Inspect for unknown application
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** error path UX.
 - **Steps:**
@@ -61,7 +55,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 
 ## INS-008 — GET /inspect parity with POST
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** interface parity between the two HTTP methods; CI only exercises POST.
 - **Steps:**

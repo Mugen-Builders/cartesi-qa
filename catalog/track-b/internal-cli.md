@@ -8,7 +8,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-001 — `db check` detects schema version mismatch
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** database migration integrity; CI always starts from a fresh schema.
 - **Steps:**
@@ -19,7 +18,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-002 — `app register` then `app list`
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** application management lifecycle used by operators.
 - **Steps:**
@@ -29,7 +27,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-003 — `app remove` transitions app to DISABLED
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
@@ -40,7 +37,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-004 — `validate` confirms notice proof on-chain
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** real on-chain proof verification via operator CLI; not covered by the developer CLI path.
 - **Steps:**
@@ -50,7 +46,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-005 — `execute` executes voucher on-chain
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** real on-chain voucher execution via operator CLI.
 - **Steps:**
@@ -60,7 +55,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ## ILC-006 — `send --hex --async` flag combination
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** flag interaction; async send path not tested by CI's synchronous lifecycle tests.
 - **Steps:**

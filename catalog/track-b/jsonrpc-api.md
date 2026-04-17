@@ -8,7 +8,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-001 — Malformed JSON body returns -32700 PARSE_ERROR
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** error code conformance to JSON-RPC spec; CI doesn't submit invalid JSON.
 - **Steps:**
@@ -17,7 +16,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-002 — Unknown method returns -32601 METHOD_NOT_FOUND
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** spec conformance.
 - **Steps:**
@@ -26,7 +24,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-003 — Invalid parameter type returns -32602 INVALID_PARAMS
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** parameter validation UX; operators and SDK authors depend on clear error codes.
 - **Steps:**
@@ -36,7 +33,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-004 — Error object structure matches JSON-RPC spec
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** spec conformance; SDK and tooling consumers depend on a stable error shape.
 - **Steps:**
@@ -46,7 +42,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-005 — Pagination: limit=0 coercion
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** boundary; last cycle found the node silently coerces to a default limit rather than rejecting.
 - **Steps:**
@@ -55,7 +50,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-006 — Pagination: offset beyond total count
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** boundary.
 - **Steps:**
@@ -64,7 +58,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-007 — Pagination: negative offset
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** invalid input; confirm the API rejects it cleanly.
 - **Steps:**
@@ -73,7 +66,6 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
 
 ## JRP-008 — Out-of-bounds index fetch
 
-- **Track:** B
 - **Risk:** L
 - **Why-not-CI:** error path clarity.
 - **Steps:**

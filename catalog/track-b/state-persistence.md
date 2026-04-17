@@ -10,7 +10,6 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ## SP-002 — Hard-kill all containers mid-execution
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** chaos-style test; disaster-recovery behavior is operational.
 - **Steps:**
@@ -20,7 +19,6 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ## SP-003 — Per-input snapshots
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** feature-flag behavior; needs visual confirmation.
 - **Steps:**
@@ -31,7 +29,6 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ## SP-004 — Per-epoch snapshots
 
-- **Track:** B
 - **Risk:** M
 - **Why-not-CI:** as above, different granularity.
 - **Steps:**
@@ -42,7 +39,6 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ## SP-005 — Claimer resync after extended offline
 
-- **Track:** B
 - **Risk:** H
 - **Why-not-CI:** resync under real chain conditions; catch-up behavior not exercised in CI.
 - **Steps:**
@@ -53,8 +49,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ## SP-006 — L1 chain reorganization
 
-- **Track:** B (when feasible)
 - **Risk:** H
+- **Feasibility:** run only when a suitable testnet or Anvil reorg setup is available.
 - **Why-not-CI:** hard to simulate in CI; needs a testnet that will reorg.
 - **Steps:**
   1. Process inputs on a testnet susceptible to reorgs (or simulate via Anvil).
