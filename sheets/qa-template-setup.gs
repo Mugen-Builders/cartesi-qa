@@ -244,7 +244,9 @@ function _buildTemplateSheet(ss) {
           .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
   s.setRowHeight(1, 38);
   s.setFrozenRows(1);
-  s.setFrozenColumns(1);
+  // NOTE: setFrozenColumns is applied AFTER all rows are written.
+  // Sheets throws "can't merge frozen and non-frozen columns" if you freeze
+  // column 1 before calling mergeAcross() on the section-divider rows.
 
   // ── Write all rows ──────────────────────────────────────────────────────────
   const configSheet = ss.getSheetByName('Config');
@@ -262,6 +264,9 @@ function _buildTemplateSheet(ss) {
     _writeRow(s, row, id, track, area, name, ownerRange);
     row++;
   });
+
+  // Freeze column 1 now that all merges are done
+  s.setFrozenColumns(1);
 
   // ── Conditional formatting ───────────────────────────────────────────────────
   const lastRow = row - 1;
