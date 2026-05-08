@@ -218,8 +218,15 @@ function _buildConfigSheet(ss) {
 
 function _buildTemplateSheet(ss) {
   let s = ss.getSheetByName('TEMPLATE');
-  if (s) { s.clearContents(); s.clearFormats(); s.clearNotes(); }
-  else    { s = ss.insertSheet('TEMPLATE'); }
+  if (s) {
+    s.setFrozenColumns(0); // must unfreeze before any mergeAcross() calls
+    s.setFrozenRows(0);
+    s.clearContents();
+    s.clearFormats();
+    s.clearNotes();
+  } else {
+    s = ss.insertSheet('TEMPLATE');
+  }
 
   // Column widths
   s.setColumnWidth(COL.ID,     90);
