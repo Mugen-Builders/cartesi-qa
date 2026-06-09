@@ -64,14 +64,14 @@ const TESTS = [
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
   ['OUT-002',  'B', 'Outputs',          'Emit notice at exactly 2MB boundary — accepted, full content retrievable',                                    'devnet'],
-  ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy',                                  'devnet'],
+  ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy',                                  'devnet + testnet'],
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'devnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
-  ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason',                                       'devnet'],
-  ['EGR-002',  'B', 'Egress',           'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference',  'devnet'],
-  ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state',                        'devnet'],
-  ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly',          'devnet'],
+  ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason',                                       'devnet + testnet'],
+  ['EGR-002',  'B', 'Egress',           'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference',  'devnet + testnet'],
+  ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state',                        'devnet + testnet'],
+  ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly',          'devnet + testnet'],
 
   // ── Configuration ────────────────────────────────────────────────────────────
   ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'devnet'],
@@ -89,11 +89,11 @@ const TESTS = [
   ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)',                                        'devnet'],
 
   // ── State Persistence ────────────────────────────────────────────────────────
-  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state',                                     'devnet'],
+  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state',                                     'devnet + testnet'],
   ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly',     'devnet'],
   ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly',     'devnet'],
-  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time',                      'devnet'],
-  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain',  'devnet'],
+  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time',                      'devnet + testnet'],
+  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain',  'devnet + testnet'],
 
   // ── Inspect Service ──────────────────────────────────────────────────────────
   ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed',                                               'devnet'],
@@ -307,8 +307,10 @@ function _buildTemplateSheet(ss) {
       row++;
       lastTrack = track;
     }
-    _writeRow(s, row, id, track, area, name, env, ownerRange);
-    row++;
+    _expandEnvironments(env).forEach((envValue) => {
+      _writeRow(s, row, id, track, area, name, envValue, ownerRange);
+      row++;
+    });
   });
 
   // Freeze column 1 now that all merges are done
@@ -347,6 +349,14 @@ function _writeDivider(s, row, track) {
    .setValue(LABELS[track] || `▸  TRACK ${track}`)
    .setHorizontalAlignment('left');
   s.setRowHeight(row, 26);
+}
+
+function _expandEnvironments(env) {
+  if (typeof env !== 'string') return ['devnet'];
+  if (env.includes('+')) {
+    return env.split('+').map((x) => x.trim()).filter(Boolean);
+  }
+  return [env.trim() || 'devnet'];
 }
 
 // ─── Test row ────────────────────────────────────────────────────────────────────
