@@ -9,7 +9,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-001 — Oversized notice (>2MB)
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
 - **Steps:**
   1. From inside the VM, emit a notice larger than 2MB.
@@ -18,7 +18,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-002 — Boundary notice (exactly 2MB)
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** classic off-by-one territory.
 - **Steps:**
   1. Emit a notice of exactly 2MB.
@@ -27,8 +27,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-003 — Voucher with invalid destination
 
 - **Risk:** M
-- **Environment:** devnet
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** execution failure handling on-chain; needs real testnet.
 - **Steps:**
   1. Generate a voucher targeting a contract/method that will revert.
@@ -38,7 +37,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-004 — Report during advance and during inspect
 
 - **Risk:** L
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** diagnostic visibility; confirm reports surface in both contexts.
 - **Steps:**
   1. Generate a report during advance-state processing.
