@@ -25,7 +25,7 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 - **Expected:** fails with an error message that identifies the missing dependency and suggests a remediation.
 
 
-## CLI-004 — `cartesi create --branch` with invalid branch
+## CLI-003 — `cartesi create --branch` with invalid branch
 
 - **Risk:** L
 - **Why-not-CI:** network-dependent error path, UX-sensitive.

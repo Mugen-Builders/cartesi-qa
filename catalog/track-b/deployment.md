@@ -6,7 +6,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 
 ---
 
-## DEP-002 — Deploy to local Anvil
+## DEP-001 — Deploy to local Anvil
 
 - **Risk:** M
 - **Why-not-CI:** local-devnet path that developers use constantly.
@@ -14,7 +14,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   1. Deploy to a local Anvil chain.
 - **Expected:** deployment completes. App addresses reported correctly.
 
-## DEP-003 — Machine hash matches across environments
+## DEP-002 — Machine hash matches across environments
 
 - **Risk:** H
 - **Why-not-CI:** determinism verification across build environments.
@@ -23,7 +23,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   2. Compare `cartesi hash` output.
 - **Expected:** identical hashes.
 
-## DEP-004 — Deploy to Base Sepolia
+## DEP-003 — Deploy to Base Sepolia
 
 - **Risk:** H
 - **Why-not-CI:** CI deploys to a controlled local environment; Base Sepolia introduces real RPC latency, funding, and finality behavior.
@@ -33,7 +33,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   3. Send one test input and confirm processing reaches expected output.
 - **Expected:** deployment succeeds, contracts are reachable, and the app processes input correctly on Base Sepolia.
 
-## DEP-005 — Deploy to Optimism Sepolia
+## DEP-004 — Deploy to Optimism Sepolia
 
 - **Risk:** H
 - **Why-not-CI:** Optimism Sepolia behavior (RPC/provider differences and chain conditions) must be validated on real infrastructure.
@@ -43,7 +43,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   3. Send one test input and confirm processing reaches expected output.
 - **Expected:** deployment succeeds, contracts are reachable, and the app processes input correctly on Optimism Sepolia.
 
-## DEP-006 — Deploy using forked testnet workflow
+## DEP-005 — Deploy using forked testnet workflow
 
 - **Risk:** H
 - **Why-not-CI:** forked-chain deployment depends on real RPC forking behavior and operator configuration paths that CI does not exercise.

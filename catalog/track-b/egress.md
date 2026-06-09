@@ -8,7 +8,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 
 ---
 
-## EGR-002 — Execute same voucher twice
+## EGR-001 — Execute same voucher twice
 
 - **Risk:** H
 - **Why-not-CI:** replay protection on real L1.
@@ -17,7 +17,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
   2. Attempt to execute the same voucher again.
 - **Expected:** second attempt reverts with a clear reason.
 
-## EGR-003 — Validate notice and execute voucher with `block: latest` vs `finalized`
+## EGR-002 — Validate notice and execute voucher with `block: latest` vs `finalized`
 
 - **Risk:** M
 - **Why-not-CI:** behavior differs by mode; needs human check on both. Applies to both notice validation and voucher execution — confirm both operations work in each mode.
@@ -26,7 +26,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
   2. Execute a voucher with `block: latest` and then with `block: finalized`.
 - **Expected:** all four calls succeed under expected conditions. Document any latency difference between modes.
 
-## EGR-004 — Execute with insufficient L1 gas
+## EGR-003 — Execute with insufficient L1 gas
 
 - **Risk:** M
 - **Why-not-CI:** real-gas failure mode.
@@ -34,7 +34,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
   1. Execute a voucher with a gas limit set below what's needed.
 - **Expected:** clean revert; no inconsistent state on the node.
 
-## EGR-005 — Withdraw more than available balance
+## EGR-004 — Withdraw more than available balance
 
 - **Risk:** M
 - **Why-not-CI:** on-chain revert handling; real L1 state required.

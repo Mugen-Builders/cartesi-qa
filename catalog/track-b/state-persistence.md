@@ -10,7 +10,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 ---
 
-## SP-002 — Hard-kill all containers mid-execution
+## SP-001 — Hard-kill all containers mid-execution
 
 - **Risk:** H
 - **Why-not-CI:** chaos-style test; disaster-recovery behavior is operational.
@@ -19,7 +19,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   2. Restart the node.
 - **Expected:** node recovers to a consistent state. Document any inputs that need to be replayed.
 
-## SP-003 — Per-input snapshots
+## SP-002 — Per-input snapshots
 
 - **Risk:** M
 - **Why-not-CI:** feature-flag behavior; needs visual confirmation.
@@ -29,7 +29,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Kill and restart from an input-level snapshot.
 - **Expected:** snapshots created per input; restart from one resumes correctly.
 
-## SP-004 — Per-epoch snapshots
+## SP-003 — Per-epoch snapshots
 
 - **Risk:** M
 - **Why-not-CI:** as above, different granularity.
@@ -39,7 +39,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Restart from an epoch snapshot.
 - **Expected:** snapshot per epoch; restart resumes correctly.
 
-## SP-005 — Claimer resync after extended offline
+## SP-004 — Claimer resync after extended offline
 
 - **Risk:** H
 - **Why-not-CI:** resync under real chain conditions; catch-up behavior not exercised in CI.
@@ -49,7 +49,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Restart the claimer.
 - **Expected:** claimer catches up without error. Document the catch-up time.
 
-## SP-006 — L1 chain reorganization
+## SP-005 — L1 chain reorganization
 
 - **Risk:** H
 - **Feasibility:** run only when a suitable testnet or Anvil reorg setup is available.

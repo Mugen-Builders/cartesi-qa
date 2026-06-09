@@ -6,7 +6,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ---
 
-## OUT-002 — Oversized notice (>2MB)
+## OUT-001 — Oversized notice (>2MB)
 
 - **Risk:** M
 - **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
@@ -14,7 +14,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   1. From inside the VM, emit a notice larger than 2MB.
 - **Expected:** emission fails with a clear error. HTTP 400 returned. Advancer marks the input rejected. Node does not crash.
 
-## OUT-003 — Boundary notice (exactly 2MB)
+## OUT-002 — Boundary notice (exactly 2MB)
 
 - **Risk:** M
 - **Why-not-CI:** classic off-by-one territory.
@@ -22,7 +22,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   1. Emit a notice of exactly 2MB.
 - **Expected:** accepted. Query returns the full content.
 
-## OUT-004 — Voucher with invalid destination
+## OUT-003 — Voucher with invalid destination
 
 - **Risk:** M
 - **Why-not-CI:** execution failure handling on-chain; needs real testnet.
@@ -31,7 +31,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   2. Attempt execution on-chain.
 - **Expected:** execution reverts cleanly. Voucher state reflects the failure; node remains healthy.
 
-## OUT-005 — Report during advance and during inspect
+## OUT-004 — Report during advance and during inspect
 
 - **Risk:** L
 - **Why-not-CI:** diagnostic visibility; confirm reports surface in both contexts.

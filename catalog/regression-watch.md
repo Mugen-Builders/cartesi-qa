@@ -17,10 +17,10 @@ Known issues and specific behavior questions from prior cycles that need one re-
 
 ## RW-002 — POST /inspect >2MB returns 200 with error body instead of 413
 
-- **Source:** INS-003, observed in last cycle Phase 15 (inspect service)
+- **Source:** INS-002, observed in last cycle Phase 15 (inspect service)
 - **Upstream issue:** file/link when filed
 - **To check:** POST an inspect payload over 2MB; confirm whether the response is now a proper 413 or still returns 200 with an error in the body.
-- **Pass condition:** clear HTTP-level rejection (413 or equivalent). Remove this entry and update INS-003 expected result accordingly.
+- **Pass condition:** clear HTTP-level rejection (413 or equivalent). Remove this entry and update INS-002 expected result accordingly.
 - **Fail condition:** still 200-with-error-body — document the response format and update the upstream issue.
 
 ## RW-003 — Wrong `CARTESI_BLOCKCHAIN_ID` error message missing timestamp and log level

@@ -6,7 +6,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ---
 
-## INP-002 — Deposit with massive `execLayerData`
+## INP-001 — Deposit with massive `execLayerData`
 
 - **Risk:** M
 - **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
@@ -15,7 +15,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   2. Submit on-chain.
 - **Expected:** either accepted and processed correctly, or rejected with a clear error. No silent truncation, no node crash.
 
-## INP-003 — Malformed / empty payload
+## INP-002 — Malformed / empty payload
 
 - **Risk:** M
 - **Why-not-CI:** error-handling UX; node should not crash on garbage input.
@@ -24,7 +24,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   2. Send an input with clearly malformed bytes for the relevant encoding.
 - **Expected:** input reaches the app, app's error response surfaces cleanly. Node stays healthy.
 
-## INP-004 — Same-block inputs from multiple wallets
+## INP-003 — Same-block inputs from multiple wallets
 
 - **Risk:** M
 - **Why-not-CI:** ordering under real mempool conditions differs from deterministic CI.
@@ -32,7 +32,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   1. From two separate wallets, submit inputs in the same block.
 - **Expected:** both inputs processed in the on-chain ordering. No duplication, no dropped input.
 
-## INP-005 — ERC721 with malformed metadata
+## INP-004 — ERC721 with malformed metadata
 
 - **Risk:** L
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.

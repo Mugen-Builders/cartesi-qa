@@ -12,7 +12,7 @@ Tests for running multiple applications on a single node.
 
 ---
 
-## MA-002 — Heavy app does not starve light app
+## MA-001 — Heavy app does not starve light app
 
 - **Risk:** H
 - **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
@@ -21,7 +21,7 @@ Tests for running multiple applications on a single node.
   2. Load both with inputs.
 - **Expected:** light app continues to progress at a reasonable rate while the heavy app processes.
 
-## MA-003 — Restart with multiple apps, many pending inputs
+## MA-002 — Restart with multiple apps, many pending inputs
 
 - **Risk:** H
 - **Why-not-CI:** restart processing order under real workloads; CI's restart tests use small input counts.
