@@ -23,7 +23,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-002 — Per-input snapshots
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** feature-flag behavior; needs visual confirmation.
 - **Steps:**
   1. Configure `--save-snapshot=every-input`.
@@ -34,7 +34,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-003 — Per-epoch snapshots
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** as above, different granularity.
 - **Steps:**
   1. Configure `--save-snapshot=every-epoch`.
