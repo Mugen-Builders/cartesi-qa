@@ -3,6 +3,8 @@
 Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 
 > **Note:** this area requires real testnets and cannot be meaningfully covered by CI. Keep the catalog focused here.
+>
+> **Scope boundary:** this file covers regular voucher/withdrawal execution. Emergency foreclosure recovery withdrawals are covered in `track-b/foreclose.md`.
 
 ---
 

@@ -44,12 +44,15 @@ Every test entry includes:
 | `track-b/egress.md` | Voucher execution, notice validation, L1 interaction |
 | `track-b/configuration.md` | Environment variables, startup validation, feature flags |
 | `track-b/state-persistence.md` | Snapshots, restarts, recovery, reorgs |
-| `track-b/multi-app.md` | Multi-application scheduling, consensus modes |
+| `track-b/multi-app.md` | Multi-application scheduling on a single node |
+| `track-b/quorum.md` | Quorum consensus behavior for one app across multiple validators |
 | `track-b/inspect-service.md` | Inspect API boundaries, concurrency |
 | `track-b/services.md` | Individual service behavior (advancer, claimer, evm-reader, validator) |
 | `track-b/deployment.md` | Cross-environment deploys (self-hosted, fly.io, testnets) |
 | `track-b/jsonrpc-api.md` | JSON-RPC API edge cases, pagination, error code conformance |
 | `track-b/internal-cli.md` | Operator CLI (`cartesi-rollups-cli`): db, app lifecycle, on-chain ops |
+| `track-b/machine-tool.md` | Machine tool (`cartesi-rollups-machine-tool`): replay and accounts-drive proof generation |
+| `track-b/foreclose.md` | Foreclosure lifecycle and emergency withdrawal recovery path |
 
 ## Growing and pruning the catalog
 

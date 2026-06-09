@@ -50,6 +50,17 @@ Run this checklist for every release candidate. One tester completes it end-to-e
   3. Execute an ERC20 withdrawal voucher.
 - **Expected:** all on-chain interactions succeed. Voucher executors receive expected effect. Notice proof accepted by contract.
 
+### EGR-002 — Smoke: emergency withdrawal after foreclosure
+
+- **Risk:** H
+- **Why-not-CI:** this validates the real operator emergency flow (foreclose -> prove drive root -> withdraw) on a live environment, including signer/proof handling that CI does not exercise end-to-end.
+- **Steps:**
+  1. Foreclose a prepared app using the guardian flow.
+  2. Prove accounts-drive root for the frozen finalized boundary.
+  3. Execute one valid emergency account withdrawal.
+  4. Attempt the same account withdrawal again.
+- **Expected:** foreclosure and drive-root proof succeed, first emergency withdrawal succeeds, and second withdrawal attempt fails as already withdrawn.
+
 ---
 
 ## Deployment

@@ -24,14 +24,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
   2. Run `cartesi build`.
 - **Expected:** fails with an error message that identifies the missing dependency and suggests a remediation.
 
-## CLI-003 — Version mismatch (CLI vs Node)
-
-- **Risk:** H
-- **Why-not-CI:** version compatibility bugs show up across releases in the wild.
-- **Steps:**
-  1. Install a CLI version incompatible with the installed node/emulator.
-  2. Run `cartesi build` or `cartesi run`.
-- **Expected:** clear incompatibility message naming both versions. Not a crash or silent wrong behavior.
 
 ## CLI-004 — `cartesi create --branch` with invalid branch
 

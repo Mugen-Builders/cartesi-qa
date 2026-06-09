@@ -1,7 +1,6 @@
 # Charter: Misuse the CLI
 
 **Time box:** 2 hours
-**Typical lead:** Any tester
 **Last revised:** (update when you modify this charter)
 
 ## Theme

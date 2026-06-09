@@ -1,7 +1,6 @@
 # Charter: Break Multi-App
 
 **Time box:** 2 hours
-**Typical lead:** Experienced tester
 **Last revised:** (update when you modify this charter)
 
 ## Theme

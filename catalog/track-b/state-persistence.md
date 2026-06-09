@@ -5,6 +5,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 > **Note:** manual chaos testing finds things CI rarely exercises — partial shutdowns, recovery ordering, resync edge cases.
 >
 > **CI coverage:** `TestRestart` and `TestSnapshotPolicy` exist in the integration suite but run **only when the test framework manages the node directly** (`isNodeSelfManaged()`). In the standard compose-based CI run these tests are skipped. Treat all entries here as active until CI's compose run is confirmed to execute them.
+>
+> **Scope boundary:** foreclosure-specific persistence checks (foreclose cursor atomicity, accounts-drive-proof catch-up, emergency withdrawal catch-up) are covered in `track-b/foreclose.md`.
 
 ---
 

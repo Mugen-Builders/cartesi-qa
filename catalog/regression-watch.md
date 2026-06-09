@@ -7,13 +7,13 @@ Known issues and specific behavior questions from prior cycles that need one re-
 
 ---
 
-## RW-001 — jsonrpc-api does not shut down gracefully
+## RW-001 — jsonrpc-api shutdown log is missing
 
 - **Source:** SVC-002, observed in last cycle during Phase 2 (clean restarts)
 - **Upstream issue:** file/link when filed
-- **To check:** send a controlled shutdown signal to jsonrpc-api; confirm whether shutdown is now clean.
-- **Pass condition:** clean shutdown sequence logged. Remove this entry.
-- **Fail condition:** still ungraceful — update the upstream issue reference.
+- **To check:** send a controlled shutdown signal to jsonrpc-api; confirm whether shutdown emits a stop log entry consistent with other services.
+- **Pass condition:** explicit shutdown log entry is present. Remove this entry.
+- **Fail condition:** service still stops without a shutdown log line — update the upstream issue reference.
 
 ## RW-002 — POST /inspect >2MB returns 200 with error body instead of 413
 
@@ -31,13 +31,13 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **Pass condition:** error output includes both. Remove this entry and update CFG-004 expected result.
 - **Fail condition:** still missing — note which fields are absent and update the upstream issue.
 
-## RW-004 — `CARTESI_ADVANCER_POLLING_INTERVAL` default does not match `--help`
+## RW-004 — `CARTESI_ADVANCER_POLLING_INTERVAL` help text default is outdated
 
 - **Source:** CFG-006, observed in last cycle (`--help` reports 7s, node started with 3s on Base Sepolia)
 - **Upstream issue:** file/link when filed
 - **To check:** start node without setting `CARTESI_ADVANCER_POLLING_INTERVAL`; compare the effective interval in logs against `cartesi-rollups-advancer --help`.
-- **Pass condition:** they match. Remove this entry.
-- **Fail condition:** still a mismatch — record both values and update the upstream issue.
+- **Pass condition:** help text matches the runtime default. Remove this entry.
+- **Fail condition:** mismatch remains — record both values and update the upstream issue/documentation task.
 
 ## RW-005 — evm-reader reads inputs out of order after dirty restart
 
@@ -54,3 +54,20 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** hard-restart the database while advancer has active connections and pending inputs; confirm advancer resumes automatically.
 - **Pass condition:** advancer reconnects and resumes without manual intervention. Remove this entry.
 - **Fail condition:** advancer still halts — document whether a manual restart is required and update the upstream issue.
+
+## RW-007 — evm-reader drifts behind OP Sepolia head when RPC latency is high
+
+- **Source:** Hosted-node observation (Fly.io OP Sepolia) plus local delayed-RPC reproduction.
+- **Upstream issue:** file/link when filed
+- **To check:** compare `chain_head - last_input_check_block` over time on hosted nodes. Run same check on OP Sepolia and Base Sepolia.
+- **Pass condition:** lag stays bounded and non-growing under steady load (for example, does not keep increasing over consecutive checks). Remove this entry.
+- **Fail condition:** lag grows persistently on OP Sepolia while Base remains stable; likely infra-distance effect (OP server far from RPC / high RTT). Record RTT and lag trend, update upstream issue.
+- **Operator note:** temporary mitigation is service restart (catch-up), but drift may return if RPC latency remains high.
+
+---
+
+## Notes from feedback (not active regressions)
+
+- Multi-app restart processing is batch-based by design (including finite resync work), not strict one-by-one round robin; this should not be tracked as a regression by itself.
+- If restart fairness is a concern for long-running inputs, tune batch size smaller (including `1`) and use epoch snapshots to reduce initial sync pressure.
+

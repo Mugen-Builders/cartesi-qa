@@ -38,6 +38,20 @@ Pick catalog subsets based on risk:
 | Outputs | Standard coverage | (tester) | Week 1 |
 | ... | | | |
 
+#### QA Focus Lanes (lifecycle-first)
+
+Use this table for features where lifecycle correctness matters more than command success.
+
+| Lane | What to test | Expected signal | Owner | Target |
+|---|---|---|---|---|
+| Staging | Authority submit/stage/accept timing | `CLAIM_COMPUTED -> CLAIM_SUBMITTED -> CLAIM_STAGED -> CLAIM_ACCEPTED` | (tester) | Week 1 |
+| Quorum | Majority staging and divergence classification | No false `INOPERABLE` for honest pending vote differences | (tester) | Week 1 |
+| Foreclosure | Foreclose before/during/after claim work | App becomes `FORECLOSED`; impossible non-accepted work becomes `CLAIM_FORECLOSED` | (tester) | Week 1 |
+| Emergency withdrawals | Prove drive root, withdraw accounts, restart scanner | Rows persist once, cursors advance with rows, API reads match | (tester) | Week 1 |
+| Ops paths | Bad signer, bad proof, bad/missing config | Clear errors, no hidden partial state | (tester) | Week 1 |
+
+> **Scope note:** if any lane is out of scope (for example PRT-specific behavior), list it explicitly below in **Out of scope**.
+
 ### Track C — Exploratory Charters
 Pick 2-3 charters from `charters/`:
 

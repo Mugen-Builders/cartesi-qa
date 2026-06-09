@@ -297,15 +297,16 @@ function _writeDivider(s, row, track) {
   const BG = { 'A': COLOR.divA, 'B': COLOR.divB, 'C': COLOR.divC, 'Regression': COLOR.divReg };
 
   const r = s.getRange(row, 1, 1, 8);
-  r.mergeAcross();
-  r.setValue(LABELS[track] || `▸  TRACK ${track}`)
-   .setFontWeight('bold')
+  r.setBackground(BG[track] || '#555555')
    .setFontColor('#ffffff')
-   .setBackground(BG[track] || '#555555')
+   .setFontWeight('bold')
    .setFontSize(9)
    .setVerticalAlignment('middle')
-   .setHorizontalAlignment('left')
    .setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  // Put label in col 1 only — no merge, so column-freeze works
+  s.getRange(row, 1)
+   .setValue(LABELS[track] || `▸  TRACK ${track}`)
+   .setHorizontalAlignment('left');
   s.setRowHeight(row, 26);
 }
 

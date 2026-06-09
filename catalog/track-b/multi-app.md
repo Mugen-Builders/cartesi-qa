@@ -1,12 +1,18 @@
-# Multi-App & Consensus
+# Multi-App
 
-Tests for running multiple applications on a single node, consensus modes (Authority, Quorum, PRT).
+Tests for running multiple applications on a single node.
 
 > **Note:** the prior cycle found a fair-scheduling regression here (heavy app starving light app on restart). This area is under-tested by CI — prioritize it.
 >
 > **CI covers:** `TestMultiAppIsolation` verifies that two apps deployed on one node process inputs independently, with isolated outputs, isolated reports, cross-contamination checks, and independent L1 execution. Manual tests focus on what CI's controlled Anvil environment cannot assert: real scheduling fairness under load, and restart ordering with real-world workloads.
+>
+> **Consensus-specific tests:** Quorum behavior lives in `track-b/quorum.md`.
+>
+> **Cycle note:** PRT-specific paths are out of scope for this cycle.
 
----## MA-002 — Heavy app does not starve light app
+---
+
+## MA-002 — Heavy app does not starve light app
 
 - **Risk:** H
 - **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
@@ -27,4 +33,4 @@ Tests for running multiple applications on a single node, consensus modes (Autho
 
 ---
 
-<!-- Add Authority / Quorum / PRT consensus tests here as they come into scope. -->
+<!-- Add more multi-app scheduling tests here as they come into scope. -->

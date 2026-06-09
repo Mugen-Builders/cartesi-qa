@@ -1,0 +1,2352 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contracts v3 PR - Rollups Node Presentation</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #637083;
+      --paper: #f7f8f3;
+      --panel: #ffffff;
+      --line: #d9decf;
+      --teal: #0e7c7b;
+      --teal-soft: #d8f0ea;
+      --coral: #d9664f;
+      --coral-soft: #f7dfd7;
+      --gold: #c89528;
+      --gold-soft: #f4e7c4;
+      --green: #3e7c47;
+      --green-soft: #dfeedd;
+      --plum: #6f4c7a;
+      --plum-soft: #eadfec;
+      --blue: #376996;
+      --blue-soft: #dce8f4;
+      --danger: #a53c3c;
+      --shadow: 0 22px 70px rgba(31, 43, 38, 0.16);
+      --radius: 8px;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(14, 124, 123, 0.08), transparent 32%),
+        linear-gradient(315deg, rgba(216, 102, 79, 0.08), transparent 30%),
+        var(--paper);
+      font-family: var(--sans);
+      letter-spacing: 0;
+      overflow: hidden;
+    }
+
+    body.theme-dark {
+      --ink: #eafff9;
+      --muted: #96aaa8;
+      --paper: #07100f;
+      --panel: rgba(9, 24, 23, 0.86);
+      --line: rgba(119, 241, 218, 0.18);
+      --teal: #55f2d2;
+      --teal-soft: rgba(85, 242, 210, 0.16);
+      --coral: #ff7e67;
+      --coral-soft: rgba(255, 126, 103, 0.17);
+      --gold: #ffd166;
+      --gold-soft: rgba(255, 209, 102, 0.15);
+      --green: #9af29b;
+      --green-soft: rgba(154, 242, 155, 0.15);
+      --plum: #d98cff;
+      --plum-soft: rgba(217, 140, 255, 0.16);
+      --blue: #79b7ff;
+      --blue-soft: rgba(121, 183, 255, 0.15);
+      --danger: #ff6b6b;
+      --shadow: 0 0 0 1px rgba(85, 242, 210, 0.08), 0 24px 80px rgba(0, 0, 0, 0.42);
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 14%, rgba(85, 242, 210, 0.18), transparent 26%),
+        radial-gradient(circle at 84% 20%, rgba(255, 126, 103, 0.13), transparent 28%),
+        radial-gradient(circle at 76% 82%, rgba(217, 140, 255, 0.12), transparent 28%),
+        linear-gradient(135deg, #06100f 0%, #0c1713 44%, #140f17 100%);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    body.theme-dark .deck::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(85, 242, 210, 0.075) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(85, 242, 210, 0.075) 1px, transparent 1px),
+        linear-gradient(135deg, transparent 0 46%, rgba(255, 209, 102, 0.06) 46% 47%, transparent 47% 100%);
+      background-size: 42px 42px, 42px 42px, 180px 180px;
+      mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 88%, transparent 100%);
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      color: rgba(23, 32, 42, 0.82);
+      font-size: 13px;
+    }
+
+    body.theme-dark .topbar {
+      color: rgba(234, 255, 249, 0.82);
+      text-shadow: 0 0 18px rgba(85, 242, 210, 0.28);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    .cartesi-mark {
+      width: 26px;
+      height: 26px;
+      flex: 0 0 auto;
+      color: currentColor;
+    }
+
+    body.theme-dark .cartesi-mark {
+      filter: drop-shadow(0 0 12px rgba(85, 242, 210, 0.32));
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    body.theme-dark .meta {
+      color: rgba(157, 232, 220, 0.74);
+    }
+
+    .progress {
+      position: absolute;
+      z-index: 11;
+      left: 0;
+      right: 0;
+      top: 54px;
+      height: 3px;
+      background: rgba(23, 32, 42, 0.09);
+    }
+
+    body.theme-dark .progress {
+      background: rgba(85, 242, 210, 0.1);
+      box-shadow: 0 0 24px rgba(85, 242, 210, 0.12);
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--teal), var(--coral), var(--gold));
+      transition: width 160ms ease;
+    }
+
+    .slides {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 78px 76px 68px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    .canvas {
+      width: min(1180px, calc(100vw - 128px));
+      height: min(700px, calc(100vh - 150px));
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 22px;
+    }
+
+    .title .canvas {
+      height: min(720px, calc(100vh - 150px));
+    }
+
+    .eyebrow {
+      color: var(--teal);
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 68px;
+      line-height: 0.95;
+      letter-spacing: 0;
+      max-width: 980px;
+    }
+
+    h2 {
+      font-size: 46px;
+      line-height: 1;
+      letter-spacing: 0;
+      max-width: 1050px;
+    }
+
+    h1 code,
+    h2 code {
+      font-size: 0.82em;
+      line-height: 0.98;
+      vertical-align: baseline;
+    }
+
+    h3 {
+      font-size: 21px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .lead {
+      max-width: 890px;
+      color: #3e4a56;
+      font-size: 23px;
+      line-height: 1.38;
+    }
+
+    body.theme-dark .lead {
+      color: rgba(234, 255, 249, 0.78);
+    }
+
+    .body-grid {
+      display: grid;
+      gap: 18px;
+      min-height: 0;
+    }
+
+    .content-cards {
+      align-content: start;
+      align-items: start;
+    }
+
+    .cols-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .cols-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      min-width: 0;
+    }
+
+    body.theme-dark .panel {
+      background:
+        linear-gradient(135deg, rgba(85, 242, 210, 0.08), transparent 32%),
+        linear-gradient(315deg, rgba(255, 126, 103, 0.05), transparent 30%),
+        var(--panel);
+      border-color: var(--line);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(234, 255, 249, 0.06);
+      backdrop-filter: blur(10px);
+    }
+
+    .panel.flat {
+      box-shadow: none;
+      background: rgba(255, 255, 255, 0.62);
+    }
+
+    body.theme-dark .panel.flat {
+      background: rgba(9, 24, 23, 0.62);
+      box-shadow: inset 0 0 0 1px rgba(85, 242, 210, 0.12);
+    }
+
+    .panel.dark {
+      color: #f8faf6;
+      background: #202a2b;
+      border-color: rgba(255, 255, 255, 0.14);
+    }
+
+    .panel.dark .muted,
+    .panel.dark .small {
+      color: rgba(248, 250, 246, 0.74);
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .list li {
+      position: relative;
+      padding-left: 18px;
+      color: #34404c;
+      font-size: 18px;
+      line-height: 1.33;
+    }
+
+    body.theme-dark .list li {
+      color: rgba(234, 255, 249, 0.86);
+    }
+
+    .list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.65em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--teal);
+    }
+
+    .dark .list li {
+      color: rgba(248, 250, 246, 0.88);
+    }
+
+    .dark .list li::before {
+      background: var(--gold);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+
+    .tag-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: #25313a;
+      background: #eef2ea;
+      border: 1px solid #d8decf;
+      font-size: 13px;
+      font-weight: 750;
+      white-space: nowrap;
+    }
+
+    body.theme-dark .tag {
+      color: rgba(234, 255, 249, 0.9);
+      background: rgba(10, 30, 29, 0.82);
+      border-color: rgba(85, 242, 210, 0.22);
+      box-shadow: inset 0 0 18px rgba(85, 242, 210, 0.06);
+    }
+
+    .tag.teal { background: var(--teal-soft); border-color: #a7d6cd; }
+    .tag.coral { background: var(--coral-soft); border-color: #edb5a8; }
+    .tag.gold { background: var(--gold-soft); border-color: #e6ce91; }
+    .tag.green { background: var(--green-soft); border-color: #b9d8b5; }
+    .tag.plum { background: var(--plum-soft); border-color: #d1bad6; }
+    .tag.blue { background: var(--blue-soft); border-color: #b9cfe4; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .kpi {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #ffffff;
+      border: 1px solid var(--line);
+    }
+
+    body.theme-dark .kpi {
+      background: rgba(9, 24, 23, 0.86);
+      border-color: var(--line);
+      box-shadow: inset 0 0 22px rgba(85, 242, 210, 0.05);
+    }
+
+    .kpi strong {
+      display: block;
+      color: var(--ink);
+      font-size: 33px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .kpi span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .compare {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      height: 100%;
+    }
+
+    .compare .panel {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .before {
+      border-top: 6px solid var(--coral);
+    }
+
+    .now {
+      border-top: 6px solid var(--teal);
+    }
+
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: var(--radius);
+      background: #f4f7ef;
+      border: 1px solid #d8decf;
+      font-size: 17px;
+      line-height: 1.35;
+    }
+
+    body.theme-dark .callout {
+      color: rgba(234, 255, 249, 0.86);
+      background: rgba(85, 242, 210, 0.08);
+      border-color: rgba(85, 242, 210, 0.22);
+      box-shadow: inset 0 0 28px rgba(85, 242, 210, 0.04);
+    }
+
+    .callout.warn {
+      background: #fff5e5;
+      border-color: #ebcc8a;
+    }
+
+    body.theme-dark .callout.warn {
+      background: rgba(255, 209, 102, 0.11);
+      border-color: rgba(255, 209, 102, 0.28);
+    }
+
+    .callout.danger {
+      background: #fae8e5;
+      border-color: #e0aaa2;
+    }
+
+    body.theme-dark .callout.danger {
+      background: rgba(255, 107, 107, 0.12);
+      border-color: rgba(255, 107, 107, 0.28);
+    }
+
+    code,
+    .code {
+      font-family: var(--mono);
+      font-size: 0.92em;
+      color: #23313f;
+      background: rgba(23, 32, 42, 0.06);
+      border: 1px solid rgba(23, 32, 42, 0.07);
+      border-radius: 6px;
+      padding: 2px 6px;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    body.theme-dark code,
+    body.theme-dark .code {
+      color: #d7fff6;
+      background: rgba(85, 242, 210, 0.1);
+      border-color: rgba(85, 242, 210, 0.18);
+    }
+
+    pre {
+      margin: 0;
+      overflow: auto;
+      padding: 16px;
+      border-radius: var(--radius);
+      color: #f7fbf4;
+      background: #202a2b;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      font-family: var(--mono);
+      font-size: 15px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    body.theme-dark pre {
+      color: #eafff9;
+      background: #050c0b;
+      border-color: rgba(85, 242, 210, 0.22);
+      box-shadow: inset 0 0 34px rgba(85, 242, 210, 0.05);
+    }
+
+    .diagram {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    body.theme-dark .diagram {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(85, 242, 210, 0.13), transparent 32%),
+        radial-gradient(circle at 85% 76%, rgba(255, 126, 103, 0.1), transparent 30%),
+        rgba(5, 13, 12, 0.82);
+      border-color: rgba(85, 242, 210, 0.2);
+      box-shadow: inset 0 0 44px rgba(85, 242, 210, 0.06), var(--shadow);
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .svg-label {
+      font-family: var(--sans);
+      font-size: 18px;
+      font-weight: 800;
+      fill: var(--ink);
+    }
+
+    .svg-state-label {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 900;
+      fill: var(--ink);
+    }
+
+    .svg-small {
+      font-family: var(--sans);
+      font-size: 13px;
+      fill: #536070;
+    }
+
+    body.theme-dark .svg-small {
+      fill: rgba(194, 226, 221, 0.8);
+    }
+
+    .svg-code {
+      font-family: var(--mono);
+      font-size: 13px;
+      fill: #27333d;
+    }
+
+    .svg-code.small {
+      font-size: 11px;
+    }
+
+    body.theme-dark .svg-code {
+      fill: rgba(219, 255, 247, 0.86);
+    }
+
+    .swimlane {
+      fill: rgba(255, 255, 255, 0.64);
+      stroke: #d6dccd;
+      stroke-width: 1;
+    }
+
+    body.theme-dark .swimlane {
+      fill: rgba(9, 24, 23, 0.56);
+      stroke: rgba(85, 242, 210, 0.22);
+    }
+
+    .node {
+      rx: 8;
+      ry: 8;
+      stroke-width: 1.5;
+    }
+
+    .node.teal { fill: #e1f3ef; stroke: #73bcb0; }
+    .node.coral { fill: #f8e3dc; stroke: #df9a88; }
+    .node.gold { fill: #f8ebc9; stroke: #d5b05c; }
+    .node.green { fill: #e4f0df; stroke: #94bd8e; }
+    .node.plum { fill: #efe5f1; stroke: #bd9cc6; }
+    .node.blue { fill: #e1ebf5; stroke: #8fb2d4; }
+    .node.gray { fill: #eef1ed; stroke: #c2cabd; }
+    .node.dark { fill: #253033; stroke: #43585d; }
+
+    body.theme-dark .node.teal { fill: rgba(85, 242, 210, 0.14); stroke: rgba(85, 242, 210, 0.72); }
+    body.theme-dark .node.coral { fill: rgba(255, 126, 103, 0.13); stroke: rgba(255, 126, 103, 0.72); }
+    body.theme-dark .node.gold { fill: rgba(255, 209, 102, 0.13); stroke: rgba(255, 209, 102, 0.72); }
+    body.theme-dark .node.green { fill: rgba(154, 242, 155, 0.13); stroke: rgba(154, 242, 155, 0.68); }
+    body.theme-dark .node.plum { fill: rgba(217, 140, 255, 0.14); stroke: rgba(217, 140, 255, 0.7); }
+    body.theme-dark .node.blue { fill: rgba(121, 183, 255, 0.13); stroke: rgba(121, 183, 255, 0.72); }
+    body.theme-dark .node.gray { fill: rgba(148, 166, 160, 0.14); stroke: rgba(194, 226, 221, 0.44); }
+    body.theme-dark .node.dark { fill: rgba(4, 12, 11, 0.82); stroke: rgba(85, 242, 210, 0.34); }
+
+    body.theme-dark svg rect[fill="#ffffff"],
+    body.theme-dark svg rect[fill="#eff3eb"],
+    body.theme-dark svg rect[fill="#fff5e5"] {
+      fill: rgba(9, 24, 23, 0.78);
+      stroke: rgba(85, 242, 210, 0.18);
+    }
+
+    body.theme-dark svg text[fill="#f8faf6"],
+    body.theme-dark svg text[fill="#d5ded5"],
+    body.theme-dark svg text[fill="#d8e2d8"],
+    body.theme-dark svg text[fill="#e8f1e8"] {
+      fill: rgba(234, 255, 249, 0.9);
+    }
+
+    .arrow {
+      stroke: #536070;
+      stroke-width: 2.1;
+      fill: none;
+      marker-end: url(#arrow);
+    }
+
+    body.theme-dark #arrow path {
+      fill: rgba(85, 242, 210, 0.9);
+    }
+
+    body.theme-dark .arrow {
+      stroke: rgba(170, 207, 201, 0.76);
+      filter: drop-shadow(0 0 4px rgba(85, 242, 210, 0.28));
+    }
+
+    .arrow.teal { stroke: var(--teal); }
+    .arrow.coral { stroke: var(--coral); }
+    .arrow.gold { stroke: var(--gold); }
+    .arrow.green { stroke: var(--green); }
+    .arrow.plum { stroke: var(--plum); }
+    .arrow.dashed {
+      stroke-dasharray: 6 6;
+    }
+
+    .state {
+      filter: drop-shadow(0 10px 18px rgba(31, 43, 38, 0.10));
+    }
+
+    body.theme-dark .state {
+      filter: drop-shadow(0 0 16px rgba(85, 242, 210, 0.16));
+    }
+
+    .notes {
+      display: none;
+      position: absolute;
+      left: 50%;
+      bottom: 58px;
+      width: min(980px, calc(100vw - 150px));
+      transform: translateX(-50%);
+      padding: 14px 18px;
+      color: #25313a;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #d7ddce;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-size: 15px;
+      line-height: 1.38;
+    }
+
+    body.theme-dark .notes {
+      color: rgba(234, 255, 249, 0.88);
+      background: rgba(5, 13, 12, 0.96);
+      border-color: rgba(85, 242, 210, 0.22);
+    }
+
+    body.show-notes .slide.active .notes {
+      display: block;
+    }
+
+    .controls {
+      position: absolute;
+      z-index: 12;
+      right: 24px;
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.76);
+      border: 1px solid rgba(23, 32, 42, 0.12);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 28px rgba(31, 43, 38, 0.12);
+    }
+
+    body.theme-dark .controls {
+      background: rgba(5, 13, 12, 0.78);
+      border-color: rgba(85, 242, 210, 0.2);
+      box-shadow: 0 0 34px rgba(85, 242, 210, 0.12);
+    }
+
+    .controls button {
+      width: 38px;
+      height: 34px;
+      border: 1px solid #cdd5c5;
+      border-radius: 7px;
+      color: var(--ink);
+      background: #ffffff;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    body.theme-dark .controls button {
+      color: rgba(234, 255, 249, 0.92);
+      background: rgba(8, 24, 22, 0.88);
+      border-color: rgba(85, 242, 210, 0.26);
+    }
+
+    body.theme-dark .controls button.active {
+      color: #06100f;
+      background: var(--teal);
+      border-color: var(--teal);
+      box-shadow: 0 0 20px rgba(85, 242, 210, 0.42);
+    }
+
+    .controls button:hover {
+      border-color: var(--teal);
+    }
+
+    .counter {
+      min-width: 68px;
+      text-align: center;
+      font-family: var(--mono);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .table {
+      display: grid;
+      gap: 0;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+    }
+
+    body.theme-dark .table {
+      background: rgba(9, 24, 23, 0.78);
+      border-color: var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr 1.2fr;
+      border-top: 1px solid var(--line);
+    }
+
+    .table-row:first-child {
+      border-top: 0;
+      background: #eff3eb;
+      font-weight: 850;
+    }
+
+    body.theme-dark .table-row:first-child {
+      background: rgba(85, 242, 210, 0.1);
+    }
+
+    .table-cell {
+      padding: 12px 14px;
+      border-left: 1px solid var(--line);
+      font-size: 15px;
+      line-height: 1.32;
+    }
+
+    body.theme-dark .table-cell {
+      color: rgba(234, 255, 249, 0.86);
+      border-left-color: var(--line);
+    }
+
+    .table-cell:first-child {
+      border-left: 0;
+    }
+
+    .review-table {
+      display: grid;
+      grid-template-columns: 0.9fr 1.45fr 1.25fr;
+      align-self: start;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    body.theme-dark .review-table {
+      background:
+        linear-gradient(135deg, rgba(85, 242, 210, 0.08), transparent 32%),
+        rgba(5, 13, 12, 0.72);
+      border-color: var(--line);
+    }
+
+    .review-cell {
+      min-width: 0;
+      padding: 13px 16px;
+      border-top: 1px solid var(--line);
+      border-left: 1px solid var(--line);
+      color: #34404c;
+      font-size: 14px;
+      line-height: 1.33;
+    }
+
+    body.theme-dark .review-cell {
+      color: rgba(234, 255, 249, 0.86);
+    }
+
+    .review-cell:nth-child(3n + 1) {
+      border-left: 0;
+    }
+
+    .review-cell:nth-child(-n + 3) {
+      border-top: 0;
+      color: var(--ink);
+      background: #eff3eb;
+      font-weight: 850;
+    }
+
+    body.theme-dark .review-cell:nth-child(-n + 3) {
+      background: rgba(85, 242, 210, 0.1);
+    }
+
+    .review-area strong,
+    .review-paths strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    .review-area span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.28;
+    }
+
+    .review-paths {
+      display: grid;
+      gap: 6px;
+    }
+
+    .review-paths code {
+      display: block;
+      width: 100%;
+      padding: 5px 7px;
+      font-size: 12px;
+      line-height: 1.22;
+      overflow-wrap: anywhere;
+    }
+
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mini {
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, 0.72);
+    }
+
+    body.theme-dark .mini {
+      background: rgba(5, 13, 12, 0.52);
+      border-color: var(--line);
+    }
+
+    .mini strong {
+      display: block;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .mini span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .step {
+      position: relative;
+      padding: 18px 16px;
+      border-radius: var(--radius);
+      background: #ffffff;
+      border: 1px solid var(--line);
+      min-height: 148px;
+    }
+
+    body.theme-dark .step {
+      background: rgba(9, 24, 23, 0.86);
+      border-color: var(--line);
+      box-shadow: inset 0 0 26px rgba(85, 242, 210, 0.05);
+    }
+
+    .step::after {
+      content: ">";
+      position: absolute;
+      top: 50%;
+      right: -12px;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-weight: 900;
+    }
+
+    .step:last-child::after {
+      content: "";
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--teal);
+      font-weight: 900;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    body.theme-dark .step-num {
+      color: #06100f;
+      background: var(--teal);
+      box-shadow: 0 0 20px rgba(85, 242, 210, 0.38);
+    }
+
+    .step h3 {
+      font-size: 18px;
+      margin-bottom: 7px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .source-map {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .path {
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
+
+    body.theme-dark .path {
+      color: rgba(194, 226, 221, 0.82);
+    }
+
+    @media (max-width: 900px) {
+      .slide {
+        padding: 74px 24px 66px;
+      }
+
+      .canvas {
+        width: calc(100vw - 42px);
+        height: calc(100vh - 142px);
+      }
+
+      h1 {
+        font-size: 42px;
+      }
+
+      h2 {
+        font-size: 32px;
+      }
+
+      .lead {
+        font-size: 18px;
+      }
+
+      .cols-2,
+      .cols-3,
+      .cols-4,
+      .compare,
+      .source-map,
+      .kpi-grid,
+      .timeline {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .meta {
+        display: none;
+      }
+
+      .controls {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        height: auto;
+        overflow: visible;
+        background: #fff;
+      }
+
+      .topbar,
+      .progress,
+      .controls,
+      .notes {
+        display: none !important;
+      }
+
+      .deck,
+      .slides {
+        position: static;
+        height: auto;
+        overflow: visible;
+      }
+
+      .slide,
+      .slide.active {
+        position: relative;
+        display: flex;
+        page-break-after: always;
+        height: 100vh;
+        padding: 48px;
+      }
+
+      .canvas {
+        width: 100%;
+        height: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#536070"></path>
+        </marker>
+      </defs>
+    </svg>
+    <header class="topbar">
+      <div class="brand">
+        <svg class="cartesi-mark" viewBox="0 0 33 32" role="img" aria-label="Cartesi logo" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M7.99837 9.18897L17.006 0L21.0512 9.87356L16.6469 14.3662L14.822 9.18897H7.99837ZM0 10.9693L3.54667 21.0317H10.1107L15.2656 15.7744L13.5718 10.9693H0ZM17.3036 16.2302L22.4632 10.9693H29.0272L32.5739 21.0317H18.9965L17.3036 16.2302ZM15.5679 32L11.5227 22.1264L15.9233 17.6385L17.7464 22.811H24.5774L15.5679 32Z"></path>
+        </svg>
+        <span>Cartesi Rollups Node</span>
+      </div>
+      <div class="meta">
+        <span>feature/bump-contracts-3.0</span>
+        <span>origin/next/2.0...HEAD</span>
+      </div>
+    </header>
+    <div class="progress"><span id="progress"></span></div>
+
+    <main class="slides" id="slides">
+      <section class="slide title active">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Current PR walkthrough</div>
+            <h1>Contracts v3 changed the node contract with L1</h1>
+            <p class="lead" style="margin-top: 24px;">
+              This deck explains the PR changes since <code>origin/next/2.0</code> for development,
+              QA, and operations: what the contracts changed, what the node now does, and what must be tested before deploy.
+            </p>
+          </div>
+          <div class="body-grid cols-3" style="align-self: end;">
+            <div class="panel flat">
+              <h3>For development</h3>
+              <ul class="list">
+                <li>Understand the new lifecycle model.</li>
+                <li>Review the claim and foreclosure code paths.</li>
+              </ul>
+            </div>
+            <div class="panel flat">
+              <h3>For QA</h3>
+              <ul class="list">
+                <li>Test state transitions, recovery, and edge cases.</li>
+                <li>Exercise tools end to end.</li>
+              </ul>
+            </div>
+            <div class="panel flat">
+              <h3>For ops</h3>
+              <ul class="list">
+                <li>Update contract addresses and config.</li>
+                <li>Deploy with a clear rollback and DB plan.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Keep the opening short. The main message is that this is not only a binding bump. It changes how the node
+          interprets L1 truth, how claims become final, and how applications move after foreclosure.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">PR size</div>
+            <h2>What changed since <code>origin/next/2.0</code></h2>
+          </div>
+          <div class="body-grid" style="align-content: start;">
+            <div class="kpi-grid">
+              <div class="kpi"><strong>17</strong><span>commits on this branch</span></div>
+              <div class="kpi"><strong>194</strong><span>files changed</span></div>
+              <div class="kpi"><strong>29,960</strong><span>insertions</span></div>
+              <div class="kpi"><strong>3,095</strong><span>deletions</span></div>
+            </div>
+            <div class="body-grid cols-2">
+              <div class="panel">
+                <h3>Contract artifacts</h3>
+                <ul class="list">
+                  <li><code>rollups-contracts</code>: <code>2.2.0</code> -> <code>3.0.0-alpha.6</code></li>
+                  <li><code>dave</code>: <code>2.1.1</code> -> <code>3.0.0-alpha.3</code></li>
+                  <li>Generated bindings refreshed under <code>pkg/contracts/</code>.</li>
+                </ul>
+              </div>
+              <div class="panel">
+                <h3>Main implementation areas</h3>
+                <div class="tag-row" style="margin-top: 14px;">
+                  <span class="tag teal">claim staging</span>
+                  <span class="tag coral">foreclosure</span>
+                  <span class="tag gold">withdrawals</span>
+                  <span class="tag green">application status</span>
+                  <span class="tag blue">JSON-RPC</span>
+                  <span class="tag plum">new CLI tools</span>
+                  <span class="tag">integration tests</span>
+                </div>
+                <p class="callout">
+                  The branch is a protocol integration PR. The review should focus on lifecycle correctness, not only compile errors.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Numbers came from git diff against origin/next/2.0. This helps the team understand why broad QA coverage is needed.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Contracts v3</div>
+            <h2>The important contract changes we had to model</h2>
+          </div>
+          <div class="body-grid cols-3 content-cards">
+            <div class="panel">
+              <h3>Claim staging</h3>
+              <ul class="list">
+                <li>Claims now move through <code>UNSTAGED</code>, <code>STAGED</code>, then <code>ACCEPTED</code>.</li>
+                <li><code>acceptClaim</code> is a separate transaction after <code>claimStagingPeriod</code>.</li>
+                <li>Events include the machine Merkle root.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Foreclosure and withdrawal</h3>
+              <ul class="list">
+                <li>Each app has a <code>WithdrawalConfig</code>.</li>
+                <li>The guardian can call <code>foreclose()</code>.</li>
+                <li>After foreclosure: prove accounts-drive root, then withdraw accounts.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>New surface</h3>
+              <ul class="list">
+                <li>Per-app claim counters.</li>
+                <li><code>getLastFinalizedMachineMerkleRoot(app)</code>.</li>
+                <li>Quorum factory and quorum deployment support.</li>
+                <li>Version tags on contracts.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          For non-native speakers, keep this concrete: what contract functions/events changed, and what node behavior followed.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Mental model</div>
+            <h2>Before: one line to finality. Now: staged finality plus emergency exit.</h2>
+          </div>
+          <div class="compare">
+            <div class="panel before">
+              <h3>Before this PR</h3>
+              <ul class="list">
+                <li>Application lifecycle was one enum: <code>ENABLED</code>, <code>DISABLED</code>, <code>FAILED</code>, <code>INOPERABLE</code>.</li>
+                <li>Authority/Quorum claims were mostly tracked as submit then accept.</li>
+                <li>No local model for post-foreclosure observation.</li>
+                <li>No withdrawal event table or withdrawal API.</li>
+              </ul>
+            </div>
+            <div class="panel now">
+              <h3>Now</h3>
+              <ul class="list">
+                <li>Operator intent is <code>enabled</code>. Health/lifecycle is <code>status</code>.</li>
+                <li>Authority/Quorum claims use <code>SUBMITTED</code>, <code>STAGED</code>, <code>ACCEPTED</code>.</li>
+                <li>Foreclosure is durable L1 state: <code>foreclose_block</code>.</li>
+                <li>EVM Reader keeps watching for drive-prove and withdrawals.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Emphasize that foreclosure is not the same as corruption. A normal foreclosed app has status FORECLOSED,
+          not INOPERABLE. INOPERABLE is reserved for local mismatch or corruption.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Current architecture</div>
+            <h2>Services still communicate through PostgreSQL, but more L1 state is explicit</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Current Rollups Node architecture diagram">
+              <rect x="52" y="48" width="1076" height="90" rx="8" fill="#ffffff" stroke="#d8decf"></rect>
+              <text x="590" y="82" text-anchor="middle" class="svg-label">Layer 1 contracts</text>
+              <text x="590" y="108" text-anchor="middle" class="svg-small">
+                InputBox, Application, Authority, Quorum, DaveConsensus, Tournament
+              </text>
+
+              <rect x="92" y="214" width="210" height="78" class="node teal"></rect>
+              <text x="197" y="246" text-anchor="middle" class="svg-label">EVM Reader</text>
+              <text x="197" y="270" text-anchor="middle" class="svg-small">events, counters, cursors</text>
+
+              <rect x="374" y="208" width="432" height="92" class="node dark"></rect>
+              <text x="590" y="244" text-anchor="middle" class="svg-label" fill="#f8faf6">PostgreSQL</text>
+              <text x="590" y="269" text-anchor="middle" class="svg-small" fill="#d5ded5">
+                choreography point for all services
+              </text>
+              <text x="590" y="291" text-anchor="middle" class="svg-code" fill="#e8f1e8">
+                applications, epochs, inputs, outputs, withdrawals
+              </text>
+
+              <rect x="878" y="178" width="210" height="70" class="node green"></rect>
+              <text x="983" y="207" text-anchor="middle" class="svg-label">JSON-RPC API</text>
+              <text x="983" y="230" text-anchor="middle" class="svg-small">client reads</text>
+
+              <rect x="878" y="280" width="210" height="70" class="node gold"></rect>
+              <text x="983" y="309" text-anchor="middle" class="svg-label">CLI / Tools</text>
+              <text x="983" y="332" text-anchor="middle" class="svg-small">operator actions</text>
+
+              <rect x="118" y="426" width="170" height="76" class="node green"></rect>
+              <text x="203" y="457" text-anchor="middle" class="svg-label">Advancer</text>
+              <text x="203" y="481" text-anchor="middle" class="svg-small">machine execution</text>
+
+              <rect x="360" y="426" width="170" height="76" class="node blue"></rect>
+              <text x="445" y="457" text-anchor="middle" class="svg-label">Validator</text>
+              <text x="445" y="481" text-anchor="middle" class="svg-small">claims and proofs</text>
+
+              <rect x="602" y="426" width="170" height="76" class="node coral"></rect>
+              <text x="687" y="457" text-anchor="middle" class="svg-label">Claimer</text>
+              <text x="687" y="481" text-anchor="middle" class="svg-small">submit, stage, accept</text>
+
+              <rect x="844" y="426" width="170" height="76" class="node plum"></rect>
+              <text x="929" y="457" text-anchor="middle" class="svg-label">PRT</text>
+              <text x="929" y="481" text-anchor="middle" class="svg-small">Dave tournaments</text>
+
+              <path d="M 197 138 L 197 214" class="arrow teal"></path>
+              <path d="M 302 253 L 374 253" class="arrow teal"></path>
+              <path d="M 806 230 L 878 213" class="arrow green"></path>
+              <path d="M 878 315 L 806 274" class="arrow gold"></path>
+
+              <path d="M 203 426 L 464 300" class="arrow green"></path>
+              <path d="M 445 426 L 540 300" class="arrow blue"></path>
+              <path d="M 687 426 L 654 300" class="arrow coral"></path>
+              <path d="M 929 426 L 734 300" class="arrow plum"></path>
+
+              <path d="M 687 426 C 706 362 782 170 590 138" class="arrow coral dashed"></path>
+              <path d="M 929 426 C 970 332 964 170 612 138" class="arrow plum dashed"></path>
+
+              <rect x="196" y="540" width="788" height="42" rx="8" fill="#fff5e5" stroke="#e4c47c"></rect>
+              <text x="590" y="566" text-anchor="middle" class="svg-small">
+                v3 adds explicit DB state for staging, foreclosure, accounts-drive proof, and withdrawals.
+              </text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          The architecture did not become message-driven. The important change is that the DB schema now has explicit states
+          for things that contracts v3 made visible or required.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Sequence diagram</div>
+            <h2>Authority claim lifecycle: submit and stage together, accept later</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Authority claim staging sequence">
+              <rect x="60" y="42" width="180" height="50" class="node green"></rect>
+              <text x="150" y="73" text-anchor="middle" class="svg-label">Validator</text>
+              <rect x="330" y="42" width="180" height="50" class="node dark"></rect>
+              <text x="420" y="73" text-anchor="middle" class="svg-label" fill="#f8faf6">DB</text>
+              <rect x="600" y="42" width="180" height="50" class="node coral"></rect>
+              <text x="690" y="73" text-anchor="middle" class="svg-label">Claimer</text>
+              <rect x="870" y="42" width="220" height="50" class="node blue"></rect>
+              <text x="980" y="73" text-anchor="middle" class="svg-label">IConsensus</text>
+
+              <path d="M 150 100 L 150 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 420 100 L 420 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 690 100 L 690 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 980 100 L 980 560" stroke="#ced6c9" stroke-width="2"></path>
+
+              <path d="M 150 132 L 420 132" class="arrow green"></path>
+              <text x="285" y="122" text-anchor="middle" class="svg-code">StoreClaimAndProofs</text>
+              <text x="285" y="151" text-anchor="middle" class="svg-small">CLAIM_COMPUTED + outputs proof</text>
+
+              <path d="M 690 208 L 420 208" class="arrow coral"></path>
+              <text x="555" y="198" text-anchor="middle" class="svg-code">SelectSubmittedClaimPairsPerApp</text>
+              <text x="555" y="227" text-anchor="middle" class="svg-small">find oldest computed work</text>
+
+              <path d="M 690 282 L 980 282" class="arrow coral"></path>
+              <text x="835" y="272" text-anchor="middle" class="svg-code">submitClaim(app, block, outputsRoot, proof)</text>
+              <text x="835" y="301" text-anchor="middle" class="svg-small">Authority emits ClaimSubmitted + ClaimStaged</text>
+
+              <path d="M 690 360 L 420 360" class="arrow teal"></path>
+              <text x="555" y="350" text-anchor="middle" class="svg-code">UpdateEpochThroughStaging</text>
+              <text x="555" y="379" text-anchor="middle" class="svg-small">CLAIM_COMPUTED -> CLAIM_SUBMITTED -> CLAIM_STAGED</text>
+
+              <path d="M 690 438 L 980 438" class="arrow gold"></path>
+              <text x="835" y="428" text-anchor="middle" class="svg-code">acceptClaim(app, block, machineRoot)</text>
+              <text x="835" y="457" text-anchor="middle" class="svg-small">after claimStagingPeriod blocks</text>
+
+              <path d="M 690 520 L 420 520" class="arrow green"></path>
+              <text x="555" y="510" text-anchor="middle" class="svg-code">UpdateEpochWithAcceptedClaim</text>
+              <text x="555" y="539" text-anchor="middle" class="svg-small">CLAIM_ACCEPTED, tx hash retained</text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          Authority stages in the same transaction as submit, but finality still waits for acceptClaim.
+          That is why the node needs a local CLAIM_STAGED state and staged_at_block.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Sequence diagram</div>
+            <h2>Quorum claim lifecycle: votes stage one claim, accept later</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Quorum claim staging sequence">
+              <rect x="52" y="42" width="176" height="50" class="node green"></rect>
+              <text x="140" y="73" text-anchor="middle" class="svg-label">Validator</text>
+              <rect x="300" y="42" width="176" height="50" class="node dark"></rect>
+              <text x="388" y="73" text-anchor="middle" class="svg-label" fill="#f8faf6">DB</text>
+              <rect x="548" y="42" width="176" height="50" class="node coral"></rect>
+              <text x="636" y="73" text-anchor="middle" class="svg-label">Claimer</text>
+              <rect x="796" y="42" width="176" height="50" class="node blue"></rect>
+              <text x="884" y="73" text-anchor="middle" class="svg-label">Quorum</text>
+              <rect x="1032" y="42" width="108" height="50" class="node gray"></rect>
+              <text x="1086" y="73" text-anchor="middle" class="svg-label">Peer</text>
+
+              <path d="M 140 100 L 140 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 388 100 L 388 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 636 100 L 636 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 884 100 L 884 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 1086 100 L 1086 560" stroke="#ced6c9" stroke-width="2"></path>
+
+              <path d="M 140 126 L 388 126" class="arrow green"></path>
+              <text x="264" y="116" text-anchor="middle" class="svg-code">StoreClaimAndProofs</text>
+              <text x="264" y="145" text-anchor="middle" class="svg-small">CLAIM_COMPUTED + outputs proof</text>
+
+              <path d="M 636 188 L 388 188" class="arrow coral"></path>
+              <text x="512" y="178" text-anchor="middle" class="svg-code">SelectSubmittedClaimPairsPerApp</text>
+              <text x="512" y="207" text-anchor="middle" class="svg-small">find oldest computed work</text>
+
+              <path d="M 636 250 L 884 250" class="arrow coral"></path>
+              <text x="760" y="240" text-anchor="middle" class="svg-code">submitClaim(...)</text>
+              <text x="760" y="269" text-anchor="middle" class="svg-small">our vote emits ClaimSubmitted</text>
+
+              <path d="M 636 312 L 388 312" class="arrow coral"></path>
+              <text x="512" y="302" text-anchor="middle" class="svg-code">UpdateEpochToSubmitted</text>
+              <text x="512" y="331" text-anchor="middle" class="svg-small">CLAIM_COMPUTED -> CLAIM_SUBMITTED</text>
+
+              <path d="M 1086 374 L 884 374" class="arrow"></path>
+              <text x="985" y="364" text-anchor="middle" class="svg-code">submitClaim(same root)</text>
+              <text x="985" y="393" text-anchor="middle" class="svg-small">majority stages the claim</text>
+
+              <path d="M 884 436 L 636 436" class="arrow teal"></path>
+              <text x="760" y="426" text-anchor="middle" class="svg-code">ClaimStaged event</text>
+              <text x="760" y="455" text-anchor="middle" class="svg-small">or getClaim returns STAGED</text>
+
+              <path d="M 636 498 L 388 498" class="arrow teal"></path>
+              <text x="512" y="488" text-anchor="middle" class="svg-code">UpdateEpochToStaged</text>
+              <text x="512" y="517" text-anchor="middle" class="svg-small">CLAIM_SUBMITTED -> CLAIM_STAGED</text>
+
+              <path d="M 636 556 L 884 556" class="arrow gold"></path>
+              <text x="760" y="546" text-anchor="middle" class="svg-code">acceptClaim later</text>
+              <text x="760" y="575" text-anchor="middle" class="svg-small">same final step as Authority</text>
+
+              <rect x="52" y="422" width="244" height="82" rx="8" fill="#fff5e5" stroke="#e4c47c"></rect>
+              <text x="174" y="448" text-anchor="middle" class="svg-label">Conflict case</text>
+              <text x="174" y="472" text-anchor="middle" class="svg-small">Different winning root:</text>
+              <text x="174" y="492" text-anchor="middle" class="svg-small">INOPERABLE or REJECTED.</text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          In Quorum, a submitted claim is not always staged by our transaction. The node must watch events and getClaim state,
+          and it must classify conflicting staged or accepted claims carefully.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">State machine</div>
+            <h2>Epoch status changed: staging and foreclosure are first-class</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Epoch state machine">
+              <text x="82" y="54" class="svg-small" font-weight="800">Input processing</text>
+              <rect x="46" y="78" width="140" height="58" class="node green state"></rect>
+              <text x="116" y="112" text-anchor="middle" class="svg-state-label">OPEN</text>
+
+              <rect x="246" y="78" width="140" height="58" class="node green state"></rect>
+              <text x="316" y="112" text-anchor="middle" class="svg-state-label">CLOSED</text>
+
+              <rect x="446" y="78" width="230" height="58" class="node green state"></rect>
+              <text x="561" y="112" text-anchor="middle" class="svg-state-label">INPUTS_PROCESSED</text>
+
+              <rect x="736" y="78" width="220" height="58" class="node blue state"></rect>
+              <text x="846" y="112" text-anchor="middle" class="svg-state-label">CLAIM_COMPUTED</text>
+
+              <path d="M 186 107 L 246 107" class="arrow green"></path>
+              <path d="M 386 107 L 446 107" class="arrow green"></path>
+              <path d="M 676 107 L 736 107" class="arrow green"></path>
+
+              <text x="118" y="218" class="svg-small" font-weight="800">Authority / Quorum normal path</text>
+              <rect x="108" y="242" width="230" height="58" class="node coral state"></rect>
+              <text x="223" y="276" text-anchor="middle" class="svg-state-label">CLAIM_SUBMITTED</text>
+
+              <rect x="474" y="242" width="190" height="58" class="node gold state"></rect>
+              <text x="569" y="276" text-anchor="middle" class="svg-state-label">CLAIM_STAGED</text>
+
+              <rect x="794" y="242" width="210" height="58" class="node teal state"></rect>
+              <text x="899" y="276" text-anchor="middle" class="svg-state-label">CLAIM_ACCEPTED</text>
+
+              <path d="M 846 136 C 724 186 418 178 223 242" class="arrow coral"></path>
+              <path d="M 338 271 L 474 271" class="arrow gold"></path>
+              <path d="M 664 271 L 794 271" class="arrow teal"></path>
+
+              <path d="M 846 136 C 760 178 688 214 569 242" class="arrow gold dashed"></path>
+              <text x="634" y="196" text-anchor="middle" class="svg-code small">restart recovery</text>
+              <path d="M 846 136 C 930 170 954 204 899 242" class="arrow teal dashed"></path>
+              <text x="940" y="190" text-anchor="middle" class="svg-code small">PRT or catch-up</text>
+
+              <text x="126" y="388" class="svg-small" font-weight="800">Terminal exceptions</text>
+              <rect x="130" y="414" width="214" height="58" class="node gray state"></rect>
+              <text x="237" y="448" text-anchor="middle" class="svg-state-label">CLAIM_REJECTED</text>
+
+              <rect x="488" y="414" width="254" height="58" class="node plum state"></rect>
+              <text x="615" y="448" text-anchor="middle" class="svg-state-label">CLAIM_FORECLOSED</text>
+
+              <rect x="806" y="392" width="310" height="104" rx="8" fill="#ffffff" stroke="#d8decf"></rect>
+              <text x="961" y="422" text-anchor="middle" class="svg-label">Rules enforced in DB</text>
+              <text x="961" y="449" text-anchor="middle" class="svg-small">no backwards transitions</text>
+              <text x="961" y="472" text-anchor="middle" class="svg-small">CLAIM_STAGED requires staged_at_block</text>
+
+              <path d="M 228 300 C 224 344 224 376 237 414" class="arrow dashed"></path>
+              <text x="286" y="356" text-anchor="middle" class="svg-code small">Quorum conflict</text>
+
+              <rect x="426" y="338" width="378" height="46" rx="8" fill="#fff5e5" stroke="#e4c47c"></rect>
+              <text x="615" y="366" text-anchor="middle" class="svg-small">
+                Foreclosure can terminalize any non-accepted pre-foreclosure work.
+              </text>
+              <path d="M 615 384 L 615 414" class="arrow plum dashed"></path>
+
+              <rect x="140" y="520" width="900" height="44" rx="8" fill="#fff5e5" stroke="#e4c47c"></rect>
+              <text x="590" y="547" text-anchor="middle" class="svg-small">
+                PRT skips CLAIM_STAGED. Dave tournaments can move CLAIM_COMPUTED to CLAIM_ACCEPTED.
+              </text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          DB triggers enforce the important transitions. CLAIM_STAGED is valid for Authority and Quorum only.
+          PRT still settles through Dave tournaments and skips staging.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Application lifecycle</div>
+            <h2>Application state became two dimensions: operator intent and effective status</h2>
+          </div>
+          <div class="compare">
+            <div class="panel before">
+              <h3>Before</h3>
+              <p class="lead" style="font-size: 20px; margin-top: 10px;">
+                One field tried to mean both "should this app run?" and "is this app healthy?"
+              </p>
+              <pre style="margin-top: 18px;">ApplicationState
+
+ENABLED
+DISABLED
+FAILED
+INOPERABLE</pre>
+              <p class="callout warn">
+                This made foreclosure difficult: L1 observation must continue even when normal execution stops.
+              </p>
+            </div>
+            <div class="panel now">
+              <h3>Now</h3>
+              <p class="lead" style="font-size: 20px; margin-top: 10px;">
+                The node separates what the operator wants from what the system knows.
+              </p>
+              <pre style="margin-top: 18px;">enabled: true | false
+
+status:
+  OK
+  FAILED
+  INOPERABLE
+  FORECLOSED
+
+foreclose_block: 0 | L1 block</pre>
+              <p class="callout">
+                Normal foreclosure is <code>enabled=true</code>, <code>status=FORECLOSED</code>, and <code>foreclose_block&gt;0</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Say this slowly. This is a key review and ops concept. Foreclose block is the source of truth for the L1 boundary.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Service filters</div>
+            <h2>After foreclosure, services do less normal work and more observation</h2>
+          </div>
+          <div class="table">
+            <div class="table-row">
+              <div class="table-cell">Service</div>
+              <div class="table-cell">Normal app work</div>
+              <div class="table-cell">Foreclosed app behavior</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>EVM Reader</strong></div>
+              <div class="table-cell">Scans inputs, outputs, epochs, and L1 state for enabled apps.</div>
+              <div class="table-cell">Records foreclosure, then scans drive-prove and withdrawal events.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Machine Manager / Advancer</strong></div>
+              <div class="table-cell"><code>enabled && status=OK && foreclose_block=0</code></div>
+              <div class="table-cell">Keeps a machine only while pre-foreclosure inputs are still undrained.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Validator</strong></div>
+              <div class="table-cell">Computes proofs for processed epochs.</div>
+              <div class="table-cell">Skips epochs that cannot become accepted after the foreclosure block.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Claimer</strong></div>
+              <div class="table-cell">Submit, stage, accept Authority/Quorum claims.</div>
+              <div class="table-cell">Does read-only reconciliation and marks impossible claims <code>CLAIM_FORECLOSED</code>.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>PRT</strong></div>
+              <div class="table-cell">Runs Dave tournament work for PRT apps.</div>
+              <div class="table-cell">Skips new tournament work and reports pre-foreclosure drain progress.</div>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          The key operational point: do not disable foreclosed apps automatically if you still need post-foreclosure observation.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">EVM Reader</div>
+            <h2>Block scanning now has a foreclosure-first plan</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="EVM Reader block scan plan">
+              <rect x="52" y="64" width="210" height="70" class="node blue state"></rect>
+              <text x="157" y="104" text-anchor="middle" class="svg-state-label">New block</text>
+
+              <rect x="320" y="64" width="246" height="70" class="node teal state"></rect>
+              <text x="443" y="95" text-anchor="middle" class="svg-state-label">Resolve scan block</text>
+              <text x="443" y="118" text-anchor="middle" class="svg-small">latest, safe, finalized</text>
+
+              <rect x="624" y="64" width="286" height="70" class="node coral state"></rect>
+              <text x="767" y="95" text-anchor="middle" class="svg-state-label">Detect foreclosure first</text>
+              <text x="767" y="118" text-anchor="middle" class="svg-small">updates in-memory app marker</text>
+
+              <rect x="66" y="262" width="290" height="86" class="node green state"></rect>
+              <text x="211" y="296" text-anchor="middle" class="svg-state-label">Pre-foreclosure inputs</text>
+              <text x="211" y="321" text-anchor="middle" class="svg-small">InputAdded or EpochSealed</text>
+
+              <rect x="434" y="262" width="250" height="86" class="node gold state"></rect>
+              <text x="559" y="296" text-anchor="middle" class="svg-state-label">Output execution</text>
+              <text x="559" y="321" text-anchor="middle" class="svg-small">still observed for app history</text>
+
+              <rect x="762" y="262" width="270" height="86" class="node plum state"></rect>
+              <text x="897" y="296" text-anchor="middle" class="svg-state-label">Post-foreclosure</text>
+              <text x="897" y="321" text-anchor="middle" class="svg-small">drive-prove or withdrawals</text>
+
+              <rect x="292" y="454" width="594" height="82" rx="8" fill="#ffffff" stroke="#d8decf"></rect>
+              <text x="589" y="487" text-anchor="middle" class="svg-state-label">Strict monotonic cursors</text>
+              <text x="589" y="512" text-anchor="middle" class="svg-code small">last_foreclose_check_block</text>
+              <text x="589" y="530" text-anchor="middle" class="svg-code small">last_accounts_drive_proved_check_block / last_withdrawal_check_block</text>
+
+              <path d="M 262 99 L 320 99" class="arrow blue"></path>
+              <path d="M 566 99 L 624 99" class="arrow teal"></path>
+              <path d="M 767 134 C 620 190 390 205 211 262" class="arrow green"></path>
+              <path d="M 767 134 C 704 188 605 217 559 262" class="arrow gold"></path>
+              <path d="M 767 134 C 835 188 880 216 897 262" class="arrow plum"></path>
+              <path d="M 897 348 C 830 403 736 433 589 454" class="arrow plum dashed"></path>
+              <path d="M 211 348 C 296 414 433 438 589 454" class="arrow green dashed"></path>
+              <path d="M 559 348 L 589 454" class="arrow gold dashed"></path>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          The order matters. Foreclosure is detected before building the scan plan, so later scanners use the marker in the same tick.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Sequence diagram</div>
+            <h2>Foreclosure: stop normal progress, keep observing L1</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Foreclosure sequence diagram">
+              <rect x="62" y="48" width="190" height="54" class="node gold"></rect>
+              <text x="157" y="82" text-anchor="middle" class="svg-label">Guardian</text>
+              <rect x="332" y="48" width="230" height="54" class="node blue"></rect>
+              <text x="447" y="82" text-anchor="middle" class="svg-label">Application contract</text>
+              <rect x="642" y="48" width="190" height="54" class="node teal"></rect>
+              <text x="737" y="82" text-anchor="middle" class="svg-label">EVM Reader</text>
+              <rect x="912" y="48" width="190" height="54" class="node dark"></rect>
+              <text x="1007" y="82" text-anchor="middle" class="svg-label" fill="#f8faf6">DB</text>
+
+              <path d="M 157 110 L 157 548" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 447 110 L 447 548" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 737 110 L 737 548" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 1007 110 L 1007 548" stroke="#ced6c9" stroke-width="2"></path>
+
+              <path d="M 157 148 L 447 148" class="arrow gold"></path>
+              <text x="302" y="137" text-anchor="middle" class="svg-code">foreclose()</text>
+              <text x="302" y="166" text-anchor="middle" class="svg-small">guardian-only</text>
+
+              <path d="M 447 218 L 737 218" class="arrow blue"></path>
+              <text x="592" y="207" text-anchor="middle" class="svg-code">isForeclosed() == true</text>
+              <text x="592" y="236" text-anchor="middle" class="svg-small">then scan Foreclosure event</text>
+
+              <path d="M 737 300 L 1007 300" class="arrow teal"></path>
+              <text x="872" y="289" text-anchor="middle" class="svg-code">UpdateApplicationForeclosure</text>
+              <text x="872" y="318" text-anchor="middle" class="svg-small">set foreclose_block + tx + status</text>
+
+              <path d="M 737 382 L 1007 382" class="arrow coral dashed"></path>
+              <text x="872" y="371" text-anchor="middle" class="svg-code">continue scanners</text>
+              <text x="872" y="400" text-anchor="middle" class="svg-small">pre-foreclosure drain, then post-foreclosure events</text>
+
+              <rect x="258" y="460" width="664" height="70" rx="8" fill="#fff5e5" stroke="#e4c47c"></rect>
+              <text x="590" y="491" text-anchor="middle" class="svg-label">Important operational meaning</text>
+              <text x="590" y="517" text-anchor="middle" class="svg-small">
+                Foreclosure is a normal emergency path. It should not hide withdrawal observation.
+              </text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          The node writes foreclosure atomically with the scan cursor. If the app was already INOPERABLE, EVM Reader preserves that status.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Withdrawal lifecycle</div>
+            <h2>Foreclosure adds a second lifecycle after normal claims stop</h2>
+          </div>
+          <div class="timeline">
+            <div class="step">
+              <div class="step-num">1</div>
+              <h3>Deploy with config</h3>
+              <p>Set guardian, account layout, accounts drive start, and output builder.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <h3>Guardian forecloses</h3>
+              <p><code>foreclose()</code> makes normal submit and accept paths revert.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <h3>Prove drive root</h3>
+              <p>Anyone anchors the accounts-drive Merkle root from the last finalized machine state.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <h3>Users withdraw</h3>
+              <p>Each account is proven once and emits a <code>Withdrawal</code> event.</p>
+            </div>
+            <div class="step">
+              <div class="step-num">5</div>
+              <h3>Node indexes</h3>
+              <p>EVM Reader stores withdrawals and JSON-RPC exposes them to clients.</p>
+            </div>
+          </div>
+          <div class="callout warn">
+            The all-zero <code>WithdrawalConfig</code> means no foreclosure path. A partial config is dangerous and should fail validation.
+          </div>
+        </div>
+        <aside class="notes">
+          The node does not build withdrawal outputs for users. The on-chain output builder does that during withdraw().
+          The node helps with indexing and local proof tooling.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Sequence diagram</div>
+            <h2>Accounts-drive proof and withdrawal event indexing</h2>
+          </div>
+          <div class="diagram">
+            <svg viewBox="0 0 1180 610" role="img" aria-label="Accounts-drive proof and withdrawal sequence">
+              <rect x="54" y="44" width="204" height="58" class="node gold"></rect>
+              <text x="156" y="80" text-anchor="middle" class="svg-label">Machine tool</text>
+              <rect x="334" y="44" width="220" height="58" class="node coral"></rect>
+              <text x="444" y="80" text-anchor="middle" class="svg-label">CLI / operator</text>
+              <rect x="630" y="44" width="224" height="58" class="node blue"></rect>
+              <text x="742" y="80" text-anchor="middle" class="svg-label">Application contract</text>
+              <rect x="930" y="44" width="196" height="58" class="node teal"></rect>
+              <text x="1028" y="80" text-anchor="middle" class="svg-label">EVM Reader</text>
+
+              <path d="M 156 112 L 156 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 444 112 L 444 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 742 112 L 742 560" stroke="#ced6c9" stroke-width="2"></path>
+              <path d="M 1028 112 L 1028 560" stroke="#ced6c9" stroke-width="2"></path>
+
+              <path d="M 156 145 L 444 145" class="arrow gold"></path>
+              <text x="300" y="134" text-anchor="middle" class="svg-code">drive-root-proof.json</text>
+              <text x="300" y="163" text-anchor="middle" class="svg-small">and account-proof.json</text>
+
+              <path d="M 444 218 L 742 218" class="arrow coral"></path>
+              <text x="593" y="207" text-anchor="middle" class="svg-code">proveAccountsDriveMerkleRoot(root, proof)</text>
+              <text x="593" y="236" text-anchor="middle" class="svg-small">permissionless, once per app</text>
+
+              <path d="M 742 292 L 1028 292" class="arrow blue"></path>
+              <text x="885" y="281" text-anchor="middle" class="svg-code">AccountsDriveMerkleRootProved</text>
+              <text x="885" y="310" text-anchor="middle" class="svg-small">record block, tx, root</text>
+
+              <path d="M 444 382 L 742 382" class="arrow coral"></path>
+              <text x="593" y="371" text-anchor="middle" class="svg-code">withdraw(account, accountProof)</text>
+              <text x="593" y="400" text-anchor="middle" class="svg-small">gas payer can differ from recipient</text>
+
+              <path d="M 742 462 L 1028 462" class="arrow teal"></path>
+              <text x="885" y="451" text-anchor="middle" class="svg-code">Withdrawal(accountIndex, account, output)</text>
+              <text x="885" y="480" text-anchor="middle" class="svg-small">stored by (application_id, account_index)</text>
+            </svg>
+          </div>
+        </div>
+        <aside class="notes">
+          The withdrawal scanner uses getNumberOfWithdrawals as a monotonic counter and scans exact transition blocks.
+          This reduces log scan cost and makes restart behavior deterministic.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Data model</div>
+            <h2>The schema now protects the lifecycle with constraints and triggers</h2>
+          </div>
+          <div class="body-grid cols-3">
+            <div class="panel">
+              <h3>Application table</h3>
+              <ul class="list">
+                <li><code>enabled</code> and <code>status</code> replace the overloaded state model.</li>
+                <li><code>claim_staging_period</code> is cached from L1.</li>
+                <li>Withdrawal config is stored in five typed columns.</li>
+                <li>Foreclosure, drive-prove, and withdrawal scan cursors are persisted.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Epoch table</h3>
+              <ul class="list">
+                <li>New <code>CLAIM_STAGED</code> status.</li>
+                <li>New <code>CLAIM_FORECLOSED</code> terminal state.</li>
+                <li><code>staged_at_block</code> is required for staged claims.</li>
+                <li>DB trigger rejects invalid transitions.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Withdrawal table</h3>
+              <ul class="list">
+                <li>Stores on-chain <code>Withdrawal</code> events.</li>
+                <li>Primary key: app plus account index.</li>
+                <li>Used by JSON-RPC and CLI read paths.</li>
+                <li>Cursor update and event storage happen together.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          This is a review focus area. A bad state transition can create silent chain/DB disagreement, so the trigger logic matters.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">APIs</div>
+            <h2>Clients now see v3 lifecycle fields and withdrawals</h2>
+          </div>
+          <div class="body-grid cols-2">
+            <div class="panel">
+              <h3>Application JSON changed</h3>
+              <ul class="list">
+                <li><code>enabled</code> and <code>status</code> are exposed instead of the old single <code>state</code>.</li>
+                <li>New fields: <code>claim_staging_period</code>, <code>withdrawal_config</code>.</li>
+                <li>New foreclosure markers: <code>foreclose_block</code>, <code>accounts_drive_proved_block</code>, root, transactions, cursors.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>New JSON-RPC methods</h3>
+              <pre>cartesi_listWithdrawals
+cartesi_getWithdrawal</pre>
+              <ul class="list">
+                <li>Read withdrawals by application.</li>
+                <li>Filter by account index.</li>
+                <li>Pagination and descending order supported.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          QA should verify both direct repository mode and JSON-RPC mode for the CLI read command.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">New tools</div>
+            <h2>The CLI now covers deploy, foreclosure, proof, withdrawal, and reads</h2>
+          </div>
+          <div class="body-grid cols-2">
+            <div class="panel">
+              <h3>Operator commands</h3>
+              <pre>cartesi-rollups-cli foreclose &lt;app&gt;
+cartesi-rollups-cli prove-drive-root &lt;app&gt; --proof-file drive-root-proof.json
+cartesi-rollups-cli withdraw &lt;app&gt; --proof-file account-proof.json
+cartesi-rollups-cli read withdrawals &lt;app&gt; [account-index]</pre>
+            </div>
+            <div class="panel">
+              <h3>Deploy and contract support</h3>
+              <ul class="list">
+                <li><code>deploy application</code> accepts <code>--claim-staging-period</code>.</li>
+                <li><code>--withdrawal-config</code> and <code>--withdrawal-config-file</code> are supported.</li>
+                <li><code>deploy quorum</code> adds v3 Quorum deployment.</li>
+                <li><code>contract</code> output shows v3 fields.</li>
+                <li><code>deposit erc20</code> helps the withdrawal lifecycle test path.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          Mention that foreclose needs guardian signing. Prove and withdraw are permissionless, but still need a gas payer.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">New binary</div>
+            <h2><code>cartesi-rollups-machine-tool</code> helps produce proof files</h2>
+          </div>
+          <div class="body-grid cols-2">
+            <div class="panel dark">
+              <h3>Replay accepted inputs</h3>
+              <pre>cartesi-rollups-machine-tool replay \
+  --template applications/erc20-withdrawal-dapp \
+  --application erc20-withdrawal-dapp \
+  --to-epoch 3 \
+  --store snapshots/accepted-epoch-3</pre>
+              <p class="small" style="margin-top: 12px;">
+                Replays accepted inputs from the node database into a stored machine.
+              </p>
+            </div>
+            <div class="panel dark">
+              <h3>Generate withdrawal proofs</h3>
+              <pre>cartesi-rollups-machine-tool prove accounts-drive \
+  --snapshot snapshots/accepted-epoch-3 \
+  --account 0x... \
+  --accounts-drive-start-index 0x... \
+  --out-drive-root-proof drive-root-proof.json \
+  --out-withdraw-proof account-proof.json</pre>
+              <p class="small" style="margin-top: 12px;">
+                Produces the JSON files consumed by <code>prove-drive-root</code> and <code>withdraw</code>.
+              </p>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          This is useful for the demo. It also gives QA a repeatable way to generate test fixtures for post-foreclosure behavior.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Review map</div>
+            <h2>Where reviewers should look first</h2>
+          </div>
+          <div class="review-table">
+            <div class="review-cell">Area</div>
+            <div class="review-cell">Start here</div>
+            <div class="review-cell">Review focus</div>
+
+            <div class="review-cell review-area">
+              <strong>Lifecycle and persistence</strong>
+              <span>DB shape and domain model</span>
+            </div>
+            <div class="review-cell review-paths">
+              <code>internal/model/models.go</code>
+              <code>internal/appstatus/</code>
+              <code>internal/repository/postgres/schema/migrations/000001_*</code>
+              <code>internal/repository/</code>
+            </div>
+            <div class="review-cell">
+              Epoch transitions, application status, foreclosure fields, repository invariants.
+            </div>
+
+            <div class="review-cell review-area">
+              <strong>Protocol flows</strong>
+              <span>How L1 changes become local state</span>
+            </div>
+            <div class="review-cell review-paths">
+              <code>internal/evmreader/foreclosure.go</code>
+              <code>internal/evmreader/post_foreclosure*.go</code>
+              <code>internal/claimer/{submit,stage,accept,foreclosure}.go</code>
+              <code>internal/prt/service.go</code>
+            </div>
+            <div class="review-cell">
+              Staging, acceptance, foreclosure reconciliation, Quorum divergence, PRT bypass of staging.
+            </div>
+
+            <div class="review-cell review-area">
+              <strong>Tools and API</strong>
+              <span>Operator and QA entry points</span>
+            </div>
+            <div class="review-cell review-paths">
+              <code>cmd/cartesi-rollups-cli/root/</code>
+              <code>cmd/cartesi-rollups-machine-tool/</code>
+              <code>internal/jsonrpc/jsonrpc.go</code>
+              <code>pkg/ethutil/</code>
+            </div>
+            <div class="review-cell">
+              Foreclose, prove-drive-root, withdraw, read withdrawals, Quorum deploy, proof files.
+            </div>
+
+            <div class="review-cell review-area">
+              <strong>Tests</strong>
+              <span>Regression and deployment confidence</span>
+            </div>
+            <div class="review-cell review-paths">
+              <code>test/integration/*foreclose*.go</code>
+              <code>test/integration/withdrawal_lifecycle_test.go</code>
+              <code>test/integration/echo_quorum_test.go</code>
+              <code>internal/repository/repotest/</code>
+            </div>
+            <div class="review-cell">
+              State machine coverage, withdrawal lifecycle, scanner restart, DB transition checks.
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          This slide helps assign review owners. Devs should not try to review all 194 files linearly.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">QA focus</div>
+            <h2>Test the lifecycle, not only command success</h2>
+          </div>
+          <div class="table">
+            <div class="table-row">
+              <div class="table-cell">Area</div>
+              <div class="table-cell">What to test</div>
+              <div class="table-cell">Expected signal</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Staging</strong></div>
+              <div class="table-cell">Authority: submit stages fast. Accept waits for staging period.</div>
+              <div class="table-cell"><code>CLAIM_COMPUTED -> SUBMITTED -> STAGED -> ACCEPTED</code></div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Quorum</strong></div>
+              <div class="table-cell">Majority stages. Different vote outcomes are classified correctly.</div>
+              <div class="table-cell">No false INOPERABLE for honest different pending votes.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Foreclosure</strong></div>
+              <div class="table-cell">Foreclose before, during, and after claim work.</div>
+              <div class="table-cell">Normal app becomes <code>FORECLOSED</code>; impossible claims become <code>CLAIM_FORECLOSED</code>.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Withdrawals</strong></div>
+              <div class="table-cell">Prove drive root, withdraw accounts, restart scanner.</div>
+              <div class="table-cell">Rows persist once, cursors advance with rows, RPC reads match.</div>
+            </div>
+            <div class="table-row">
+              <div class="table-cell"><strong>Ops paths</strong></div>
+              <div class="table-cell">Bad signer, bad proof, no builder code, bad config.</div>
+              <div class="table-cell">Clear errors, no hidden partial state.</div>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          The branch already adds integration coverage for staging, quorum, foreclosure, replay, and withdrawal. QA should still run
+          manual paths because the new tools are operator-facing.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Ops checklist</div>
+            <h2>Deploy only after configuration and data assumptions are explicit</h2>
+          </div>
+          <div class="body-grid cols-2">
+            <div class="panel">
+              <h3>Before deploy</h3>
+              <ul class="list">
+                <li>Update factory addresses: InputBox, AuthorityFactory, QuorumFactory, ApplicationFactory, SelfHosted, DaveAppFactory.</li>
+                <li>Set <code>CARTESI_CLAIMER_MAX_ACCEPT_ATTEMPTS</code> if the default <code>5</code> is not right for the network.</li>
+                <li>Confirm guardian wallets and withdrawal config for apps that need foreclosure.</li>
+                <li>Confirm snapshot policy for apps that may need withdrawal proofs.</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Data and rollout</h3>
+              <ul class="list">
+                <li>This alpha branch changes migration <code>000001</code>. Do not reuse a v2-alpha DB without a plan.</li>
+                <li>Check that JSON-RPC clients expect <code>enabled</code> and <code>status</code>.</li>
+                <li>Monitor <code>FORECLOSED</code>, <code>FAILED</code>, <code>INOPERABLE</code>, and claim staging states separately.</li>
+                <li>Have guardian and gas-payer accounts ready for emergency flows.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="callout danger">
+            The highest-risk deployment mistake is mixing old contracts, old factory addresses, or old DB shape with the new node binary.
+          </div>
+        </div>
+        <aside class="notes">
+          Keep this practical. Operations needs exact checks more than protocol theory.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Known risk points</div>
+            <h2>Where bugs would hurt most</h2>
+          </div>
+          <div class="body-grid cols-4">
+            <div class="panel">
+              <h3>Chain/DB divergence</h3>
+              <p class="small" style="margin-top: 10px;">
+                A missed ClaimStaged, ClaimAccepted, Foreclosure, or Withdrawal event can make local state lie.
+              </p>
+              <p class="callout">Mitigation: counters, event scans, cursors, reconciliation reads.</p>
+            </div>
+            <div class="panel">
+              <h3>Bad withdrawal config</h3>
+              <p class="small" style="margin-top: 10px;">
+                Wrong guardian, drive layout, or output builder can block recovery.
+              </p>
+              <p class="callout warn">Mitigation: all-or-nothing config, validation, tool output checks.</p>
+            </div>
+            <div class="panel">
+              <h3>Gas spending loops</h3>
+              <p class="small" style="margin-top: 10px;">
+                Repeated acceptClaim failures should not burn gas forever.
+              </p>
+              <p class="callout">Mitigation: max accept attempts marks app FAILED.</p>
+            </div>
+            <div class="panel">
+              <h3>PRT assumptions</h3>
+              <p class="small" style="margin-top: 10px;">
+                PRT never goes through CLAIM_STAGED and cannot settle new tournament work after foreclosure.
+              </p>
+              <p class="callout">Mitigation: consensus-aware filters and DB trigger rules.</p>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          This is a good place to ask reviewers to use the bug taxonomy mindset: L1 ingestion, state corruption, consensus, and dispute resolution.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Demo handoff</div>
+            <h2>The terminal demo can follow the same story</h2>
+          </div>
+          <div class="body-grid cols-2">
+            <div class="panel dark">
+              <h3>Suggested demo path</h3>
+              <pre>make build
+eval $(make env)
+cartesi-rollups-cli deploy quorum ...
+cartesi-rollups-cli deploy application ...
+cartesi-rollups-cli read epochs ...
+cartesi-rollups-cli foreclose ...
+cartesi-rollups-machine-tool replay ...
+cartesi-rollups-machine-tool prove accounts-drive ...
+cartesi-rollups-cli prove-drive-root ...
+cartesi-rollups-cli withdraw ...
+cartesi-rollups-cli read withdrawals ...</pre>
+            </div>
+            <div class="panel">
+              <h3>What the audience should watch</h3>
+              <ul class="list">
+                <li>Application shows <code>enabled</code>, <code>status</code>, and foreclosure markers.</li>
+                <li>Epochs move through staged states before acceptance.</li>
+                <li>Foreclosure stops normal claims but not L1 observation.</li>
+                <li>Withdrawal rows appear only after the drive root is proved.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <aside class="notes">
+          The user said not to worry about the terminal demo yet. This slide is only a bridge so the talk has a natural ending.
+        </aside>
+      </section>
+
+      <section class="slide">
+        <div class="canvas">
+          <div>
+            <div class="eyebrow">Close</div>
+            <h2>The PR makes the node a v3 lifecycle observer, not only a claim submitter</h2>
+          </div>
+          <div class="body-grid cols-3">
+            <div class="panel">
+              <h3>Development review</h3>
+              <ul class="list">
+                <li>State transitions</li>
+                <li>Event reconciliation</li>
+                <li>Consensus-specific paths</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>QA review</h3>
+              <ul class="list">
+                <li>Normal flow</li>
+                <li>Recovery flow</li>
+                <li>Foreclosure and withdrawals</li>
+              </ul>
+            </div>
+            <div class="panel">
+              <h3>Ops review</h3>
+              <ul class="list">
+                <li>New addresses</li>
+                <li>New DB shape</li>
+                <li>Guardian and proof procedure</li>
+              </ul>
+            </div>
+          </div>
+          <p class="lead" style="align-self: end;">
+            Review question for the team: does every L1 event that changes user-visible state have a clear local state, cursor, API, and recovery path?
+          </p>
+        </div>
+        <aside class="notes">
+          End with the review question. It gives dev, QA, and ops one shared lens for the PR.
+        </aside>
+      </section>
+    </main>
+
+    <nav class="controls" aria-label="Presentation controls">
+      <button type="button" id="prev" aria-label="Previous slide">&lt;</button>
+      <span class="counter" id="counter">1 / 1</span>
+      <button type="button" id="next" aria-label="Next slide">&gt;</button>
+      <button type="button" id="notes" aria-label="Toggle notes">N</button>
+      <button type="button" id="theme" aria-label="Toggle high-tech dark theme">H</button>
+    </nav>
+  </div>
+
+  <script>
+    const slideEls = Array.from(document.querySelectorAll(".slide"));
+    const counter = document.getElementById("counter");
+    const progress = document.getElementById("progress");
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    const notes = document.getElementById("notes");
+    const theme = document.getElementById("theme");
+    let index = 0;
+
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function show(nextIndex, updateHash = true) {
+      index = clamp(nextIndex, 0, slideEls.length - 1);
+      slideEls.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+      counter.textContent = `${index + 1} / ${slideEls.length}`;
+      progress.style.width = `${((index + 1) / slideEls.length) * 100}%`;
+      if (updateHash) {
+        history.replaceState(null, "", `#${index + 1}`);
+      }
+    }
+
+    function fromHash() {
+      const raw = window.location.hash.replace("#", "");
+      const n = Number.parseInt(raw, 10);
+      if (Number.isFinite(n)) {
+        show(n - 1, false);
+      } else {
+        show(0, false);
+      }
+    }
+
+    prev.addEventListener("click", () => show(index - 1));
+    next.addEventListener("click", () => show(index + 1));
+    notes.addEventListener("click", () => document.body.classList.toggle("show-notes"));
+    theme.addEventListener("click", () => toggleTheme());
+
+    function setTheme(isDark) {
+      document.body.classList.toggle("theme-dark", isDark);
+      theme.classList.toggle("active", isDark);
+      theme.setAttribute("aria-pressed", String(isDark));
+      try {
+        localStorage.setItem("rollups-node-presentation-theme", isDark ? "dark" : "light");
+      } catch {
+        // File URLs or locked-down browsers may block localStorage.
+      }
+    }
+
+    function toggleTheme() {
+      setTheme(!document.body.classList.contains("theme-dark"));
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        show(index + 1);
+      } else if (event.key === "ArrowLeft" || event.key === "PageUp" || event.key === "Backspace") {
+        event.preventDefault();
+        show(index - 1);
+      } else if (event.key === "Home") {
+        event.preventDefault();
+        show(0);
+      } else if (event.key === "End") {
+        event.preventDefault();
+        show(slideEls.length - 1);
+      } else if (event.key.toLowerCase() === "n") {
+        document.body.classList.toggle("show-notes");
+      } else if (event.key.toLowerCase() === "h") {
+        toggleTheme();
+      }
+    });
+
+    try {
+      setTheme(localStorage.getItem("rollups-node-presentation-theme") !== "light");
+    } catch {
+      setTheme(true);
+    }
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
+  </script>
+</body>
+</html>

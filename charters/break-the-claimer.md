@@ -1,7 +1,6 @@
 # Charter: Break the Claimer
 
 **Time box:** 2 hours
-**Typical lead:** Experienced tester
 **Last revised:** (update when you modify this charter)
 
 ## Theme
@@ -18,7 +17,13 @@ These are *suggestions*, not a checklist. The session should follow the tester's
 - Let the claimer stay offline for 5+ epochs while the rest of the node runs. Bring it back.
 - Point the claimer at an RPC that drops connections periodically.
 - Misconfigure `CARTESI_AUTH_KIND` — what happens at startup?
+- Force repeated `acceptClaim` failures (for example by wrong timing or signer context). Verify retries are bounded and do not create infinite gas spending loops.
+- **(Edge case: requires tool)** Manually trigger `acceptClaim` before the staging period elapses. The contract should reject it. Then, if the claimer is offline and comes back up, it should log the rejection and recover cleanly without re-attempting the impossible accept. This tests recovery from race conditions or operator mistakes.
+- Force repeated `acceptClaim` failures (for example by wrong timing or signer context). Verify retries are bounded and do not create infinite gas spending loops.
+- Foreclose while claim work is in-flight. Verify the claimer does not keep trying to finalize impossible work and classification remains consistent.
 - Observe logs across all these scenarios: are error messages clear? Do they have timestamps and log levels? Can an operator tell what to do next?
+
+> **Cycle note:** PRT-specific paths are out of scope for this cycle.
 
 ## What to look for
 
@@ -27,6 +32,7 @@ These are *suggestions*, not a checklist. The session should follow the tester's
 - Inconsistent state between claimer and the rest of the node
 - Recovery paths that don't work or aren't documented
 - UX issues: if you were an operator, would you know what to do?
+- Lifecycle truth drift: chain state and node classification disagree after retries/failures
 
 ## Output
 

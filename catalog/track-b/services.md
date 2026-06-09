@@ -3,6 +3,8 @@
 Tests for individual node services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt.
 
 > **Note:** basic "does the service boot" tests are covered by CI. Keep manual entries focused on restart behavior, graceful shutdown, and inter-service dependencies. Known open issues go in `../regression-watch.md`, not here.
+>
+> **Scope boundary:** service behavior tied to foreclosure and emergency withdrawal recovery is covered in `track-b/foreclose.md`.
 
 ---
 

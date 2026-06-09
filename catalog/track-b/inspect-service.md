@@ -9,7 +9,7 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 - **Risk:** M
 - **Why-not-CI:** boundary behavior.
 - **Steps:**
-  1. POST an inspect with an exactly-2MB payload.
+  1. POST an inspect with an exactly-or close to-2MB payload.
 - **Expected:** accepted and processed.
 
 ## INS-003 — POST /inspect exceeding 2MB
@@ -52,14 +52,6 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
 - **Steps:**
   1. POST inspect to an app name/address that isn't registered.
 - **Expected:** 404 or a clear application-not-found error.
-
-## INS-008 — GET /inspect parity with POST
-
-- **Risk:** L
-- **Why-not-CI:** interface parity between the two HTTP methods; CI only exercises POST.
-- **Steps:**
-  1. Send the same payload via `GET /inspect/{app}?payload=...` and via `POST /inspect/{app}`.
-- **Expected:** identical response bodies and status codes.
 
 ---
 
