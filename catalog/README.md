@@ -12,6 +12,8 @@ The catalog is the master list of all known manual tests, organized by component
 
 Track A is intentionally allowed to overlap with CI — it exists for human confirmation on a real release, not to cover gaps. Track B must not duplicate what CI already asserts; the filter is in the root README. `regression-watch.md` is not a test file — it holds specific questions from prior cycles. Entries are removed when confirmed fixed.
 
+Markdown files in `catalog/` are the source of truth for test definition and order. Any spreadsheet or automation output must mirror IDs, environments, and execution order from the markdown files.
+
 ## What goes in the catalog
 
 Specific, repeatable, pre-written tests. Each entry says: *do this exact thing, expect this exact result.*

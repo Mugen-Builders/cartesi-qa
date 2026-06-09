@@ -7,6 +7,20 @@ Run this checklist for every release candidate. One tester completes it end-to-e
 
 > **CI coverage note (keep this current):** The integration test suite now covers the full echo-dapp lifecycle (input → notice + delegatecall voucher + voucher → claim accepted → execute + proof validation), inspect happy path, inspect-404, reject/exception input handling, and multi-app isolation — all on Anvil. Track A focuses exclusively on what CI cannot cover: **real-testnet behavior** and **CLI UX on a real machine**. Before adding a test here, ask whether CI already asserts the same mechanics on Anvil; if yes, the only remaining manual value is the real-testnet or clean-machine angle.
 
+## Canonical Execution Order (Source of Truth)
+
+This ordered list is the source of truth for Track A execution sequence. The spreadsheet must mirror this order exactly.
+
+1. `SMK-001` (devnet)
+2. `SMK-003` (devnet)
+3. `SMK-004` (devnet)
+4. `SMK-005` (devnet)
+5. `SMK-006` (testnet)
+6. `SMK-002` (testnet)
+7. `SMK-003` (testnet)
+8. `SMK-004` (testnet)
+9. `SMK-005` (testnet)
+
 ---
 
 ## Phase 1 — Devnet Smoke
