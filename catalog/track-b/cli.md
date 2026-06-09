@@ -9,6 +9,7 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 ## CLI-001 — `cartesi doctor` with Docker stopped
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** error message clarity is a UX concern; CI usually runs with Docker up.
 - **Steps:**
   1. Stop Docker Desktop / daemon.
@@ -18,6 +19,7 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 ## CLI-002 — `cartesi build` with missing dependencies
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** CI environments come pre-provisioned; users don't. Error should point at the missing thing clearly.
 - **Steps:**
   1. In a valid project, delete `node_modules` (or equivalent for the template).
@@ -28,6 +30,7 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
 ## CLI-003 — `cartesi create --branch` with invalid branch
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** network-dependent error path, UX-sensitive.
 - **Steps:**
   1. Run `cartesi create myapp --branch nonexistent-branch-xyz`.

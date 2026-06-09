@@ -9,6 +9,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-001 — `db check` detects schema version mismatch
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** database migration integrity; CI always starts from a fresh schema.
 - **Steps:**
   1. Run `cartesi-rollups-cli db init` on a fresh database.
@@ -19,6 +20,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-002 — `app register` then `app list`
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** application management lifecycle used by operators.
 - **Steps:**
   1. Register a new application with `cartesi-rollups-cli app register`.
@@ -28,6 +30,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-003 — `app remove` transitions app to DISABLED
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
   1. Register an application.
@@ -38,6 +41,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-004 — `validate` confirms notice proof on-chain
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** real on-chain proof verification via operator CLI; not covered by the developer CLI path.
 - **Steps:**
   1. Process an input that generates a notice.
@@ -47,6 +51,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-005 — `execute` executes voucher on-chain
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** real on-chain voucher execution via operator CLI.
 - **Steps:**
   1. Process an input that generates a voucher.
@@ -56,6 +61,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-006 — `send --hex --async` flag combination
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** flag interaction; async send path not tested by CI's synchronous lifecycle tests.
 - **Steps:**
   1. Send a hex-encoded payload with `cartesi-rollups-cli send --hex --async`.
@@ -66,6 +72,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-007 — `deploy quorum` creates a v3 Quorum consensus
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** v3 Quorum factory deployment; CI uses pre-deployed contracts, not this command.
 - **Steps:**
   1. Run `cartesi-rollups-cli deploy quorum` with valid operator addresses and threshold.
@@ -75,6 +82,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-008 — `deploy application` with v3 flags
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** `--claim-staging-period` and `--withdrawal-config` flags are new; CI does not exercise them.
 - **Steps:**
   1. Deploy with `--claim-staging-period <N>`.
@@ -85,6 +93,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-009 — `read epochs` shows v3 epoch states
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** new staged and foreclosed epoch states visible only after the lifecycle runs; CI does not inspect via the operator CLI.
 - **Steps:**
   1. Run a node through a normal staging cycle.
@@ -95,6 +104,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-010 — `contract` output shows v3 fields
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** JSON shape of the contract output changed; CI does not assert the full field set.
 - **Steps:**
   1. Register and configure an application with a withdrawal config and guardian.

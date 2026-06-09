@@ -9,6 +9,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-001 — `CARTESI_LOG_LEVEL=debug` propagates across services
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** cross-service log verification is visual; humans notice inconsistencies.
 - **Steps:**
   1. Start node with `CARTESI_LOG_LEVEL=debug`.
@@ -19,6 +20,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-002 — `CARTESI_LOG_LEVEL=warn` suppresses info messages
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** UX concern — startup config logging is nice to have but is an INFO message; confirm what's lost at WARN.
 - **Steps:**
   1. Start node with `CARTESI_LOG_LEVEL=warn`.
@@ -28,6 +30,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-003 — Missing `CARTESI_AUTH_PRIVATE_KEY`
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** partial-failure behavior — what does the rest of the node do when the claimer can't start?
 - **Steps:**
   1. Start node without `CARTESI_AUTH_PRIVATE_KEY`.
@@ -38,6 +41,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-004 — Wrong `CARTESI_BLOCKCHAIN_ID`
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** startup validation clarity; CI doesn't test mismatched chain IDs.
 - **Steps:**
   1. Start node with a `CARTESI_BLOCKCHAIN_ID` that does not match the connected RPC.
@@ -46,6 +50,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-005 — Invalid `CARTESI_DATABASE_CONNECTION`
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** fast-fail behavior and error clarity.
 - **Steps:**
   1. Start node with an unreachable or malformed database connection string.
@@ -54,6 +59,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-006 — Custom `CARTESI_ADVANCER_POLLING_INTERVAL`
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** observable timing behavior in logs; CI doesn't check real timing.
 - **Steps:**
   1. Set a non-default polling interval.
@@ -63,6 +69,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-007 — `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES` limits WS reconnect attempts
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** real network failure simulation; CI doesn't drop the WS endpoint.
 - **Steps:**
   1. Set `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1`.
@@ -72,6 +79,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-008 — `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` controls retry delay
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** timing-dependent; CI doesn't simulate WS outages.
 - **Steps:**
   1. Set a short `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` (e.g., 2s).
@@ -81,6 +89,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-009 — `CARTESI_AUTH_KIND=private-key` explicit auth path
 
 - **Risk:** L
+- **Environment:** devnet
 - **Why-not-CI:** explicit flag validation; confirm the private-key auth path is used for claim signing when set explicitly (vs. implicit default).
 - **Steps:**
   1. Start node with `CARTESI_AUTH_KIND=private-key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.

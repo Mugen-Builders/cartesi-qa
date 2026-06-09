@@ -11,6 +11,7 @@ Tests for individual node services: advancer, claimer, evm-reader, validator, js
 ## SVC-001 — Clean restart of each service individually
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** per-service restart behavior matters to operators.
 - **Steps:**
   1. For each service (advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt):
@@ -22,6 +23,7 @@ Tests for individual node services: advancer, claimer, evm-reader, validator, js
 ## SVC-002 — Dirty restart of each service with active workload
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** partial-failure recovery under real conditions; CI restart tests use minimal input counts and do not apply concurrent load.
 - **Steps:**
   1. For each service (advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt):

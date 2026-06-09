@@ -15,6 +15,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-001 — Authority staging to acceptance lifecycle (happy path)
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** lifecycle timing against real block progression and staging windows is operator-facing and hard to validate in controlled CI timing.
 - **Steps:**
   1. Process inputs until claim computation is available.
@@ -32,6 +33,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-002 — Foreclose before claim staging is complete
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** timing-sensitive operator action before staging is not reliably represented in CI happy-path coverage.
 - **Steps:**
   1. Trigger foreclosure while claim work is still pre-staging.
@@ -41,6 +43,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-003 — Foreclose during staged (not yet accepted) claim
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** staged-window timing and boundary behavior are difficult to assert deterministically in CI.
 - **Steps:**
   1. Move an epoch to `CLAIM_STAGED`.
@@ -51,6 +54,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-004 — Foreclose after claim acceptance preserves accepted history
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** post-accept foreclosure behavior is a timing/state boundary that CI happy-path tests do not target directly.
 - **Steps:**
   1. Move an epoch to `CLAIM_ACCEPTED`.
@@ -61,6 +65,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-005 — Foreclose authorization boundary
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** signer/key misconfiguration behavior and operator clarity are environment-dependent.
 - **Steps:**
   1. Attempt foreclose with a non-guardian signer.
@@ -74,6 +79,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-006 — Wrong epoch drive-root proof is rejected
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** emergency proof material and snapshot selection errors are operational and not covered by standard lifecycle CI.
 - **Steps:**
   1. Foreclose an app and identify the frozen finalized boundary.
@@ -83,6 +89,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-007 — Wrong app proof reuse is rejected
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** cross-application operator mistakes are hard to represent in isolated CI fixtures.
 - **Steps:**
   1. Generate a valid drive-root proof for app A.
@@ -92,6 +99,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-008 — Emergency withdraw before drive-root proof is rejected
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** sequencing failures in emergency procedures are mostly operational, not unit-level.
 - **Steps:**
   1. Foreclose an app.
@@ -101,6 +109,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-009 — Wrong epoch account proof is rejected
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** mismatched snapshot/proof handling is an operator failure mode with real proof artifacts.
 - **Steps:**
   1. Prove a valid drive root for the foreclosed boundary.
@@ -110,6 +119,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-010 — Emergency withdrawal is single-use per account
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** replay resistance in emergency mode is safety-critical and must be verified against real chain execution.
 - **Steps:**
   1. Execute one valid emergency withdrawal for an account.
@@ -119,6 +129,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-011 — Restart and catch-up preserve emergency recovery truth
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** restart timing and event backfill under live RPC behavior are not fully represented by CI.
 - **Steps:**
   1. Foreclose app and perform drive-root proof and at least one emergency withdrawal.
@@ -129,6 +140,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-012 — Emergency withdrawal API parity
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** consistency between operator-facing and JSON-RPC read surfaces is primarily a UX and integration concern.
 - **Steps:**
   1. Execute multiple emergency withdrawals with distinct account indexes.
@@ -142,6 +154,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-013 — Bad emergency config fails fast and clearly
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** configuration UX and startup failure clarity are environment- and operator-path specific.
 - **Steps:**
   1. Start with wrong guardian address.
@@ -152,6 +165,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-014 — Repeated accept failures do not create gas-spending loops
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** long-running retry and cost behavior under live conditions is not fully covered in CI.
 - **Steps:**
   1. Create conditions that repeatedly fail claim acceptance.

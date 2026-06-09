@@ -9,6 +9,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-001 — Deploy to local Anvil
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** local-devnet path that developers use constantly.
 - **Steps:**
   1. Deploy to a local Anvil chain.
@@ -17,6 +18,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-002 — Machine hash matches across environments
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** determinism verification across build environments.
 - **Steps:**
   1. Build the same app on two different machines.
@@ -26,6 +28,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-003 — Deploy to Base Sepolia
 
 - **Risk:** H
+- **Environment:** testnet
 - **Why-not-CI:** CI deploys to a controlled local environment; Base Sepolia introduces real RPC latency, funding, and finality behavior.
 - **Steps:**
   1. Deploy an application to Base Sepolia.
@@ -36,6 +39,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-004 — Deploy to Optimism Sepolia
 
 - **Risk:** H
+- **Environment:** testnet
 - **Why-not-CI:** Optimism Sepolia behavior (RPC/provider differences and chain conditions) must be validated on real infrastructure.
 - **Steps:**
   1. Deploy an application to Optimism Sepolia.
@@ -46,6 +50,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-005 — Deploy using forked testnet workflow
 
 - **Risk:** H
+- **Environment:** testnet
 - **Why-not-CI:** forked-chain deployment depends on real RPC forking behavior and operator configuration paths that CI does not exercise.
 - **Steps:**
   1. Follow the fork tutorial flow from docs PR #320 to start the node against a forked public testnet.

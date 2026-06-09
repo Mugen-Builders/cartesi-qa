@@ -11,6 +11,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-001 — Execute same voucher twice
 
 - **Risk:** H
+- **Environment:** devnet
 - **Why-not-CI:** replay protection on real L1.
 - **Steps:**
   1. Execute a voucher successfully.
@@ -20,6 +21,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-002 — Validate notice and execute voucher with `block: latest` vs `finalized`
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** behavior differs by mode; needs human check on both. Applies to both notice validation and voucher execution — confirm both operations work in each mode.
 - **Steps:**
   1. Validate the same notice once with `block: latest` and once with `block: finalized`.
@@ -29,6 +31,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-003 — Execute with insufficient L1 gas
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** real-gas failure mode.
 - **Steps:**
   1. Execute a voucher with a gas limit set below what's needed.
@@ -37,6 +40,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-004 — Withdraw more than available balance
 
 - **Risk:** M
+- **Environment:** devnet
 - **Why-not-CI:** on-chain revert handling; real L1 state required.
 - **Steps:**
   1. Generate a withdrawal voucher for an amount exceeding the app contract's balance.
