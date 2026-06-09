@@ -56,10 +56,10 @@ const TESTS = [
   ['CLI-003',  'B', 'CLI',              'cartesi create --branch with a nonexistent branch — clear "not found" message',               'devnet'],
 
   // ── Inputs ───────────────────────────────────────────────────────────────────
-  ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation',  'devnet'],
-  ['INP-002',  'B', 'Inputs',           'Malformed / empty payload — node stays healthy, error surfaces to app cleanly',                               'devnet'],
-  ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering',                               'devnet'],
-  ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent',                            'devnet'],
+  ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation',  'devnet + testnet'],
+  ['INP-002',  'B', 'Inputs',           'Malformed / empty payload — node stays healthy, error surfaces to app cleanly',                               'devnet + testnet'],
+  ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering',                               'devnet + testnet'],
+  ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent',                            'devnet + testnet'],
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
@@ -145,20 +145,20 @@ const TESTS = [
   ['MTL-002',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw',      'devnet'],
 
   // ── Foreclosure & Emergency Withdrawals ───────────────────────────────────
-  ['FOR-001',  'B', 'Foreclosure',      'Authority path: submit claim -> immediate staged -> acceptClaim only after staging period',                       'devnet'],
-  ['FOR-002',  'B', 'Foreclosure',      'Foreclose before staging completes -> app FORECLOSED and impossible work marked CLAIM_FORECLOSED',               'devnet'],
-  ['FOR-003',  'B', 'Foreclosure',      'Foreclose during staged (not yet accepted) claim -> staged work that cannot finalize becomes CLAIM_FORECLOSED',  'devnet'],
-  ['FOR-004',  'B', 'Foreclosure',      'Foreclose after accepted claim -> accepted history preserved',                                                    'devnet'],
-  ['FOR-005',  'B', 'Foreclosure',      'Foreclose authorization boundary -> non-guardian fails, guardian succeeds',                                       'devnet'],
-  ['FOR-006',  'B', 'Foreclosure',      'Wrong epoch drive-root proof rejected',                                                                           'devnet'],
-  ['FOR-007',  'B', 'Foreclosure',      'Wrong app proof reuse rejected',                                                                                  'devnet'],
-  ['FOR-008',  'B', 'Foreclosure',      'Emergency withdraw before drive-root proof rejected',                                                             'devnet'],
-  ['FOR-009',  'B', 'Foreclosure',      'Wrong epoch account proof rejected',                                                                              'devnet'],
-  ['FOR-010',  'B', 'Foreclosure',      'Emergency withdrawal single-use per account',                                                                     'devnet'],
-  ['FOR-011',  'B', 'Foreclosure',      'Restart/catch-up preserves foreclosure, proof, and withdrawal truth',                                             'devnet'],
-  ['FOR-012',  'B', 'Foreclosure',      'Emergency withdrawal API parity (operator path vs JSON-RPC)',                                                     'devnet'],
-  ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors',                                                            'devnet'],
-  ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops',                                              'devnet'],
+  ['FOR-001',  'B', 'Foreclosure',      'Authority path: submit claim -> immediate staged -> acceptClaim only after staging period',                       'devnet + testnet'],
+  ['FOR-002',  'B', 'Foreclosure',      'Foreclose before staging completes -> app FORECLOSED and impossible work marked CLAIM_FORECLOSED',               'devnet + testnet'],
+  ['FOR-003',  'B', 'Foreclosure',      'Foreclose during staged (not yet accepted) claim -> staged work that cannot finalize becomes CLAIM_FORECLOSED',  'devnet + testnet'],
+  ['FOR-004',  'B', 'Foreclosure',      'Foreclose after accepted claim -> accepted history preserved',                                                    'devnet + testnet'],
+  ['FOR-005',  'B', 'Foreclosure',      'Foreclose authorization boundary -> non-guardian fails, guardian succeeds',                                       'devnet + testnet'],
+  ['FOR-006',  'B', 'Foreclosure',      'Wrong epoch drive-root proof rejected',                                                                           'devnet + testnet'],
+  ['FOR-007',  'B', 'Foreclosure',      'Wrong app proof reuse rejected',                                                                                  'devnet + testnet'],
+  ['FOR-008',  'B', 'Foreclosure',      'Emergency withdraw before drive-root proof rejected',                                                             'devnet + testnet'],
+  ['FOR-009',  'B', 'Foreclosure',      'Wrong epoch account proof rejected',                                                                              'devnet + testnet'],
+  ['FOR-010',  'B', 'Foreclosure',      'Emergency withdrawal single-use per account',                                                                     'devnet + testnet'],
+  ['FOR-011',  'B', 'Foreclosure',      'Restart/catch-up preserves foreclosure, proof, and withdrawal truth',                                             'devnet + testnet'],
+  ['FOR-012',  'B', 'Foreclosure',      'Emergency withdrawal API parity (operator path vs JSON-RPC)',                                                     'devnet + testnet'],
+  ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors',                                                            'devnet + testnet'],
+  ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops',                                              'devnet + testnet'],
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TRACK C — Exploratory Charters  (2-hour time-boxed sessions)

@@ -9,7 +9,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-001 — Deposit with massive `execLayerData`
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
 - **Steps:**
   1. Construct a deposit with `execLayerData` sized near the practical upper bound.
@@ -19,7 +19,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-002 — Malformed / empty payload
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** error-handling UX; node should not crash on garbage input.
 - **Steps:**
   1. Send an input with an empty payload.
@@ -29,7 +29,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-003 — Same-block inputs from multiple wallets
 
 - **Risk:** M
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** ordering under real mempool conditions differs from deterministic CI.
 - **Steps:**
   1. From two separate wallets, submit inputs in the same block.
@@ -38,7 +38,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-004 — ERC721 with malformed metadata
 
 - **Risk:** L
-- **Environment:** devnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.
 - **Steps:**
   1. Deposit an ERC721 with malformed or unexpected metadata bytes.
