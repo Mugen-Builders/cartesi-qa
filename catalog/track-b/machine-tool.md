@@ -9,7 +9,8 @@ Tests for the `cartesi-rollups-machine-tool` binary used to replay accepted stat
 ## MTL-001 — `replay` advances machine to a stored snapshot
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** requires a running node DB with accepted epochs; CI integration tests do not validate the machine-tool binary separately.
 - **Steps:**
   1. Run a node to `CLAIM_ACCEPTED` on at least one epoch.
@@ -20,7 +21,8 @@ Tests for the `cartesi-rollups-machine-tool` binary used to replay accepted stat
 ## MTL-002 — `prove accounts-drive` generates valid proof files
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** end-to-end proof generation requires a stored snapshot from a running application; CI does not cover this binary.
 - **Steps:**
   1. Produce a snapshot with MTL-001.

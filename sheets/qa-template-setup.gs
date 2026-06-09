@@ -56,22 +56,31 @@ const TESTS = [
   ['CLI-003',  'B', 'CLI',              'cartesi create --branch with a nonexistent branch — clear "not found" message',               'devnet'],
 
   // ── Inputs ───────────────────────────────────────────────────────────────────
-  ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation',  'devnet + testnet'],
-  ['INP-002',  'B', 'Inputs',           'Malformed / empty payload — node stays healthy, error surfaces to app cleanly',                               'devnet + testnet'],
-  ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering',                               'devnet + testnet'],
-  ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent',                            'devnet + testnet'],
+  ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation', 'devnet'],
+  ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation', 'testnet'],
+  ['INP-002',  'B', 'Inputs',           'Malformed / empty payload — node stays healthy, error surfaces to app cleanly', 'devnet'],
+  ['INP-002',  'B', 'Inputs',           'Malformed / empty payload — node stays healthy, error surfaces to app cleanly', 'testnet'],
+  ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering', 'devnet'],
+  ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering', 'testnet'],
+  ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent', 'devnet'],
+  ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent', 'testnet'],
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
   ['OUT-002',  'B', 'Outputs',          'Emit notice at exactly 2MB boundary — accepted, full content retrievable',                                    'devnet'],
-  ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy',                                  'devnet + testnet'],
+  ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'devnet'],
+  ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'testnet'],
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'devnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
-  ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason',                                       'devnet + testnet'],
-  ['EGR-002',  'B', 'Egress',           'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference',  'devnet + testnet'],
-  ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state',                        'devnet + testnet'],
-  ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly',          'devnet + testnet'],
+  ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
+  ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'testnet'],
+  ['EGR-002',  'B', 'Egress',           'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference', 'devnet'],
+  ['EGR-002',  'B', 'Egress',           'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference', 'testnet'],
+  ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state', 'devnet'],
+  ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state', 'testnet'],
+  ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'devnet'],
+  ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'testnet'],
 
   // ── Configuration ────────────────────────────────────────────────────────────
   ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'devnet'],
@@ -85,41 +94,66 @@ const TESTS = [
   ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private-key set explicitly — claimer signs and submits claims, no auth errors',               'devnet'],
 
   // ── Services ─────────────────────────────────────────────────────────────────
-  ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)',  'devnet + testnet'],
-  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)',                                        'devnet + testnet'],
+  ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'devnet'],
+  ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],
+  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)', 'devnet'],
+  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)', 'testnet'],
 
   // ── State Persistence ────────────────────────────────────────────────────────
-  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state',                                     'devnet + testnet'],
-  ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly',     'devnet + testnet'],
-  ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly',     'devnet + testnet'],
-  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time',                      'devnet + testnet'],
-  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain',  'devnet + testnet'],
+  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'devnet'],
+  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'testnet'],
+  ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'devnet'],
+  ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'testnet'],
+  ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'devnet'],
+  ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'testnet'],
+  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'devnet'],
+  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'testnet'],
+  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'devnet'],
+  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'testnet'],
 
   // ── Inspect Service ──────────────────────────────────────────────────────────
-  ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed',                                               'devnet + testnet'],
-  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code (see RW-002)',                         'devnet + testnet'],
-  ['INS-003',  'B', 'Inspect Service',  'Concurrent inspects up to execution-parameters limit — all handled, no drops or crashes',                       'devnet + testnet'],
-  ['INS-004',  'B', 'Inspect Service',  'Inspect while advance is actively processing — queued, returns correct result after advance',                    'devnet + testnet'],
-  ['INS-005',  'B', 'Inspect Service',  'Inspect by 0x hex address vs app name — identical responses',                                                   'devnet + testnet'],
-  ['INS-006',  'B', 'Inspect Service',  'Inspect for unknown application — 404 or clear app-not-found error',                                            'devnet + testnet'],
+  ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed', 'devnet'],
+  ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed', 'testnet'],
+  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code (see RW-002)', 'devnet'],
+  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code (see RW-002)', 'testnet'],
+  ['INS-003',  'B', 'Inspect Service',  'Concurrent inspects up to execution-parameters limit — all handled, no drops or crashes', 'devnet'],
+  ['INS-003',  'B', 'Inspect Service',  'Concurrent inspects up to execution-parameters limit — all handled, no drops or crashes', 'testnet'],
+  ['INS-004',  'B', 'Inspect Service',  'Inspect while advance is actively processing — queued, returns correct result after advance', 'devnet'],
+  ['INS-004',  'B', 'Inspect Service',  'Inspect while advance is actively processing — queued, returns correct result after advance', 'testnet'],
+  ['INS-005',  'B', 'Inspect Service',  'Inspect by 0x hex address vs app name — identical responses', 'devnet'],
+  ['INS-005',  'B', 'Inspect Service',  'Inspect by 0x hex address vs app name — identical responses', 'testnet'],
+  ['INS-006',  'B', 'Inspect Service',  'Inspect for unknown application — 404 or clear app-not-found error', 'devnet'],
+  ['INS-006',  'B', 'Inspect Service',  'Inspect for unknown application — 404 or clear app-not-found error', 'testnet'],
 
   // ── JSON-RPC API ─────────────────────────────────────────────────────────────
-  ['JRP-001',  'B', 'JSON-RPC API',     'Invalid JSON body → HTTP 400, code -32700 PARSE_ERROR',                                                         'devnet + testnet'],
-  ['JRP-002',  'B', 'JSON-RPC API',     'Non-existent method → code -32601 METHOD_NOT_FOUND',                                                            'devnet + testnet'],
-  ['JRP-003',  'B', 'JSON-RPC API',     'Wrong parameter type (decimal where hex expected) → code -32602 INVALID_PARAMS, offending param named',          'devnet + testnet'],
-  ['JRP-004',  'B', 'JSON-RPC API',     'Error object shape matches JSON-RPC spec: exactly {code, message, [data]}, no extra fields',                     'devnet + testnet'],
-  ['JRP-005',  'B', 'JSON-RPC API',     'Pagination limit=0 — behavior consistent across list methods (document: coerce or reject)',                      'devnet + testnet'],
-  ['JRP-006',  'B', 'JSON-RPC API',     'Pagination offset > total count — empty data array, correct total_count, no error',                             'devnet + testnet'],
-  ['JRP-007',  'B', 'JSON-RPC API',     'Pagination negative offset → -32602 INVALID_PARAMS',                                                            'devnet + testnet'],
-  ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500',                                    'devnet + testnet'],
+  ['JRP-001',  'B', 'JSON-RPC API',     'Invalid JSON body → HTTP 400, code -32700 PARSE_ERROR', 'devnet'],
+  ['JRP-001',  'B', 'JSON-RPC API',     'Invalid JSON body → HTTP 400, code -32700 PARSE_ERROR', 'testnet'],
+  ['JRP-002',  'B', 'JSON-RPC API',     'Non-existent method → code -32601 METHOD_NOT_FOUND', 'devnet'],
+  ['JRP-002',  'B', 'JSON-RPC API',     'Non-existent method → code -32601 METHOD_NOT_FOUND', 'testnet'],
+  ['JRP-003',  'B', 'JSON-RPC API',     'Wrong parameter type (decimal where hex expected) → code -32602 INVALID_PARAMS, offending param named', 'devnet'],
+  ['JRP-003',  'B', 'JSON-RPC API',     'Wrong parameter type (decimal where hex expected) → code -32602 INVALID_PARAMS, offending param named', 'testnet'],
+  ['JRP-004',  'B', 'JSON-RPC API',     'Error object shape matches JSON-RPC spec: exactly {code, message, [data]}, no extra fields', 'devnet'],
+  ['JRP-004',  'B', 'JSON-RPC API',     'Error object shape matches JSON-RPC spec: exactly {code, message, [data]}, no extra fields', 'testnet'],
+  ['JRP-005',  'B', 'JSON-RPC API',     'Pagination limit=0 — behavior consistent across list methods (document: coerce or reject)', 'devnet'],
+  ['JRP-005',  'B', 'JSON-RPC API',     'Pagination limit=0 — behavior consistent across list methods (document: coerce or reject)', 'testnet'],
+  ['JRP-006',  'B', 'JSON-RPC API',     'Pagination offset > total count — empty data array, correct total_count, no error', 'devnet'],
+  ['JRP-006',  'B', 'JSON-RPC API',     'Pagination offset > total count — empty data array, correct total_count, no error', 'testnet'],
+  ['JRP-007',  'B', 'JSON-RPC API',     'Pagination negative offset → -32602 INVALID_PARAMS', 'devnet'],
+  ['JRP-007',  'B', 'JSON-RPC API',     'Pagination negative offset → -32602 INVALID_PARAMS', 'testnet'],
+  ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500', 'devnet'],
+  ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500', 'testnet'],
 
   // ── Multi-App ────────────────────────────────────────────────────────────────
-  ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load',                                                      'devnet + testnet'],
-  ['MA-002',   'B', 'Multi-App',        'Restart node with many pending inputs across two apps — document processing order (serial vs fair)',              'devnet + testnet'],
+  ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'devnet'],
+  ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'testnet'],
+  ['MA-002',   'B', 'Multi-App',        'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'devnet'],
+  ['MA-002',   'B', 'Multi-App',        'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'testnet'],
 
   // ── Quorum Consensus ────────────────────────────────────────────────────────
-  ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence',                        'devnet + testnet'],
-  ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period',                                        'devnet + testnet'],
+  ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence', 'devnet'],
+  ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence', 'testnet'],
+  ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period', 'devnet'],
+  ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period', 'testnet'],
 
   // ── Deployment ───────────────────────────────────────────────────────────────
   ['DEP-001',  'B', 'Deployment',       'Deploy to local Anvil — deployment completes, app addresses correct',                                             'devnet'],
@@ -129,36 +163,62 @@ const TESTS = [
   ['DEP-005',  'B', 'Deployment',       'Deploy using forked-testnet workflow — deploy, process input, restart and verify cursor recovery',                'testnet'],
 
   // ── Internal Operator CLI ────────────────────────────────────────────────────
-  ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch',                                             'devnet + testnet'],
-  ['ILC-002',  'B', 'Internal CLI',     'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct',                   'devnet + testnet'],
-  ['ILC-003',  'B', 'Internal CLI',     'cartesi-rollups-cli app remove — transitions to DISABLED, services stop processing it',                           'devnet + testnet'],
-  ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned',               'devnet + testnet'],
-  ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned',                   'devnet + testnet'],
-  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode',                   'devnet + testnet'],
-  ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly',                           'devnet + testnet'],
-  ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated',     'devnet + testnet'],
-  ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses',             'devnet + testnet'],
-  ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)',     'devnet + testnet'],
+  ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch', 'devnet'],
+  ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch', 'testnet'],
+  ['ILC-002',  'B', 'Internal CLI',     'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'devnet'],
+  ['ILC-002',  'B', 'Internal CLI',     'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'testnet'],
+  ['ILC-003',  'B', 'Internal CLI',     'cartesi-rollups-cli app remove — transitions to DISABLED, services stop processing it', 'devnet'],
+  ['ILC-003',  'B', 'Internal CLI',     'cartesi-rollups-cli app remove — transitions to DISABLED, services stop processing it', 'testnet'],
+  ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'devnet'],
+  ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'testnet'],
+  ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'devnet'],
+  ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'testnet'],
+  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'devnet'],
+  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'testnet'],
+  ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'devnet'],
+  ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'testnet'],
+  ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'devnet'],
+  ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'testnet'],
+  ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'devnet'],
+  ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'testnet'],
+  ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'devnet'],
+  ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'testnet'],
 
   // ── Machine Tool ────────────────────────────────────────────────────────────
-  ['MTL-001',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch',                            'devnet + testnet'],
-  ['MTL-002',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw',      'devnet + testnet'],
+  ['MTL-001',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'devnet'],
+  ['MTL-001',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'testnet'],
+  ['MTL-002',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw', 'devnet'],
+  ['MTL-002',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw', 'testnet'],
 
   // ── Foreclosure & Emergency Withdrawals ───────────────────────────────────
-  ['FOR-001',  'B', 'Foreclosure',      'Authority path: submit claim -> immediate staged -> acceptClaim only after staging period',                       'devnet + testnet'],
-  ['FOR-002',  'B', 'Foreclosure',      'Foreclose before staging completes -> app FORECLOSED and impossible work marked CLAIM_FORECLOSED',               'devnet + testnet'],
-  ['FOR-003',  'B', 'Foreclosure',      'Foreclose during staged (not yet accepted) claim -> staged work that cannot finalize becomes CLAIM_FORECLOSED',  'devnet + testnet'],
-  ['FOR-004',  'B', 'Foreclosure',      'Foreclose after accepted claim -> accepted history preserved',                                                    'devnet + testnet'],
-  ['FOR-005',  'B', 'Foreclosure',      'Foreclose authorization boundary -> non-guardian fails, guardian succeeds',                                       'devnet + testnet'],
-  ['FOR-006',  'B', 'Foreclosure',      'Wrong epoch drive-root proof rejected',                                                                           'devnet + testnet'],
-  ['FOR-007',  'B', 'Foreclosure',      'Wrong app proof reuse rejected',                                                                                  'devnet + testnet'],
-  ['FOR-008',  'B', 'Foreclosure',      'Emergency withdraw before drive-root proof rejected',                                                             'devnet + testnet'],
-  ['FOR-009',  'B', 'Foreclosure',      'Wrong epoch account proof rejected',                                                                              'devnet + testnet'],
-  ['FOR-010',  'B', 'Foreclosure',      'Emergency withdrawal single-use per account',                                                                     'devnet + testnet'],
-  ['FOR-011',  'B', 'Foreclosure',      'Restart/catch-up preserves foreclosure, proof, and withdrawal truth',                                             'devnet + testnet'],
-  ['FOR-012',  'B', 'Foreclosure',      'Emergency withdrawal API parity (operator path vs JSON-RPC)',                                                     'devnet + testnet'],
-  ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors',                                                            'devnet + testnet'],
-  ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops',                                              'devnet + testnet'],
+  ['FOR-001',  'B', 'Foreclosure',      'Authority path: submit claim -> immediate staged -> acceptClaim only after staging period', 'devnet'],
+  ['FOR-001',  'B', 'Foreclosure',      'Authority path: submit claim -> immediate staged -> acceptClaim only after staging period', 'testnet'],
+  ['FOR-002',  'B', 'Foreclosure',      'Foreclose before staging completes -> app FORECLOSED and impossible work marked CLAIM_FORECLOSED', 'devnet'],
+  ['FOR-002',  'B', 'Foreclosure',      'Foreclose before staging completes -> app FORECLOSED and impossible work marked CLAIM_FORECLOSED', 'testnet'],
+  ['FOR-003',  'B', 'Foreclosure',      'Foreclose during staged (not yet accepted) claim -> staged work that cannot finalize becomes CLAIM_FORECLOSED', 'devnet'],
+  ['FOR-003',  'B', 'Foreclosure',      'Foreclose during staged (not yet accepted) claim -> staged work that cannot finalize becomes CLAIM_FORECLOSED', 'testnet'],
+  ['FOR-004',  'B', 'Foreclosure',      'Foreclose after accepted claim -> accepted history preserved', 'devnet'],
+  ['FOR-004',  'B', 'Foreclosure',      'Foreclose after accepted claim -> accepted history preserved', 'testnet'],
+  ['FOR-005',  'B', 'Foreclosure',      'Foreclose authorization boundary -> non-guardian fails, guardian succeeds', 'devnet'],
+  ['FOR-005',  'B', 'Foreclosure',      'Foreclose authorization boundary -> non-guardian fails, guardian succeeds', 'testnet'],
+  ['FOR-006',  'B', 'Foreclosure',      'Wrong epoch drive-root proof rejected', 'devnet'],
+  ['FOR-006',  'B', 'Foreclosure',      'Wrong epoch drive-root proof rejected', 'testnet'],
+  ['FOR-007',  'B', 'Foreclosure',      'Wrong app proof reuse rejected', 'devnet'],
+  ['FOR-007',  'B', 'Foreclosure',      'Wrong app proof reuse rejected', 'testnet'],
+  ['FOR-008',  'B', 'Foreclosure',      'Emergency withdraw before drive-root proof rejected', 'devnet'],
+  ['FOR-008',  'B', 'Foreclosure',      'Emergency withdraw before drive-root proof rejected', 'testnet'],
+  ['FOR-009',  'B', 'Foreclosure',      'Wrong epoch account proof rejected', 'devnet'],
+  ['FOR-009',  'B', 'Foreclosure',      'Wrong epoch account proof rejected', 'testnet'],
+  ['FOR-010',  'B', 'Foreclosure',      'Emergency withdrawal single-use per account', 'devnet'],
+  ['FOR-010',  'B', 'Foreclosure',      'Emergency withdrawal single-use per account', 'testnet'],
+  ['FOR-011',  'B', 'Foreclosure',      'Restart/catch-up preserves foreclosure, proof, and withdrawal truth', 'devnet'],
+  ['FOR-011',  'B', 'Foreclosure',      'Restart/catch-up preserves foreclosure, proof, and withdrawal truth', 'testnet'],
+  ['FOR-012',  'B', 'Foreclosure',      'Emergency withdrawal API parity (operator path vs JSON-RPC)', 'devnet'],
+  ['FOR-012',  'B', 'Foreclosure',      'Emergency withdrawal API parity (operator path vs JSON-RPC)', 'testnet'],
+  ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors', 'devnet'],
+  ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors', 'testnet'],
+  ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops', 'devnet'],
+  ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops', 'testnet'],
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TRACK C — Exploratory Charters  (2-hour time-boxed sessions)
@@ -307,10 +367,8 @@ function _buildTemplateSheet(ss) {
       row++;
       lastTrack = track;
     }
-    _expandEnvironments(env).forEach((envValue) => {
-      _writeRow(s, row, id, track, area, name, envValue, ownerRange);
-      row++;
-    });
+    _writeRow(s, row, id, track, area, name, env, ownerRange);
+    row++;
   });
 
   // Freeze column 1 now that all merges are done
@@ -350,15 +408,6 @@ function _writeDivider(s, row, track) {
    .setHorizontalAlignment('left');
   s.setRowHeight(row, 26);
 }
-
-function _expandEnvironments(env) {
-  if (typeof env !== 'string') return ['devnet'];
-  if (env.includes('+')) {
-    return env.split('+').map((x) => x.trim()).filter(Boolean);
-  }
-  return [env.trim() || 'devnet'];
-}
-
 // ─── Test row ────────────────────────────────────────────────────────────────────
 
 function _writeRow(s, row, id, track, area, name, env, ownerRange) {

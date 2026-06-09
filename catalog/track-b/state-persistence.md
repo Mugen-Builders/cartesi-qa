@@ -13,7 +13,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-001 — Hard-kill all containers mid-execution
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** chaos-style test; disaster-recovery behavior is operational.
 - **Steps:**
   1. While the node is actively processing inputs, hard-kill all containers.
@@ -23,7 +24,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-002 — Per-input snapshots
 
 - **Risk:** M
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** feature-flag behavior; needs visual confirmation.
 - **Steps:**
   1. Configure `--save-snapshot=every-input`.
@@ -34,7 +36,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-003 — Per-epoch snapshots
 
 - **Risk:** M
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** as above, different granularity.
 - **Steps:**
   1. Configure `--save-snapshot=every-epoch`.
@@ -45,7 +48,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-004 — Claimer resync after extended offline
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** resync under real chain conditions; catch-up behavior not exercised in CI.
 - **Steps:**
   1. Run node, let it claim several epochs.
@@ -56,7 +60,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-005 — L1 chain reorganization
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Feasibility:** run only when a suitable testnet or Anvil reorg setup is available.
 - **Why-not-CI:** hard to simulate in CI; needs a testnet that will reorg.
 - **Steps:**

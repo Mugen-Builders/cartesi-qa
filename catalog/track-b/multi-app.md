@@ -15,7 +15,8 @@ Tests for running multiple applications on a single node.
 ## MA-001 — Heavy app does not starve light app
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
 - **Steps:**
   1. Deploy a compute-heavy app and a light app on the same node.
@@ -25,7 +26,8 @@ Tests for running multiple applications on a single node.
 ## MA-002 — Restart with multiple apps, many pending inputs
 
 - **Risk:** H
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** restart processing order under real workloads; CI's restart tests use small input counts.
 - **Steps:**
   1. Queue many inputs to two apps.

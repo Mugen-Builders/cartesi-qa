@@ -27,7 +27,8 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-003 — Voucher with invalid destination
 
 - **Risk:** M
-- **Environment:** devnet + testnet
+- **Environment:** devnet
+- **Environment:** testnet
 - **Why-not-CI:** execution failure handling on-chain; needs real testnet.
 - **Steps:**
   1. Generate a voucher targeting a contract/method that will revert.
