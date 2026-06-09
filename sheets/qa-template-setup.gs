@@ -67,10 +67,13 @@ const TESTS = [
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
+  ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'testnet'],
   ['OUT-002',  'B', 'Outputs',          'Emit notice at exactly 2MB boundary — accepted, full content retrievable',                                    'devnet'],
+  ['OUT-002',  'B', 'Outputs',          'Emit notice at exactly 2MB boundary — accepted, full content retrievable',                                    'testnet'],
   ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'devnet'],
   ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'testnet'],
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'devnet'],
+  ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'testnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
   ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
@@ -83,32 +86,25 @@ const TESTS = [
   ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'testnet'],
 
   // ── Configuration ────────────────────────────────────────────────────────────
-  ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'devnet'],
-  ['CFG-002',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=warn — info suppressed; document which startup markers disappear',                            'devnet'],
-  ['CFG-003',  'B', 'Configuration',    'Missing CARTESI_AUTH_PRIVATE_KEY — claimer fails fast with clear message, other services start normally',       'devnet'],
-  ['CFG-004',  'B', 'Configuration',    'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level (see RW-003)',   'devnet'],
-  ['CFG-005',  'B', 'Configuration',    'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error',                        'devnet'],
-  ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output (see RW-004)',    'devnet'],
-  ['CFG-007',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1 — evm-reader retries once then logs clear failure, no panic',               'devnet'],
-  ['CFG-008',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL custom value — reconnect timing matches config',                        'devnet'],
-  ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private-key set explicitly — claimer signs and submits claims, no auth errors',               'devnet'],
+  ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'testnet'],
+  ['CFG-002',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=warn — info suppressed; document which startup markers disappear',                            'testnet'],
+  ['CFG-003',  'B', 'Configuration',    'Missing CARTESI_AUTH_PRIVATE_KEY — claimer fails fast with clear message, other services start normally',       'testnet'],
+  ['CFG-004',  'B', 'Configuration',    'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level (see RW-003)',   'testnet'],
+  ['CFG-005',  'B', 'Configuration',    'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error',                        'testnet'],
+  ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output (see RW-004)',    'testnet'],
+  ['CFG-007',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1 — evm-reader retries once then logs clear failure, no panic',               'testnet'],
+  ['CFG-008',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL custom value — reconnect timing matches config',                        'testnet'],
+  ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private-key set explicitly — claimer signs and submits claims, no auth errors',               'testnet'],
 
   // ── Services ─────────────────────────────────────────────────────────────────
-  ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'devnet'],
   ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],
-  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)', 'devnet'],
   ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)', 'testnet'],
 
   // ── State Persistence ────────────────────────────────────────────────────────
-  ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'devnet'],
   ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'testnet'],
-  ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'devnet'],
   ['SP-002',   'B', 'State Persistence','Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'testnet'],
-  ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'devnet'],
   ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'testnet'],
-  ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'devnet'],
   ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'testnet'],
-  ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'devnet'],
   ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'testnet'],
 
   // ── Inspect Service ──────────────────────────────────────────────────────────
@@ -144,15 +140,11 @@ const TESTS = [
   ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500', 'testnet'],
 
   // ── Multi-App ────────────────────────────────────────────────────────────────
-  ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'devnet'],
   ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'testnet'],
-  ['MA-002',   'B', 'Multi-App',        'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'devnet'],
   ['MA-002',   'B', 'Multi-App',        'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'testnet'],
 
   // ── Quorum Consensus ────────────────────────────────────────────────────────
-  ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence', 'devnet'],
   ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence', 'testnet'],
-  ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period', 'devnet'],
   ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period', 'testnet'],
 
   // ── Deployment ───────────────────────────────────────────────────────────────
@@ -163,25 +155,17 @@ const TESTS = [
   ['DEP-005',  'B', 'Deployment',       'Deploy using forked-testnet workflow — deploy, process input, restart and verify cursor recovery',                'testnet'],
 
   // ── Internal Operator CLI ────────────────────────────────────────────────────
-  ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch', 'devnet'],
   ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch', 'testnet'],
-  ['ILC-002',  'B', 'Internal CLI',     'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'devnet'],
   ['ILC-002',  'B', 'Internal CLI',     'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'testnet'],
-  ['ILC-003',  'B', 'Internal CLI',     'cartesi-rollups-cli app remove — transitions to DISABLED, services stop processing it', 'devnet'],
   ['ILC-003',  'B', 'Internal CLI',     'cartesi-rollups-cli app remove — transitions to DISABLED, services stop processing it', 'testnet'],
-  ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'devnet'],
   ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'testnet'],
   ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'devnet'],
   ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'testnet'],
   ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'devnet'],
   ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'testnet'],
-  ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'devnet'],
   ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'testnet'],
-  ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'devnet'],
   ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'testnet'],
-  ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'devnet'],
   ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'testnet'],
-  ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'devnet'],
   ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'testnet'],
 
   // ── Machine Tool ────────────────────────────────────────────────────────────
@@ -361,7 +345,7 @@ function _buildTemplateSheet(ss) {
   let row = 2;
   let lastTrack = null;
 
-  TESTS.forEach(([id, track, area, name, env]) => {
+  _orderedTestsForSheet(TESTS).forEach(([id, track, area, name, env]) => {
     if (track !== lastTrack) {
       _writeDivider(s, row, track);
       row++;
@@ -382,6 +366,32 @@ function _buildTemplateSheet(ss) {
   s.getRange(1, 1, lastRow, HEADERS.length)
    .setBorder(true, true, true, true, false, false, COLOR.border,
               SpreadsheetApp.BorderStyle.SOLID);
+}
+
+function _orderedTestsForSheet(tests) {
+  const byTrack = new Map();
+
+  tests.forEach((test) => {
+    const [id, track] = test;
+    if (!byTrack.has(track)) {
+      byTrack.set(track, []);
+    }
+    byTrack.get(track).push(test);
+  });
+
+  const ordered = [];
+  byTrack.forEach((trackTests, track) => {
+    if (track === 'B') {
+      ordered.push(...trackTests.filter((test) => test[4] === 'devnet'));
+      ordered.push(...trackTests.filter((test) => test[4] === 'testnet'));
+      ordered.push(...trackTests.filter((test) => test[4] !== 'devnet' && test[4] !== 'testnet'));
+      return;
+    }
+
+    ordered.push(...trackTests);
+  });
+
+  return ordered;
 }
 
 // ─── Section divider row ────────────────────────────────────────────────────────
