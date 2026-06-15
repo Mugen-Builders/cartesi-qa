@@ -6,6 +6,7 @@ The catalog is the master list of all known manual tests, organized by component
 
 | Path | Contents |
 |---|---|
+| `../reference/` | v3 lifecycle reference and QA harness setup (context, not test cases) |
 | `track-a.md` | All Track A (smoke) tests in a single runnable checklist |
 | `track-b/` | Track B (deep validation) tests, one file per component |
 | `regression-watch.md` | Ephemeral list of known open issues to re-check next cycle |

@@ -70,6 +70,9 @@ Across the whole program, roughly **30% happy-path, 70% breaking/poking.**
 | Artifact | Location |
 |---|---|
 | Test catalog | `catalog/` in this repo |
+| v3 lifecycle reference | `reference/v3-lifecycle.md` |
+| v3 QA harness setup | `reference/v3-qa-harness.md` |
+| Contracts v3 presentation | `docs/presentations/contracts-v3-pr.html` |
 | Charter definitions | `charters/` in this repo |
 | Cycle plans & reports | `cycles/` in this repo |
 | Session notes (charter outputs) | `cycles/<cycle-name>/session-notes/` |
