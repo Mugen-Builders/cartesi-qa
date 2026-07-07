@@ -44,6 +44,16 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   2. Generate a report during inspect-state processing.
 - **Expected:** both reports retrievable via the appropriate API.
 
+## OUT-005 — Emit arbitrary blob output and fetch via JSON-RPC
+
+- **Risk:** M
+- **Environment:** devnet + testnet
+- **Why-not-CI:** generic blob payload handling and retrieval shape are integration-level behavior not covered by current CI assertions.
+- **Steps:**
+  1. From inside the VM, emit an arbitrary blob output (non-empty bytes that are not a voucher or notice payload).
+  2. Query outputs through JSON-RPC list/get methods for the input/epoch.
+- **Expected:** node accepts the blob output, persists it, and returns the exact bytes through JSON-RPC without truncation or reinterpretation.
+
 ---
 
 <!-- Add voucher-by-token-type entries, replay protection tests, etc. -->

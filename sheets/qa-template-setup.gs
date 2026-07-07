@@ -64,6 +64,14 @@ const TESTS = [
   ['INP-003',  'B', 'Inputs',           'Same-block inputs from multiple wallets — both processed in on-chain ordering', 'testnet'],
   ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent', 'devnet'],
   ['INP-004',  'B', 'Inputs',           'ERC721 deposit with malformed metadata — input accepted, app response consistent', 'testnet'],
+  ['INP-005',  'B', 'Inputs',           'Direct InputBox massive payload near tx-size practical limit — accepted and processed with exact bytes', 'devnet'],
+  ['INP-005',  'B', 'Inputs',           'Direct InputBox massive payload near tx-size practical limit — accepted and processed with exact bytes', 'testnet'],
+  ['INP-006',  'B', 'Inputs',           'Multiple addInput calls in one tx (spambox-style) — node keeps up and preserves on-chain order', 'devnet'],
+  ['INP-006',  'B', 'Inputs',           'Multiple addInput calls in one tx (spambox-style) — node keeps up and preserves on-chain order', 'testnet'],
+  ['INP-007',  'B', 'Inputs',           'USDC deposit into application — L1 accepts, node feeds machine, machine reports successful deposit', 'devnet'],
+  ['INP-007',  'B', 'Inputs',           'USDC deposit into application — L1 accepts, node feeds machine, machine reports successful deposit', 'testnet'],
+  ['INP-008',  'B', 'Inputs',           'USDC withdrawal request input — L1 accepts, node feeds machine, machine reports successful request', 'devnet'],
+  ['INP-008',  'B', 'Inputs',           'USDC withdrawal request input — L1 accepts, node feeds machine, machine reports successful request', 'testnet'],
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
@@ -74,6 +82,8 @@ const TESTS = [
   ['OUT-003',  'B', 'Outputs',          'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'testnet'],
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'devnet'],
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'testnet'],
+  ['OUT-005',  'B', 'Outputs',          'Arbitrary blob output accepted and retrievable through JSON-RPC with exact bytes', 'devnet'],
+  ['OUT-005',  'B', 'Outputs',          'Arbitrary blob output accepted and retrievable through JSON-RPC with exact bytes', 'testnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
   ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
@@ -84,6 +94,20 @@ const TESTS = [
   ['EGR-003',  'B', 'Egress',           'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state', 'testnet'],
   ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'devnet'],
   ['EGR-004',  'B', 'Egress',           'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'testnet'],
+  ['EGR-005',  'B', 'Egress',           'Validate arbitrary-blob output proof on L1 — proof accepted', 'devnet'],
+  ['EGR-005',  'B', 'Egress',           'Validate arbitrary-blob output proof on L1 — proof accepted', 'testnet'],
+  ['EGR-006',  'B', 'Egress',           'Execute non-executable outputs (empty, notice, blob) — each rejected with clear error and clean node failure record', 'devnet'],
+  ['EGR-006',  'B', 'Egress',           'Execute non-executable outputs (empty, notice, blob) — each rejected with clear error and clean node failure record', 'testnet'],
+  ['EGR-007',  'B', 'Egress',           'Validate USDC withdrawal voucher proof in app contract — accepted', 'devnet'],
+  ['EGR-007',  'B', 'Egress',           'Validate USDC withdrawal voucher proof in app contract — accepted', 'testnet'],
+  ['EGR-008',  'B', 'Egress',           'Execute USDC withdrawal voucher — L1 accepts and node marks output executed', 'devnet'],
+  ['EGR-008',  'B', 'Egress',           'Execute USDC withdrawal voucher — L1 accepts and node marks output executed', 'testnet'],
+  ['EGR-009',  'B', 'Egress',           'Attempt Ether withdrawal above app-contract balance — clear L1 revert and clean node failure record', 'devnet'],
+  ['EGR-009',  'B', 'Egress',           'Attempt Ether withdrawal above app-contract balance — clear L1 revert and clean node failure record', 'testnet'],
+  ['EGR-010',  'B', 'Egress',           'Attempt ERC-721 withdrawal for token not owned by app contract — clear L1 revert and clean node failure record', 'devnet'],
+  ['EGR-010',  'B', 'Egress',           'Attempt ERC-721 withdrawal for token not owned by app contract — clear L1 revert and clean node failure record', 'testnet'],
+  ['EGR-011',  'B', 'Egress',           'Attempt ERC-1155 withdrawal above app-contract balance — clear L1 revert and clean node failure record', 'devnet'],
+  ['EGR-011',  'B', 'Egress',           'Attempt ERC-1155 withdrawal above app-contract balance — clear L1 revert and clean node failure record', 'testnet'],
 
   // ── Configuration ────────────────────────────────────────────────────────────
   ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'testnet'],
@@ -203,6 +227,12 @@ const TESTS = [
   ['FOR-013',  'B', 'Foreclosure',      'Bad emergency config fails fast with explicit errors', 'testnet'],
   ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops', 'devnet'],
   ['FOR-014',  'B', 'Foreclosure',      'Repeated accept failures do not create infinite gas-spending loops', 'testnet'],
+  ['FOR-015',  'B', 'Foreclosure',      'Validate/execute output from staged (not accepted) epoch — both revert with clear errors', 'devnet'],
+  ['FOR-015',  'B', 'Foreclosure',      'Validate/execute output from staged (not accepted) epoch — both revert with clear errors', 'testnet'],
+  ['FOR-016',  'B', 'Foreclosure',      'Guardian foreclosure front-runs node acceptClaim — foreclosure succeeds, accept reverts, app/claim marked foreclosed', 'devnet'],
+  ['FOR-016',  'B', 'Foreclosure',      'Guardian foreclosure front-runs node acceptClaim — foreclosure succeeds, accept reverts, app/claim marked foreclosed', 'testnet'],
+  ['FOR-017',  'B', 'Foreclosure',      'Post-foreclosure USDC emergency withdrawal — account proof accepted and withdrawal output executed', 'devnet'],
+  ['FOR-017',  'B', 'Foreclosure',      'Post-foreclosure USDC emergency withdrawal — account proof accepted and withdrawal output executed', 'testnet'],
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TRACK C — Exploratory Charters  (2-hour time-boxed sessions)

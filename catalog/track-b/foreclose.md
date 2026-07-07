@@ -84,6 +84,8 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 - **Steps:**
   1. Foreclose an app and identify the frozen finalized boundary.
   2. Submit `proveAccountsDriveMerkleRoot` using proof material from a different epoch.
+- **Notes:**
+  - If both epochs have the same post-epoch machine state, the proof may still validate. Use epochs with different post-epoch machine states.
 - **Expected:** proof is rejected. No accounts-drive-root anchor is recorded.
 
 ### FOR-007 — Wrong app proof reuse is rejected
@@ -114,6 +116,8 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 - **Steps:**
   1. Prove a valid drive root for the foreclosed boundary.
   2. Attempt withdraw using account proof generated from a different epoch snapshot.
+- **Notes:**
+  - If both epochs have the same post-epoch accounts drive, the proof may still validate. Use epochs with different post-epoch accounts drives.
 - **Expected:** withdrawal fails. No payout occurs.
 
 ### FOR-010 — Emergency withdrawal is single-use per account
@@ -171,6 +175,40 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   1. Create conditions that repeatedly fail claim acceptance.
   2. Observe retry behavior and app status progression.
 - **Expected:** retries are bounded by configured limits. System transitions safely (for example, to `FAILED`) instead of burning gas indefinitely.
+
+### FOR-015 — Validate/execute output from staged epoch is rejected
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** staged-versus-accepted epoch boundary enforcement requires carefully timed on-chain operations not covered by CI.
+- **Steps:**
+  1. Produce an output in an epoch that is still `CLAIM_STAGED` (not accepted).
+  2. Attempt to validate the output proof on L1.
+  3. Attempt to execute the output on L1.
+- **Expected:** both operations revert with a clear error message because the epoch is not accepted.
+
+### FOR-016 — Front-run guardian foreclosure against node claim acceptance
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** mempool race behavior between guardian foreclosure and claimer acceptance tx is non-deterministic and operator-facing.
+- **Steps:**
+  1. Move an epoch to staged and prepare both transactions: node-driven `acceptClaim` and guardian-driven foreclosure.
+  2. Submit the guardian foreclosure transaction so it is mined first.
+  3. Allow the pending `acceptClaim` transaction to be mined after foreclosure.
+  4. Observe app/epoch lifecycle and node failure recording.
+- **Expected:** both txs are accepted by mempool, foreclosure succeeds on L1, later `acceptClaim` reverts, node records failure cleanly, app is marked `FORECLOSED`, and staged claim is marked `CLAIM_FORECLOSED`.
+
+### FOR-017 — Withdraw USDC after foreclosure via emergency path
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** emergency token recovery after foreclosure needs real proof artifacts and live contract execution.
+- **Steps:**
+  1. Foreclose an app with USDC balance attributable to a user account in the accounts drive.
+  2. Prove the accounts-drive root for the foreclosed boundary.
+  3. Submit account proof and execute emergency USDC withdrawal output.
+- **Expected:** L1 accepts the account proof and executes the USDC withdrawal output successfully.
 
 ---
 

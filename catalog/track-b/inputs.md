@@ -44,6 +44,49 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   1. Deposit an ERC721 with malformed or unexpected metadata bytes.
 - **Expected:** input accepted by the contract; app's response is consistent with its defined handling. Document the observed behavior.
 
+## INP-005 — Direct InputBox input with massive payload
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** stress-level payload sizing through direct `InputBox.addInput` is expensive and environment-sensitive.
+- **Steps:**
+  1. Craft a direct InputBox input payload near practical transaction-size limits.
+  2. Submit `addInput` on-chain for the target app.
+  3. Read the processed input from node APIs.
+- **Expected:** L1 accepts the transaction, the node advances the machine, and the app receives the exact payload bytes (no truncation or mutation).
+
+## INP-006 — Multiple inputs in one transaction (spambox-style)
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** multi-input same-tx ingress depends on custom contract behavior and ordering semantics not covered in standard pipelines.
+- **Steps:**
+  1. Use a custom smart contract that calls `InputBox.addInput` multiple times in a single transaction.
+  2. Submit the transaction while node services are running normally.
+  3. Verify node processing order and completeness.
+- **Expected:** L1 accepts the transaction and the node keeps up, processing every input in on-chain order with no drops/duplication.
+
+## INP-007 — Deposit USDC into application
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** token-specific bridge wiring and live token behavior are integration-level and chain-dependent.
+- **Steps:**
+  1. Configure USDC token and portal addresses for the target environment.
+  2. Deposit USDC to the application via the appropriate portal flow.
+  3. Observe node input ingestion and app-level handling.
+- **Expected:** L1 accepts the deposit, node feeds the machine, and the machine reports a successful USDC deposit.
+
+## INP-008 — Request USDC withdrawal in application logic
+
+- **Risk:** H
+- **Environment:** devnet + testnet
+- **Why-not-CI:** depends on app-specific withdrawal request encoding plus live portal/token contract integration.
+- **Steps:**
+  1. Submit an app input that requests a USDC withdrawal.
+  2. Inspect produced outputs for the expected withdrawal voucher.
+- **Expected:** L1 accepts the input transaction, node feeds the machine, and the machine reports a successful USDC withdrawal request.
+
 ---
 
 <!-- Add entries for fee-on-transfer tokens, boundary deposit amounts, and other edge cases
