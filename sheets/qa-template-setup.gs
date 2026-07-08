@@ -118,7 +118,7 @@ const TESTS = [
   ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output (see RW-004)',    'testnet'],
   ['CFG-007',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1 — evm-reader retries once then logs clear failure, no panic',               'testnet'],
   ['CFG-008',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL custom value — reconnect timing matches config',                        'testnet'],
-  ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private-key set explicitly — claimer signs and submits claims, no auth errors',               'testnet'],
+  ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private_key set explicitly — claimer signs and submits claims, no auth errors',               'testnet'],
 
   // ── Services ─────────────────────────────────────────────────────────────────
   ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],

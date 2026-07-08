@@ -86,13 +86,13 @@ Tests for environment variables, startup validation, and feature flags.
   2. Interrupt the WS connection and observe reconnect timing in logs.
 - **Expected:** reconnect attempts happen at the configured interval, not the default.
 
-## CFG-009 — `CARTESI_AUTH_KIND=private-key` explicit auth path
+## CFG-009 — `CARTESI_AUTH_KIND=private_key` explicit auth path
 
 - **Risk:** L
 - **Environment:** testnet
-- **Why-not-CI:** explicit flag validation; confirm the private-key auth path is used for claim signing when set explicitly (vs. implicit default).
+- **Why-not-CI:** explicit flag validation; confirm the private_key auth path is used for claim signing when set explicitly (vs. implicit default).
 - **Steps:**
-  1. Start node with `CARTESI_AUTH_KIND=private-key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.
+  1. Start node with `CARTESI_AUTH_KIND=private_key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.
   2. Observe claim submission.
 - **Expected:** claimer signs and submits claims normally. No auth errors in logs.
 
