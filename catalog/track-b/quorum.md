@@ -40,7 +40,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** same security-sensitive machine validity proof requirement as Authority (see `track-b/foreclose.md` FOR-018), now also enforced on `Quorum.submitClaim`; needs adversarial proof-tampering checks with multiple validators.
+- **Why-not-CI:** same security-sensitive machine validity proof requirement as Authority (see `track-b/foreclose.md` FOR-018..021 for the granular per-error-code cases), now also enforced on `Quorum.submitClaim`; this entry checks the gate applies under multi-validator voting, not the proof mechanics themselves.
 - **Steps:**
   1. Have a validator submit a Quorum vote with a valid machine validity proof (machine manually yielded, "RX accepted" reason).
   2. Have a validator submit a vote where the machine was not yielded, or was yielded with a different reason, or the Merkle proof is malformed.

@@ -231,24 +231,52 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ## Claim Validity Proof
 
-### FOR-018 — Authority claim submission requires a valid machine validity proof
+### FOR-018 — Authority claim submission accepts a valid machine validity proof
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** the contracts author flags the machine validity proof libraries as the security-sensitive part of this change; needs adversarial proof-tampering checks beyond CI's happy-path claim submission.
+- **Why-not-CI:** the contracts author flags the machine validity proof libraries as the security-sensitive part of this change; the happy path establishes the baseline the FOR-019..021 rejection cases are compared against.
 - **Steps:**
-  1. Submit an Authority claim with a valid machine validity proof (machine manually yielded, "RX accepted" reason).
-  2. Submit a claim where the machine was not yielded, or was yielded with a different reason.
-  3. Submit a claim with a malformed/incorrect Merkle proof for the machine state.
-  4. Submit a claim with a siblings array of the wrong length.
-- **Expected:** (1) accepted; (2), (3), (4) each revert with the matching error (`InvalidPostEpochMachineIflagsYRegister` / `InvalidPostEpochMachineHtifTohostRegister`, `InvalidMachineMerkleProof`, `InvalidSiblingsArrayLength`). No claim reaches `STAGED` on a rejected proof.
+  1. Submit an Authority claim with a valid machine validity proof: the machine manually yielded, "RX accepted" reason.
+- **Expected:** the proof is accepted and the claim reaches `STAGED`.
+
+### FOR-019 — Authority claim submission rejects a machine that was not manually yielded (RX accepted)
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** this is one of three independently reachable rejection paths in the same proof check; each has its own error and needs its own pass/fail record.
+- **Steps:**
+  1. Submit an Authority claim where the machine was not yielded.
+  2. Submit an Authority claim where the machine was yielded, but with a reason other than "RX accepted".
+- **Expected:** both attempts revert with `InvalidPostEpochMachineIflagsYRegister` or `InvalidPostEpochMachineHtifTohostRegister` as applicable. No claim reaches `STAGED`.
+
+### FOR-020 — Authority claim submission rejects a malformed machine Merkle proof
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** distinct from the yield-state checks (FOR-019) and the siblings-length check (FOR-021); exercises the Merkle verification itself.
+- **Steps:**
+  1. Submit an Authority claim with a machine validity proof whose Merkle proof is malformed or incorrect for the claimed machine state.
+- **Expected:** reverts with `InvalidMachineMerkleProof`. No claim reaches `STAGED`.
+
+### FOR-021 — Authority claim submission rejects a siblings array of the wrong length
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** boundary/structural validation on the proof's siblings array, separate from Merkle correctness (FOR-020).
+- **Steps:**
+  1. Submit an Authority claim with a machine validity proof whose siblings array has the wrong length.
+- **Expected:** reverts with `InvalidSiblingsArrayLength`. No claim reaches `STAGED`.
 
 ---
 
 ## Accounts-Drive Encoding
 
-### FOR-019 — Accounts-drive account encoding: legacy 28-byte accounts are rejected, not misread
+### FOR-022 — Accounts-drive account encoding: legacy 28-byte accounts are rejected, not misread
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
@@ -264,7 +292,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ## Deposit Refunds
 
-### FOR-020 — Deposit to a foreclosed application is refunded to the original depositor
+### FOR-023 — Deposit to a foreclosed application is refunded to the original depositor
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
@@ -276,7 +304,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   3. Observe the refund output issued for each deposit.
 - **Expected:** each deposit is decoded, validated against the input box, and refunded in full to the original depositor. No deposit is silently accepted or lost.
 
-### FOR-021 — Deposit refund boundary: finalized vs. non-finalized input
+### FOR-024 — Deposit refund boundary: finalized vs. non-finalized input
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
