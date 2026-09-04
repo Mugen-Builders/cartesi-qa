@@ -54,6 +54,7 @@ const TESTS = [
   ['CLI-001',  'B', 'CLI',              'cartesi doctor with Docker stopped — error message is human-readable, not a stack trace',  'devnet'],
   ['CLI-002',  'B', 'CLI',              'cartesi build with missing dependencies — error names the missing thing and how to fix it',  'devnet'],
   ['CLI-003',  'B', 'CLI',              'cartesi create --branch with a nonexistent branch — clear "not found" message',               'devnet'],
+  ['CLI-004',  'B', 'CLI',              'ERC-20 deposit resolves IERC20Metadata/IERC20Errors ABI after contracts alpha.10 (regresses the alpha.7-9 break)', 'devnet'],
 
   // ── Inputs ───────────────────────────────────────────────────────────────────
   ['INP-001',  'B', 'Inputs',           'Deposit with massive execLayerData near gas-limit boundary — accepted or clear error, no silent truncation', 'devnet'],
@@ -72,6 +73,8 @@ const TESTS = [
   ['INP-007',  'B', 'Inputs',           'USDC deposit into application — L1 accepts, node feeds machine, machine reports successful deposit', 'testnet'],
   ['INP-008',  'B', 'Inputs',           'USDC withdrawal request input — L1 accepts, node feeds machine, machine reports successful request', 'devnet'],
   ['INP-008',  'B', 'Inputs',           'USDC withdrawal request input — L1 accepts, node feeds machine, machine reports successful request', 'testnet'],
+  ['INP-009',  'B', 'Inputs',           'Inputs from the same transaction are identified by tx hash + log index and correctly filterable via JSON-RPC', 'devnet'],
+  ['INP-009',  'B', 'Inputs',           'Inputs from the same transaction are identified by tx hash + log index and correctly filterable via JSON-RPC', 'testnet'],
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
@@ -84,6 +87,8 @@ const TESTS = [
   ['OUT-004',  'B', 'Outputs',          'Reports during advance-state and inspect-state — both retrievable via API',                                   'testnet'],
   ['OUT-005',  'B', 'Outputs',          'Arbitrary blob output accepted and retrievable through JSON-RPC with exact bytes', 'devnet'],
   ['OUT-005',  'B', 'Outputs',          'Arbitrary blob output accepted and retrievable through JSON-RPC with exact bytes', 'testnet'],
+  ['OUT-006',  'B', 'Outputs',          'Voucher-address output filter uses its DB index (EXPLAIN shows index scan), matches only intended voucher/delegate-call-voucher', 'devnet'],
+  ['OUT-006',  'B', 'Outputs',          'Voucher-address output filter uses its DB index (EXPLAIN shows index scan), matches only intended voucher/delegate-call-voucher', 'testnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
   ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
@@ -113,16 +118,18 @@ const TESTS = [
   ['CFG-001',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services',                              'testnet'],
   ['CFG-002',  'B', 'Configuration',    'CARTESI_LOG_LEVEL=warn — info suppressed; document which startup markers disappear',                            'testnet'],
   ['CFG-003',  'B', 'Configuration',    'Missing CARTESI_AUTH_PRIVATE_KEY — claimer fails fast with clear message, other services start normally',       'testnet'],
-  ['CFG-004',  'B', 'Configuration',    'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level (see RW-003)',   'testnet'],
+  ['CFG-004',  'B', 'Configuration',    'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level',   'testnet'],
   ['CFG-005',  'B', 'Configuration',    'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error',                        'testnet'],
-  ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output (see RW-004)',    'testnet'],
+  ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output',    'testnet'],
   ['CFG-007',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1 — evm-reader retries once then logs clear failure, no panic',               'testnet'],
   ['CFG-008',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL custom value — reconnect timing matches config',                        'testnet'],
   ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private_key set explicitly — claimer signs and submits claims, no auth errors',               'testnet'],
 
   // ── Services ─────────────────────────────────────────────────────────────────
   ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],
-  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state (see RW-005, RW-006)', 'testnet'],
+  ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state', 'testnet'],
+  ['SVC-003',  'B', 'Services',         'AWS KMS signer produces a valid signature on an EIP-1559 (dynamic-fee) network', 'testnet'],
+  ['SVC-004',  'B', 'Services',         'KMS authentication failure delays claimer startup (bounded by CARTESI_MAX_STARTUP_TIME) instead of crash-looping', 'testnet'],
 
   // ── State Persistence ────────────────────────────────────────────────────────
   ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'testnet'],
@@ -130,12 +137,18 @@ const TESTS = [
   ['SP-003',   'B', 'State Persistence','Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'testnet'],
   ['SP-004',   'B', 'State Persistence','Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'testnet'],
   ['SP-005',   'B', 'State Persistence','L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'testnet'],
+  ['SP-006',   'B', 'State Persistence','Startup replay reconciles persisted history against re-execution with no discrepancy', 'devnet'],
+  ['SP-006',   'B', 'State Persistence','Startup replay reconciles persisted history against re-execution with no discrepancy', 'testnet'],
+  ['SP-007',   'B', 'State Persistence','Node fences an application whose persisted outcome contradicts real execution; other apps keep processing', 'devnet'],
+  ['SP-007',   'B', 'State Persistence','Node fences an application whose persisted outcome contradicts real execution; other apps keep processing', 'testnet'],
+  ['SP-008',   'B', 'State Persistence','Advancer preserves machine-database alignment after a hard crash mid-processing', 'devnet'],
+  ['SP-008',   'B', 'State Persistence','Advancer preserves machine-database alignment after a hard crash mid-processing', 'testnet'],
 
   // ── Inspect Service ──────────────────────────────────────────────────────────
   ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed', 'devnet'],
   ['INS-001',  'B', 'Inspect Service',  'POST /inspect with exactly-2MB payload — accepted and processed', 'testnet'],
-  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code (see RW-002)', 'devnet'],
-  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code (see RW-002)', 'testnet'],
+  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code', 'devnet'],
+  ['INS-002',  'B', 'Inspect Service',  'POST /inspect with >2MB payload — clear rejection; document response code', 'testnet'],
   ['INS-003',  'B', 'Inspect Service',  'Concurrent inspects up to execution-parameters limit — all handled, no drops or crashes', 'devnet'],
   ['INS-003',  'B', 'Inspect Service',  'Concurrent inspects up to execution-parameters limit — all handled, no drops or crashes', 'testnet'],
   ['INS-004',  'B', 'Inspect Service',  'Inspect while advance is actively processing — queued, returns correct result after advance', 'devnet'],
@@ -162,6 +175,20 @@ const TESTS = [
   ['JRP-007',  'B', 'JSON-RPC API',     'Pagination negative offset → -32602 INVALID_PARAMS', 'testnet'],
   ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500', 'devnet'],
   ['JRP-008',  'B', 'JSON-RPC API',     'Fetch non-existent index → -32001 (or equivalent not-found), not HTTP 500', 'testnet'],
+  ['JRP-009',  'B', 'JSON-RPC API',     'Batch requests: single call succeeds; >100 entries and empty batch rejected with -32040; response size budget matches single-request limit', 'devnet'],
+  ['JRP-009',  'B', 'JSON-RPC API',     'Batch requests: single call succeeds; >100 entries and empty batch rejected with -32040; response size budget matches single-request limit', 'testnet'],
+  ['JRP-010',  'B', 'JSON-RPC API',     'cartesi_getMatchAdvance succeeds; renamed-from cartesi_getMatchAdvanced is no longer a registered method (-32601)', 'devnet'],
+  ['JRP-010',  'B', 'JSON-RPC API',     'cartesi_getMatchAdvance succeeds; renamed-from cartesi_getMatchAdvanced is no longer a registered method (-32601)', 'testnet'],
+  ['JRP-011',  'B', 'JSON-RPC API',     'New node-info method reports correct chain ID, node version, and default block tag', 'devnet'],
+  ['JRP-011',  'B', 'JSON-RPC API',     'New node-info method reports correct chain ID, node version, and default block tag', 'testnet'],
+  ['JRP-012',  'B', 'JSON-RPC API',     'Inclusive [start,end] index ranges return exact boundary items; get-epoch-by-virtual-index matches regular listing', 'devnet'],
+  ['JRP-012',  'B', 'JSON-RPC API',     'Inclusive [start,end] index ranges return exact boundary items; get-epoch-by-virtual-index matches regular listing', 'testnet'],
+  ['JRP-013',  'B', 'JSON-RPC API',     'Filter outputs by execution status + multiple selectors; executed/pending output counts match a manual tally', 'devnet'],
+  ['JRP-013',  'B', 'JSON-RPC API',     'Filter outputs by execution status + multiple selectors; executed/pending output counts match a manual tally', 'testnet'],
+  ['JRP-014',  'B', 'JSON-RPC API',     'List epochs with multiple statuses at once — JSON-RPC and CLI results match', 'devnet'],
+  ['JRP-014',  'B', 'JSON-RPC API',     'List epochs with multiple statuses at once — JSON-RPC and CLI results match', 'testnet'],
+  ['JRP-015',  'B', 'JSON-RPC API',     'Missing resource returns -31001, unknown application returns -31002 (replacing former -32001/-32002)', 'devnet'],
+  ['JRP-015',  'B', 'JSON-RPC API',     'Missing resource returns -31001, unknown application returns -31002 (replacing former -32001/-32002)', 'testnet'],
 
   // ── Multi-App ────────────────────────────────────────────────────────────────
   ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'testnet'],
@@ -170,6 +197,7 @@ const TESTS = [
   // ── Quorum Consensus ────────────────────────────────────────────────────────
   ['QUO-001',  'B', 'Quorum',           'Pending quorum votes do not misclassify app state as INOPERABLE during honest divergence', 'testnet'],
   ['QUO-002',  'B', 'Quorum',           'Winning quorum claim stages first, then acceptClaim after staging period', 'testnet'],
+  ['QUO-003',  'B', 'Quorum',           'Quorum.submitClaim enforces the same machine validity proof requirement as Authority under multi-validator voting', 'testnet'],
 
   // ── Deployment ───────────────────────────────────────────────────────────────
   ['DEP-001',  'B', 'Deployment',       'Deploy to local Anvil — deployment completes, app addresses correct',                                             'devnet'],
@@ -177,6 +205,8 @@ const TESTS = [
   ['DEP-003',  'B', 'Deployment',       'Deploy to Base Sepolia — services healthy and test input processed',                                              'testnet'],
   ['DEP-004',  'B', 'Deployment',       'Deploy to Optimism Sepolia — services healthy and test input processed',                                          'testnet'],
   ['DEP-005',  'B', 'Deployment',       'Deploy using forked-testnet workflow — deploy, process input, restart and verify cursor recovery',                'testnet'],
+  ['DEP-006',  'B', 'Deployment',       'Deploy against contracts alpha.10 using the inputBox factory parameter (replacing dataAvailability)',              'devnet'],
+  ['DEP-006',  'B', 'Deployment',       'Deploy against contracts alpha.10 using the inputBox factory parameter (replacing dataAvailability)',              'testnet'],
 
   // ── Internal Operator CLI ────────────────────────────────────────────────────
   ['ILC-001',  'B', 'Internal CLI',     'cartesi-rollups-cli db check detects manual schema version mismatch', 'testnet'],
@@ -191,6 +221,10 @@ const TESTS = [
   ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'testnet'],
   ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'testnet'],
   ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'testnet'],
+  ['ILC-011',  'B', 'Internal CLI',     'CLI transaction gas limit is estimated by default; CARTESI_BLOCKCHAIN_GAS_LIMIT overrides it', 'devnet'],
+  ['ILC-011',  'B', 'Internal CLI',     'CLI transaction gas limit is estimated by default; CARTESI_BLOCKCHAIN_GAS_LIMIT overrides it', 'testnet'],
+  ['ILC-012',  'B', 'Internal CLI',     'Self-hosted deployment failure surfaces the original on-chain revert reason, not a generic error', 'devnet'],
+  ['ILC-012',  'B', 'Internal CLI',     'Self-hosted deployment failure surfaces the original on-chain revert reason, not a generic error', 'testnet'],
 
   // ── Machine Tool ────────────────────────────────────────────────────────────
   ['MTL-001',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'devnet'],
@@ -233,6 +267,20 @@ const TESTS = [
   ['FOR-016',  'B', 'Foreclosure',      'Guardian foreclosure front-runs node acceptClaim — foreclosure succeeds, accept reverts, app/claim marked foreclosed', 'testnet'],
   ['FOR-017',  'B', 'Foreclosure',      'Post-foreclosure USDC emergency withdrawal — account proof accepted and withdrawal output executed', 'devnet'],
   ['FOR-017',  'B', 'Foreclosure',      'Post-foreclosure USDC emergency withdrawal — account proof accepted and withdrawal output executed', 'testnet'],
+  ['FOR-018',  'B', 'Foreclosure',      'Authority claim submission accepts a valid machine validity proof (manually yielded, RX accepted)', 'devnet'],
+  ['FOR-018',  'B', 'Foreclosure',      'Authority claim submission accepts a valid machine validity proof (manually yielded, RX accepted)', 'testnet'],
+  ['FOR-019',  'B', 'Foreclosure',      'Authority claim submission rejects a machine that was not yielded, or yielded with the wrong reason', 'devnet'],
+  ['FOR-019',  'B', 'Foreclosure',      'Authority claim submission rejects a machine that was not yielded, or yielded with the wrong reason', 'testnet'],
+  ['FOR-020',  'B', 'Foreclosure',      'Authority claim submission rejects a malformed machine Merkle proof (InvalidMachineMerkleProof)', 'devnet'],
+  ['FOR-020',  'B', 'Foreclosure',      'Authority claim submission rejects a malformed machine Merkle proof (InvalidMachineMerkleProof)', 'testnet'],
+  ['FOR-021',  'B', 'Foreclosure',      'Authority claim submission rejects a siblings array of the wrong length (InvalidSiblingsArrayLength)', 'devnet'],
+  ['FOR-021',  'B', 'Foreclosure',      'Authority claim submission rejects a siblings array of the wrong length (InvalidSiblingsArrayLength)', 'testnet'],
+  ['FOR-022',  'B', 'Foreclosure',      'Accounts-drive account encoding: legacy 28-byte accounts rejected (InvalidAccountSize), not misread as a garbage owner', 'devnet'],
+  ['FOR-022',  'B', 'Foreclosure',      'Accounts-drive account encoding: legacy 28-byte accounts rejected (InvalidAccountSize), not misread as a garbage owner', 'testnet'],
+  ['FOR-023',  'B', 'Foreclosure',      'Deposit to a foreclosed application (Ether/ERC-20/ERC-721/ERC-1155) is refunded in full to the original depositor', 'devnet'],
+  ['FOR-023',  'B', 'Foreclosure',      'Deposit to a foreclosed application (Ether/ERC-20/ERC-721/ERC-1155) is refunded in full to the original depositor', 'testnet'],
+  ['FOR-024',  'B', 'Foreclosure',      'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'devnet'],
+  ['FOR-024',  'B', 'Foreclosure',      'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'testnet'],
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TRACK C — Exploratory Charters  (2-hour time-boxed sessions)
@@ -247,13 +295,10 @@ const TESTS = [
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // REGRESSION WATCH  (re-check every cycle — remove when confirmed fixed)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ['RW-001',   'Regression', 'Services',          'jsonrpc-api shutdown log is missing — confirm stop log is now emitted',                                   'devnet'],
-  ['RW-002',   'Regression', 'Inspect Service',   'POST /inspect >2MB returns 200+error-in-body instead of 413 — confirm HTTP-level rejection now',         'devnet'],
-  ['RW-003',   'Regression', 'Configuration',     'Wrong CARTESI_BLOCKCHAIN_ID: error message missing timestamp and log level',                             'devnet'],
-  ['RW-004',   'Regression', 'Configuration',     'CARTESI_ADVANCER_POLLING_INTERVAL help text default is outdated — confirm docs/help now match runtime',   'devnet'],
-  ['RW-005',   'Regression', 'Services',          'evm-reader reads inputs out of order after dirty restart',                                               'devnet'],
-  ['RW-006',   'Regression', 'Services',          'Advancer halts after database hard-restart with active connections',                                     'devnet'],
-  ['RW-007',   'Regression', 'Services',          'evm-reader drifts behind OP Sepolia head under high RPC latency (infra distance/RTT effect)',            'testnet'],
+  ['RW-001',   'Regression', 'Internal CLI',      'CLI hardcoded a 30M gas limit, breaking transactions on networks with a lower per-tx gas cap (issue #786)', 'testnet'],
+  ['RW-002',   'Regression', 'Inputs',            'Two or more addInput calls in one transaction wedge the app permanently (transaction_reference collision)', 'devnet'],
+  ['RW-003',   'Regression', 'Machine Tool',      'machine-tool prove accounts-drive rejects account balances the contract and machine ledger both accept',   'devnet'],
+  ['RW-004',   'Regression', 'Services',          'Execution-parameter (wall-clock) failures should mark the app FAILED, not the current behavior',           'devnet'],
 ];
 
 // ─── Colours ──────────────────────────────────────────────────────────────────
