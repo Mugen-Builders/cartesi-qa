@@ -325,7 +325,7 @@ const COLOR = {
 const STATUS_LIST = ['Pending', 'Done', 'Out of Scope'];
 const RESULT_LIST = ['Pass', 'Fail', 'Pass with Notes', 'Fail with Notes', 'Not Tested', 'N/A'];
 
-const COL = { ID: 1, TRACK: 2, AREA: 3, NAME: 4, ENV: 5, OWNER: 6, STATUS: 7, RESULT: 8, NOTES: 9 };
+const COL = { ID: 1, TRACK: 2, AREA: 3, NAME: 4, ENV: 5, OWNER: 6, STATUS: 7, RESULT: 8, NOTES: 9, DEVAD_NOTES: 10 };
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
@@ -395,9 +395,10 @@ function _buildTemplateSheet(ss) {
   s.setColumnWidth(COL.STATUS,130);
   s.setColumnWidth(COL.RESULT,165);
   s.setColumnWidth(COL.NOTES, 340);
+  s.setColumnWidth(COL.DEVAD_NOTES, 340);
 
   // ── Header row ──────────────────────────────────────────────────────────────
-  const HEADERS = ['ID', 'Track', 'Area / Component', 'Test / Charter', 'Env', 'Owner', 'Status', 'Result', 'Notes'];
+  const HEADERS = ['ID', 'Track', 'Area / Component', 'Test / Charter', 'Env', 'Owner', 'Status', 'Result', 'Notes', 'DevAd Internal Notes'];
   const hdrRange = s.getRange(1, 1, 1, HEADERS.length);
   hdrRange.setValues([HEADERS])
           .setFontWeight('bold')
@@ -480,7 +481,7 @@ function _writeDivider(s, row, track) {
   };
   const BG = { 'A': COLOR.divA, 'B': COLOR.divB, 'C': COLOR.divC, 'Regression': COLOR.divReg };
 
-  const r = s.getRange(row, 1, 1, 9);
+  const r = s.getRange(row, 1, 1, 10);
   r.setBackground(BG[track] || '#555555')
    .setFontColor('#ffffff')
    .setFontWeight('bold')
@@ -506,8 +507,8 @@ function _writeRow(s, row, id, track, area, name, env, ownerRange) {
   const defaultStatus = 'Pending';
   const defaultResult = track === 'C' ? 'N/A' : 'Not Tested';
 
-  s.getRange(row, 1, 1, 9)
-   .setValues([[id, track, area, name, env, '', defaultStatus, defaultResult, '']])
+  s.getRange(row, 1, 1, 10)
+   .setValues([[id, track, area, name, env, '', defaultStatus, defaultResult, '', '']])
    .setBackground(BG[track] || '#ffffff')
    .setVerticalAlignment('middle')
    .setFontSize(10);
