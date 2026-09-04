@@ -9,6 +9,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-001 — Deposit with massive `execLayerData`
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
 - **Steps:**
@@ -19,6 +20,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-002 — Malformed / empty payload
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** error-handling UX; node should not crash on garbage input.
 - **Steps:**
@@ -29,6 +31,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-003 — Same-block inputs from multiple wallets
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** ordering under real mempool conditions differs from deterministic CI.
 - **Steps:**
@@ -38,6 +41,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-004 — ERC721 with malformed metadata
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.
 - **Steps:**
@@ -47,6 +51,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-005 — Direct InputBox input with massive payload
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** stress-level payload sizing through direct `InputBox.addInput` is expensive and environment-sensitive.
 - **Steps:**
@@ -58,6 +63,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-006 — Multiple inputs in one transaction (spambox-style)
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** multi-input same-tx ingress depends on custom contract behavior and ordering semantics not covered in standard pipelines.
 - **Steps:**
@@ -69,6 +75,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-007 — Deposit USDC into application
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** token-specific bridge wiring and live token behavior are integration-level and chain-dependent.
 - **Steps:**
@@ -80,12 +87,24 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-008 — Request USDC withdrawal in application logic
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** depends on app-specific withdrawal request encoding plus live portal/token contract integration.
 - **Steps:**
   1. Submit an app input that requests a USDC withdrawal.
   2. Inspect produced outputs for the expected withdrawal voucher.
 - **Expected:** L1 accepts the input transaction, node feeds the machine, and the machine reports a successful USDC withdrawal request.
+
+## INP-009 — Inputs identified and filtered by transaction hash + log index
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** the repository now identifies inputs by `(transaction hash, log index)` instead of a simpler key; CI's fixtures don't stress multi-input-per-tx filtering.
+- **Steps:**
+  1. Use a custom contract to submit two or more inputs for the same application in a single transaction.
+  2. List/filter inputs by that transaction hash via JSON-RPC.
+- **Expected:** every input from the transaction is returned, each with a distinct log index, correctly ordered. No input is merged, dropped, or duplicated.
 
 ---
 

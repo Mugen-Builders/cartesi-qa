@@ -12,6 +12,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 ## QUO-001 — Pending quorum votes do not misclassify the app
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** real quorum timing and vote-arrival divergence are hard to model deterministically in CI.
 - **Steps:**
@@ -23,6 +24,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 ## QUO-002 — Winning quorum claim stages before acceptance
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** quorum vote resolution and the resulting staged claim are consensus-specific behaviors not covered by CI's happy-path isolation tests.
 - **Steps:**
@@ -32,5 +34,16 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
   4. Wait for the staging period to elapse.
   5. Observe the claimer send `acceptClaim` for the winning claim.
 - **Expected:** the submitted claim does not stage immediately. A winning claim from quorum voting is staged first, then accepted after the staging period. If the local node's claim loses, the node classifies it accordingly without treating the honest divergence as `INOPERABLE`.
+
+## QUO-003 — Quorum claim submission requires a valid machine validity proof
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** same security-sensitive machine validity proof requirement as Authority (see `track-b/foreclose.md` FOR-018), now also enforced on `Quorum.submitClaim`; needs adversarial proof-tampering checks with multiple validators.
+- **Steps:**
+  1. Have a validator submit a Quorum vote with a valid machine validity proof (machine manually yielded, "RX accepted" reason).
+  2. Have a validator submit a vote where the machine was not yielded, or was yielded with a different reason, or the Merkle proof is malformed.
+- **Expected:** (1) vote is accepted and counted toward quorum. (2) each variant reverts with the matching error and is not counted as a valid vote.
 
 ---

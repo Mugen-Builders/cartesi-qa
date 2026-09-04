@@ -15,6 +15,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-001 — Authority staging to acceptance lifecycle (happy path)
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** lifecycle timing against real block progression and staging windows is operator-facing and hard to validate in controlled CI timing.
 - **Steps:**
@@ -33,6 +34,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-002 — Foreclose before claim staging is complete
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** timing-sensitive operator action before staging is not reliably represented in CI happy-path coverage.
 - **Steps:**
@@ -43,6 +45,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-003 — Foreclose during staged (not yet accepted) claim
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** staged-window timing and boundary behavior are difficult to assert deterministically in CI.
 - **Steps:**
@@ -54,6 +57,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-004 — Foreclose after claim acceptance preserves accepted history
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** post-accept foreclosure behavior is a timing/state boundary that CI happy-path tests do not target directly.
 - **Steps:**
@@ -65,6 +69,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-005 — Foreclose authorization boundary
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** signer/key misconfiguration behavior and operator clarity are environment-dependent.
 - **Steps:**
@@ -79,6 +84,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-006 — Wrong epoch drive-root proof is rejected
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** emergency proof material and snapshot selection errors are operational and not covered by standard lifecycle CI.
 - **Steps:**
@@ -91,6 +97,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-007 — Wrong app proof reuse is rejected
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** cross-application operator mistakes are hard to represent in isolated CI fixtures.
 - **Steps:**
@@ -101,6 +108,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-008 — Emergency withdraw before drive-root proof is rejected
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** sequencing failures in emergency procedures are mostly operational, not unit-level.
 - **Steps:**
@@ -111,6 +119,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-009 — Wrong epoch account proof is rejected
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** mismatched snapshot/proof handling is an operator failure mode with real proof artifacts.
 - **Steps:**
@@ -123,6 +132,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-010 — Emergency withdrawal is single-use per account
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** replay resistance in emergency mode is safety-critical and must be verified against real chain execution.
 - **Steps:**
@@ -133,6 +143,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-011 — Restart and catch-up preserve emergency recovery truth
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** restart timing and event backfill under live RPC behavior are not fully represented by CI.
 - **Steps:**
@@ -144,6 +155,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-012 — Emergency withdrawal API parity
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** consistency between operator-facing and JSON-RPC read surfaces is primarily a UX and integration concern.
 - **Steps:**
@@ -158,6 +170,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-013 — Bad emergency config fails fast and clearly
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** configuration UX and startup failure clarity are environment- and operator-path specific.
 - **Steps:**
@@ -169,6 +182,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-014 — Repeated accept failures do not create gas-spending loops
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** long-running retry and cost behavior under live conditions is not fully covered in CI.
 - **Steps:**
@@ -179,6 +193,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-015 — Validate/execute output from staged epoch is rejected
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** staged-versus-accepted epoch boundary enforcement requires carefully timed on-chain operations not covered by CI.
 - **Steps:**
@@ -190,6 +205,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-016 — Front-run guardian foreclosure against node claim acceptance
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** mempool race behavior between guardian foreclosure and claimer acceptance tx is non-deterministic and operator-facing.
 - **Steps:**
@@ -202,6 +218,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-017 — Withdraw USDC after foreclosure via emergency path
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** emergency token recovery after foreclosure needs real proof artifacts and live contract execution.
 - **Steps:**
@@ -209,6 +226,67 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   2. Prove the accounts-drive root for the foreclosed boundary.
   3. Submit account proof and execute emergency USDC withdrawal output.
 - **Expected:** L1 accepts the account proof and executes the USDC withdrawal output successfully.
+
+---
+
+## Claim Validity Proof
+
+### FOR-018 — Authority claim submission requires a valid machine validity proof
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** the contracts author flags the machine validity proof libraries as the security-sensitive part of this change; needs adversarial proof-tampering checks beyond CI's happy-path claim submission.
+- **Steps:**
+  1. Submit an Authority claim with a valid machine validity proof (machine manually yielded, "RX accepted" reason).
+  2. Submit a claim where the machine was not yielded, or was yielded with a different reason.
+  3. Submit a claim with a malformed/incorrect Merkle proof for the machine state.
+  4. Submit a claim with a siblings array of the wrong length.
+- **Expected:** (1) accepted; (2), (3), (4) each revert with the matching error (`InvalidPostEpochMachineIflagsYRegister` / `InvalidPostEpochMachineHtifTohostRegister`, `InvalidMachineMerkleProof`, `InvalidSiblingsArrayLength`). No claim reaches `STAGED` on a rejected proof.
+
+---
+
+## Accounts-Drive Encoding
+
+### FOR-019 — Accounts-drive account encoding: legacy 28-byte accounts are rejected, not misread
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** this is a silent-corruption risk explicitly called out by the contracts author (a stale 28-byte account could decode into a garbage owner rather than failing loudly); needs deliberate testing against both old and new layouts.
+- **Steps:**
+  1. Prove the accounts-drive root and generate an account proof for an account built in the new 32-byte layout (12-byte little-endian `uint96` balance + 20-byte owner).
+  2. Submit the emergency withdrawal with that proof and confirm the correct owner and balance are used.
+  3. If a snapshot or fixture with a legacy 28-byte account layout is available, attempt the same flow against it.
+- **Expected:** (2) succeeds with the correct owner/balance decoded from the new layout; (3) reverts with `InvalidAccountSize` rather than resolving to an incorrect owner.
+
+---
+
+## Deposit Refunds
+
+### FOR-020 — Deposit to a foreclosed application is refunded to the original depositor
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** end-to-end refund behavior against a foreclosed application, across token types, needs real deployments and is not part of CI's happy-path lifecycle.
+- **Steps:**
+  1. Foreclose an application.
+  2. Deposit Ether, then an ERC-20, ERC-721, and ERC-1155 (single and batch) to the foreclosed application.
+  3. Observe the refund output issued for each deposit.
+- **Expected:** each deposit is decoded, validated against the input box, and refunded in full to the original depositor. No deposit is silently accepted or lost.
+
+### FOR-021 — Deposit refund boundary: finalized vs. non-finalized input
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** the finalized/non-finalized boundary is defined by the last-processed block number, a timing-sensitive on-chain concept CI's fixed-block fixtures don't naturally exercise.
+- **Steps:**
+  1. Foreclose an application.
+  2. Submit a deposit input in a block at or before the frozen last-processed block (finalized).
+  3. Submit a deposit input in a block after it (non-finalized).
+- **Expected:** the finalized deposit is refundable via the emergency withdrawal (accounts drive) path; the non-finalized deposit is refunded directly on the base layer. Neither is double-refunded or dropped.
 
 ---
 

@@ -9,6 +9,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-001 — `db check` detects schema version mismatch
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** database migration integrity; CI always starts from a fresh schema.
 - **Steps:**
@@ -20,6 +21,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-002 — `app register` then `app list`
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** application management lifecycle used by operators.
 - **Steps:**
@@ -30,6 +32,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-003 — `app remove` transitions app to DISABLED
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
@@ -41,6 +44,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-004 — `validate` confirms notice proof on-chain
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** real on-chain proof verification via operator CLI; not covered by the developer CLI path.
 - **Steps:**
@@ -51,6 +55,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-005 — `execute` executes voucher on-chain
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** real on-chain voucher execution via operator CLI.
 - **Steps:**
@@ -61,6 +66,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-006 — `send --hex --async` flag combination
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** flag interaction; async send path not tested by CI's synchronous lifecycle tests.
 - **Steps:**
@@ -72,6 +78,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-007 — `deploy quorum` creates a v3 Quorum consensus
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** v3 Quorum factory deployment; CI uses pre-deployed contracts, not this command.
 - **Steps:**
@@ -82,6 +89,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-008 — `deploy application` with v3 flags
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** `--claim-staging-period` and `--withdrawal-config` flags are new; CI does not exercise them.
 - **Steps:**
@@ -93,6 +101,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-009 — `read epochs` shows v3 epoch states
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** new staged and foreclosed epoch states visible only after the lifecycle runs; CI does not inspect via the operator CLI.
 - **Steps:**
@@ -104,12 +113,35 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-010 — `contract` output shows v3 fields
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** JSON shape of the contract output changed; CI does not assert the full field set.
 - **Steps:**
   1. Register and configure an application with a withdrawal config and guardian.
   2. Run `cartesi-rollups-cli contract <app>` (or equivalent read command).
 - **Expected:** Output includes `enabled`, `status`, `claim_staging_period`, `withdrawal_config`, `foreclose_block`, `accounts_drive_proved_block`. No old single-state field present.
+
+## ILC-011 — Transaction gas limit is estimated by default; override via `CARTESI_BLOCKCHAIN_GAS_LIMIT`
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** CI runs against a permissive local Anvil chain regardless of gas limit strategy; the estimate-vs-override behavior needs a real RPC provider to matter.
+- **Steps:**
+  1. Submit a transaction via the operator CLI without setting `CARTESI_BLOCKCHAIN_GAS_LIMIT` and confirm the gas limit used is estimated by the client, not a hardcoded value.
+  2. Set `CARTESI_BLOCKCHAIN_GAS_LIMIT` to a non-zero value and repeat; confirm the configured value is used instead of the estimate.
+- **Expected:** (1) transaction succeeds with an estimated gas limit; (2) transaction uses the configured override exactly.
+
+## ILC-012 — Self-hosted deployment failure preserves the original transaction error cause
+
+- **Risk:** L
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** error-message fidelity on a failing deployment transaction is a UX concern CI doesn't assert on.
+- **Steps:**
+  1. Trigger a self-hosted application deployment that will fail on-chain (e.g. invalid constructor argument or insufficient funds).
+  2. Inspect the error surfaced by the CLI.
+- **Expected:** the CLI reports the original on-chain revert reason, not a generic or masked error.
 
 ---
 
