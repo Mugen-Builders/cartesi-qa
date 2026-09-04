@@ -95,6 +95,7 @@ Each test is documented as a level-3 heading and structured as:
 ### ID — Short title
 
 - **Risk:** [H|M|L]
+- **Last Scheduled Test:** vX-alphaY
 - **Environment:** [devnet | testnet | devnet + testnet]
 - **Why-not-CI:** brief explanation of why this is not in CI.
 - **Steps:** numbered procedure.
@@ -103,6 +104,7 @@ Each test is documented as a level-3 heading and structured as:
 
 **Required fields:**
 - `Risk`: criticality (H/M/L).
+- `Last Scheduled Test`: the cycle (node/contracts version pair, e.g. `v2-alpha12`) this test is or was last scheduled to run in. Update every entry's value at the start of a new cycle to that cycle's tag — for tests carried over unchanged, this simply moves forward; for a brand-new entry written because of a PR landed since the last cycle, it names the cycle the entry is *scheduled for* (its first run), not a completed one.
 - `Environment`: single or dual environment.
 - `Why-not-CI`: reason it's operator/integration scoped.
 - `Steps` and `Expected`: clear procedure and assertion.

@@ -11,6 +11,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-001 — Execute same voucher twice
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** replay protection on real L1.
 - **Steps:**
@@ -21,6 +22,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-002 — Validate notice and execute voucher with `block: latest` vs `finalized`
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** behavior differs by mode; needs human check on both. Applies to both notice validation and voucher execution — confirm both operations work in each mode.
 - **Steps:**
@@ -31,6 +33,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-003 — Execute with insufficient L1 gas
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** real-gas failure mode.
 - **Steps:**
@@ -40,6 +43,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-004 — Withdraw more than available balance
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** on-chain revert handling; real L1 state required.
 - **Steps:**
@@ -50,6 +54,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-005 — Validate arbitrary-blob output proof
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** proof validation for non-standard output payloads is not exercised by current CI happy-path cases.
 - **Steps:**
@@ -61,6 +66,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-006 — Attempt to execute non-executable outputs
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** execution-path rejection for invalid output classes is safety-critical and requires explicit adversarial checks.
 - **Steps:**
@@ -72,6 +78,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-007 — Validate USDC withdrawal voucher
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** token-specific voucher validity path depends on live deployment contracts and bridge configuration.
 - **Steps:**
@@ -83,6 +90,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-008 — Execute USDC withdrawal voucher
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** end-to-end USDC egress execution requires full L1 integration and token balances.
 - **Steps:**
@@ -94,6 +102,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-009 — Attempt Ether withdrawal above app-contract balance
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** negative-path revert messaging and node-side failed-execution recording are not fully covered in CI.
 - **Steps:**
@@ -104,6 +113,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-010 — Attempt ERC-721 withdrawal for token not owned by app
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** ownership mismatch at withdrawal execution is a real integration failure mode.
 - **Steps:**
@@ -114,6 +124,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-011 — Attempt ERC-1155 withdrawal above app-contract balance
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** devnet + testnet
 - **Why-not-CI:** quantity-boundary failure handling for ERC-1155 egress is not represented by standard happy-path CI.
 - **Steps:**

@@ -9,6 +9,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-001 — `CARTESI_LOG_LEVEL=debug` propagates across services
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** cross-service log verification is visual; humans notice inconsistencies.
 - **Steps:**
@@ -20,6 +21,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-002 — `CARTESI_LOG_LEVEL=warn` suppresses info messages
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** UX concern — startup config logging is nice to have but is an INFO message; confirm what's lost at WARN.
 - **Steps:**
@@ -30,6 +32,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-003 — Missing `CARTESI_AUTH_PRIVATE_KEY`
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** partial-failure behavior — what does the rest of the node do when the claimer can't start?
 - **Steps:**
@@ -41,6 +44,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-004 — Wrong `CARTESI_BLOCKCHAIN_ID`
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** startup validation clarity; CI doesn't test mismatched chain IDs.
 - **Steps:**
@@ -50,6 +54,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-005 — Invalid `CARTESI_DATABASE_CONNECTION`
 
 - **Risk:** H
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** fast-fail behavior and error clarity.
 - **Steps:**
@@ -59,6 +64,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-006 — Custom `CARTESI_ADVANCER_POLLING_INTERVAL`
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** observable timing behavior in logs; CI doesn't check real timing.
 - **Steps:**
@@ -69,6 +75,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-007 — `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES` limits WS reconnect attempts
 
 - **Risk:** M
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** real network failure simulation; CI doesn't drop the WS endpoint.
 - **Steps:**
@@ -79,6 +86,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-008 — `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` controls retry delay
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** timing-dependent; CI doesn't simulate WS outages.
 - **Steps:**
@@ -89,6 +97,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-009 — `CARTESI_AUTH_KIND=private_key` explicit auth path
 
 - **Risk:** L
+- **Last Scheduled Test:** v2-alpha12
 - **Environment:** testnet
 - **Why-not-CI:** explicit flag validation; confirm the private_key auth path is used for claim signing when set explicitly (vs. implicit default).
 - **Steps:**

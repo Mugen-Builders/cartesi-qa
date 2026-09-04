@@ -31,6 +31,7 @@ Every test entry includes:
 - **ID** — stable identifier, e.g. `CLI-001`, `INP-014`
 - **Name** — short descriptive name
 - **Risk** — H / M / L (impact × likelihood)
+- **Last Scheduled Test** — the cycle this test is/was last scheduled to run in, e.g. `v2-alpha12`. For a brand-new entry that hasn't run yet, this is the cycle it's scheduled for first (the upcoming one), not a past one.
 - **Why-not-CI** — one-line justification for being a manual test
 - **Steps** — numbered, reproducible
 - **Expected** — what should happen
