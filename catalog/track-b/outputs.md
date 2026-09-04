@@ -29,7 +29,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-003 — Voucher with invalid destination
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** execution failure handling on-chain; needs real testnet.
 - **Steps:**
@@ -51,7 +51,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-005 — Emit arbitrary blob output and fetch via JSON-RPC
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** generic blob payload handling and retrieval shape are integration-level behavior not covered by current CI assertions.
 - **Steps:**

@@ -9,7 +9,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-001 — Deploy to local Anvil
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
 - **Why-not-CI:** local-devnet path that developers use constantly.
 - **Steps:**
@@ -30,7 +30,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-003 — Deploy to Base Sepolia
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** CI deploys to a controlled local environment; Base Sepolia introduces real RPC latency, funding, and finality behavior.
 - **Steps:**
@@ -42,7 +42,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-004 — Deploy to Optimism Sepolia
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** Optimism Sepolia behavior (RPC/provider differences and chain conditions) must be validated on real infrastructure.
 - **Steps:**
@@ -54,7 +54,7 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
 ## DEP-005 — Deploy using forked testnet workflow
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** forked-chain deployment depends on real RPC forking behavior and operator configuration paths that CI does not exercise.
 - **Steps:**

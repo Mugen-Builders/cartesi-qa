@@ -15,7 +15,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-001 — Authority staging to acceptance lifecycle (happy path)
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** lifecycle timing against real block progression and staging windows is operator-facing and hard to validate in controlled CI timing.
 - **Steps:**
@@ -34,7 +34,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-002 — Foreclose before claim staging is complete
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** timing-sensitive operator action before staging is not reliably represented in CI happy-path coverage.
 - **Steps:**
@@ -45,7 +45,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-003 — Foreclose during staged (not yet accepted) claim
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** staged-window timing and boundary behavior are difficult to assert deterministically in CI.
 - **Steps:**
@@ -57,7 +57,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-004 — Foreclose after claim acceptance preserves accepted history
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** post-accept foreclosure behavior is a timing/state boundary that CI happy-path tests do not target directly.
 - **Steps:**
@@ -69,7 +69,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-005 — Foreclose authorization boundary
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** signer/key misconfiguration behavior and operator clarity are environment-dependent.
 - **Steps:**
@@ -84,7 +84,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-006 — Wrong epoch drive-root proof is rejected
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** emergency proof material and snapshot selection errors are operational and not covered by standard lifecycle CI.
 - **Steps:**
@@ -97,7 +97,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-007 — Wrong app proof reuse is rejected
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** cross-application operator mistakes are hard to represent in isolated CI fixtures.
 - **Steps:**
@@ -108,7 +108,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-008 — Emergency withdraw before drive-root proof is rejected
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** sequencing failures in emergency procedures are mostly operational, not unit-level.
 - **Steps:**
@@ -119,7 +119,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-009 — Wrong epoch account proof is rejected
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** mismatched snapshot/proof handling is an operator failure mode with real proof artifacts.
 - **Steps:**
@@ -132,7 +132,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-010 — Emergency withdrawal is single-use per account
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** replay resistance in emergency mode is safety-critical and must be verified against real chain execution.
 - **Steps:**
@@ -143,7 +143,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-011 — Restart and catch-up preserve emergency recovery truth
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** restart timing and event backfill under live RPC behavior are not fully represented by CI.
 - **Steps:**
@@ -155,7 +155,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-012 — Emergency withdrawal API parity
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** consistency between operator-facing and JSON-RPC read surfaces is primarily a UX and integration concern.
 - **Steps:**
@@ -170,7 +170,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-013 — Bad emergency config fails fast and clearly
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** configuration UX and startup failure clarity are environment- and operator-path specific.
 - **Steps:**
@@ -182,7 +182,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-014 — Repeated accept failures do not create gas-spending loops
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** long-running retry and cost behavior under live conditions is not fully covered in CI.
 - **Steps:**
@@ -193,7 +193,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-015 — Validate/execute output from staged epoch is rejected
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** staged-versus-accepted epoch boundary enforcement requires carefully timed on-chain operations not covered by CI.
 - **Steps:**
@@ -205,7 +205,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-016 — Front-run guardian foreclosure against node claim acceptance
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** mempool race behavior between guardian foreclosure and claimer acceptance tx is non-deterministic and operator-facing.
 - **Steps:**
@@ -218,7 +218,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 ### FOR-017 — Withdraw USDC after foreclosure via emergency path
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** emergency token recovery after foreclosure needs real proof artifacts and live contract execution.
 - **Steps:**

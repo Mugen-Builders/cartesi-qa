@@ -12,7 +12,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 ## QUO-001 — Pending quorum votes do not misclassify the app
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** real quorum timing and vote-arrival divergence are hard to model deterministically in CI.
 - **Steps:**
@@ -24,7 +24,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 ## QUO-002 — Winning quorum claim stages before acceptance
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** quorum vote resolution and the resulting staged claim are consensus-specific behaviors not covered by CI's happy-path isolation tests.
 - **Steps:**

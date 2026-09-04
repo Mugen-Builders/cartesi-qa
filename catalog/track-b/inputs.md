@@ -31,7 +31,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-003 — Same-block inputs from multiple wallets
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** ordering under real mempool conditions differs from deterministic CI.
 - **Steps:**
@@ -63,7 +63,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-006 — Multiple inputs in one transaction (spambox-style)
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** multi-input same-tx ingress depends on custom contract behavior and ordering semantics not covered in standard pipelines.
 - **Steps:**
@@ -75,7 +75,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-007 — Deposit USDC into application
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** token-specific bridge wiring and live token behavior are integration-level and chain-dependent.
 - **Steps:**
@@ -87,7 +87,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-008 — Request USDC withdrawal in application logic
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** depends on app-specific withdrawal request encoding plus live portal/token contract integration.
 - **Steps:**

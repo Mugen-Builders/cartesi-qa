@@ -78,7 +78,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-007 — Validate USDC withdrawal voucher
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** token-specific voucher validity path depends on live deployment contracts and bridge configuration.
 - **Steps:**
@@ -90,7 +90,7 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
 ## EGR-008 — Execute USDC withdrawal voucher
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** end-to-end USDC egress execution requires full L1 integration and token balances.
 - **Steps:**
