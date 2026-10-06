@@ -116,7 +116,19 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 - **Steps:**
   1. Put a proxy in front of the RPC that drops one `InputAdded` log from one `eth_getLogs` response.
   2. Separately, have the proxy return an altered log for an input the node already stored.
-- **Expected:** (1) the node detects the count mismatch for that window and does not move its cursor past it, and recovers once the proxy stops dropping. (2) reported as a conflicting input identity with a clear error, not an endless retry. The sling node documents that it does not make this check (`qa-slingnode-catalog` PRV-004); the two results together are the stack comparison.
+- **Expected:** (1) the node detects the count mismatch for that window, does not move its cursor past it, and recovers once the proxy stops dropping. (2) the application is marked CORRUPTED with a clear error (alpha.13 has no general reorg rollback), not an endless retry. The sling node documents that it does not make this check (`qa-slingnode-catalog` PRV-004); the two results together are the stack comparison.
+
+
+## INP-011 — Input sent between stage and accept lands in the next epoch
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** with PRT staging (alpha.13, #798) the next epoch's input bound is sampled at acceptance, not at staging. Users who expect their input in the epoch being staged will be surprised; CI does not assert this from a user's point of view.
+- **Steps:**
+  1. On a PRT application with a non-zero staging period, send an input after the epoch's result is staged and before it is accepted.
+  2. Read the input's epoch through JSON-RPC once both epochs settle.
+- **Expected:** the input belongs to the next sealed epoch and its outputs are only provable after that epoch is accepted.
 
 ---
 

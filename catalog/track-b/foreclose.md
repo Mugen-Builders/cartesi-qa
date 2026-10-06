@@ -333,6 +333,23 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   3. Foreclose, prove the accounts-drive root, run an emergency withdrawal for an account with balance, and refund the post-terminal deposit (ILC-013).
 - **Expected:** balances credited before the terminal input can be withdrawn; the deposit sent after it is refunded; the node keeps indexing the application's L1 events throughout.
 
+
+---
+
+## Rejected Deposits
+
+### FOR-026 — Deposit rejected by the app in an accepted epoch cannot be refunded
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** the refund path only covers deposits that were never finalized. A deposit the application rejected, in an epoch consensus accepted, is finalized: the portal already moved the funds and there is no refund. CI covers refund eligibility, not this user-visible outcome.
+- **Steps:**
+  1. Make the application reject a portal deposit (for example an amount its ledger refuses) in an epoch that then gets accepted.
+  2. Foreclose and try `refund` for that input (ILC-019 expects `CannotRefundFinalizedInput`).
+  3. Check where the funds are: the application's token balance, the accounts drive, and any voucher.
+- **Expected:** refund is rejected as documented. Record that the funds sit in the application with no path back unless the app itself emitted a voucher; this is the case application developers must avoid by never rejecting portal deposits.
+
 ---
 
 <!-- Add more foreclosure-specific entries as charter findings become reproducible. -->

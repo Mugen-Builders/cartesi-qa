@@ -65,6 +65,29 @@ Tests for the inspect HTTP API: boundary payloads, concurrency, addressing modes
   1. POST inspect to an app name/address that isn't registered.
 - **Expected:** 404 or a clear application-not-found error.
 
+
+## INS-007 — Inspect on a terminal application returns 503
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 answers inspect for terminal applications with HTTP 503 and plain text (#795); clients that expect the Inspect JSON shape will break.
+- **Steps:**
+  1. Inspect an application in each terminal state you can reach (see `track-b/terminal-states.md`), and one marked DIVERGED or CORRUPTED.
+  2. Inspect an application in FAILED state.
+- **Expected:** terminal and DIVERGED/CORRUPTED: HTTP 503 with the plain text `Application is terminal; inspect unavailable`. FAILED is recoverable, not terminal: record what it returns.
+
+## INS-008 — Inspect exception fields and Failed status
+
+- **Risk:** L
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 changed the inspect response: `exception_payload` becomes an optional sanitized error, raw guest bytes move to `exception_data`, and `Failed` replaces `CycleLimitExceeded`/`TimeLimitExceeded`.
+- **Steps:**
+  1. Inspect with a payload that makes the guest raise an exception in the temporary inspect machine.
+  2. Inspect with a payload that exceeds the inspect cycle or time limit.
+- **Expected:** (1) `exception_data` holds the raw guest bytes and the application itself is not marked terminal (inspect runs on a temporary machine). (2) status `Failed`; any reports returned can be a partial prefix.
+
 ---
 
 <!-- GET variant, inspect-triggered internal errors, etc. -->

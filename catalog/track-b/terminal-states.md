@@ -62,6 +62,8 @@ L1 events, and exposes the state and its proof data through JSON-RPC.
 - **Steps:**
   1. Reach mcycle overflow with a purpose-built machine configuration, recording how it was reached.
 - **Expected:** `MCYCLE_OVERFLOW`, with the same checks as TRM-002. If overflow is not reachable in practice, record that and keep this entry as evidence-checked against CI.
+- **Notes:**
+  - A configured mcycle target that coincides with the emulator boundary can also produce this completion. A configured limit that aborts the advance before the emulator boundary is TRM-007, not this test.
 
 ## TRM-005 — Accepted input with an invalid outputs root
 
@@ -84,6 +86,24 @@ L1 events, and exposes the state and its proof data through JSON-RPC.
 - **Steps:**
   1. For every state reached in TRM-001 to TRM-005, read `cartesi-rollups-cli app status`, the application through JSON-RPC, and the node log.
 - **Expected:** on every surface the state, the input index and the reason are identifiable; the proof data exposed through JSON-RPC belongs to the terminal input; the log line at the transition says what happened and points to the next step (foreclosure).
+- **Notes:**
+  - Also check inspect for each state (INS-007): HTTP 503 with plain text.
+
+
+## TRM-007 — Configured execution limit aborts the advance: input stays NONE, application FAILED
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** this is the recoverable path, distinct from the terminal states: a configured cycle cap, deadline, output or report count, or payload ceiling aborts the live advance. CI checks the mechanism with test machines; this checks the operator recovery loop.
+- **Steps:**
+  1. Set a tight execution parameter (for example the advance deadline or cycle cap) with `cartesi-rollups-cli app execution-parameters set`, and send an input that exceeds it.
+  2. Check the input and application status.
+  3. Raise the limit, re-enable the application, and watch the input.
+  4. Separately, stop the node with `SIGTERM` in the middle of a long advance.
+- **Expected:** (2) no completed result is stored: the input stays `NONE` and the application is FAILED. It does not retry on its own. (3) after the fix and re-enable, the same input is processed normally. (4) shutdown does not mark the application FAILED.
+- **Notes:**
+  - This is the behavior the node team described for regression-watch RW-004.
 
 ---
 

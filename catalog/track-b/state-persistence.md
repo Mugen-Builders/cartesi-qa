@@ -105,6 +105,19 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Restart it and let it catch up.
 - **Expected:** machine state and database state remain aligned after restart — no input is silently skipped, double-applied, or left in an intermediate state.
 
+
+## SP-009 — Corrupted saved snapshot falls back to template replay
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** alpha.13 logs and skips an invalid or inaccessible snapshot and rebuilds from the template by canonical replay; a replay contradiction then marks the application FAILED. CI has unit fixtures for these faults, not a run against a real snapshot directory.
+- **Steps:**
+  1. With `snapshot_policy` set to `EVERY_EPOCH`, run several epochs.
+  2. Stop the node, corrupt the latest snapshot directory (truncate a file), and restart.
+  3. Repeat with the snapshot directory unreadable (permissions).
+- **Expected:** the node logs the skipped snapshot, replays from the template, and reaches the same state as before; record how long the replay takes. It must not load the corrupted snapshot or silently diverge.
+
 ---
 
 <!-- Add entries for large-inputbox resync, RPC provider failure, WS liveness timeout, etc.

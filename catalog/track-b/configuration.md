@@ -92,23 +92,26 @@ Tests for environment variables, startup validation, and feature flags.
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** breaking change in alpha.13 (#798): PRT submission needs its own auth settings, independent of the claimer's. Operators upgrading with a single-key configuration hit this first.
+- **Why-not-CI:** breaking change in alpha.13 (#798): PRT submission needs its own auth settings and never falls back to `CARTESI_AUTH_*`. With claim submission enabled, standalone startup resolves PRT credentials even when only Authority or Quorum applications are registered.
 - **Steps:**
-  1. Run a PRT application with only the claimer's `CARTESI_AUTH_*` settings, as on alpha.12.
-  2. Add `CARTESI_PRT_AUTH_KIND` and its key settings for a different account.
-  3. Configure both with the same address.
-- **Expected:** (1) fails at startup with a message naming the missing PRT auth settings, not later at submission time. (2) PRT transactions are signed by the PRT account and claims by the claimer account. (3) accepted, as documented.
+  1. Start the standalone node with claim submission enabled, only Authority applications registered, and only the claimer's `CARTESI_AUTH_*` settings (an alpha.12-style config).
+  2. Add `CARTESI_PRT_AUTH_KIND` and its key settings for a different account and run a PRT application.
+  3. With a mnemonic, leave both account indexes at their defaults; then configure both to the same address.
+  4. Restart with claim submission disabled and no PRT auth settings.
+- **Expected:** (1) fails at startup with a message naming the missing PRT auth settings, even though no PRT app exists. (2) PRT transactions are signed by the PRT account and claims by the claimer account. (3) defaults derive different addresses (claimer index 0, PRT index 6); the same address is accepted, with no nonce coordination between the two. (4) starts without resolving PRT signers.
 
 ## CFG-011 — Claimer key is not the Authority owner
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** alpha.13 diagnoses this case (#798, "detect authority signer mismatch"). CI tests it on anvil; this checks what an operator gets on a real chain, including after an ownership transfer.
+- **Why-not-CI:** alpha.13 diagnoses this case after a submission revert (#798, "detect authority signer mismatch"). It is not a startup check, so the operator only learns about it when a claim fails.
 - **Steps:**
-  1. Start the claimer with a key that is not the owner of the application's Authority.
+  1. Start the claimer with a key that is not the owner of the application's Authority and let it try to submit a claim.
   2. With a working claimer, transfer the Authority's ownership to another account while the node runs.
-- **Expected:** both end in a recoverable configuration failure that names the configured signer and the on-chain owner, not a generic revert or a retry loop.
+- **Expected:** (1) after the revert, the claimer reads the owner at the configured and latest blocks, marks the application FAILED and logs the configured signer and the on-chain owner. (2) while the two owner views differ, the diagnosis waits; once they agree, same result as (1). Record how long the node runs before the operator can see the problem.
+- **Notes:**
+  - The diagnosis does not run at startup. If an earlier startup check is expected, that is a feature request, not a failure of this test.
 
 ## CFG-012 — Database URL with `#` or a repeated parameter
 

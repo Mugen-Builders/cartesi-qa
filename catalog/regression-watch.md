@@ -47,7 +47,7 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** trigger a wall-clock/execution-parameter failure (not a guest-decided outcome) and confirm the app transitions to a `FAILED` state an operator can recover from by adjusting config and restarting, rather than the previously observed behavior. The deterministic-outcomes rework in node PR [#794](https://github.com/cartesi/rollups-node/pull/794) is a plausible candidate mechanism (it does add fencing for applications whose persisted records contradict execution) but has not been confirmed to be the same fix described here — verify directly against this specific failure mode rather than assuming the PR covers it.
 - **Pass condition:** the app reaches `FAILED` on this failure mode and resumes cleanly after an operator fix. Remove this entry.
 - **Fail condition:** the app does not recover as described — record the actual observed state transition and follow up with the node team.
-- **Status (2026-10-06):** no merged PR in v2.0.0-alpha.13 names this fix. alpha.13 does explain the FAILED health gate in `app status` (ILC-014); check whether that is the operator path the node team meant.
+- **Status (2026-10-06):** alpha.13 implements the described behavior: a configured cycle cap, deadline, output/report count or payload ceiling that aborts a live advance stores no result (input stays `NONE`), marks the application FAILED, and recovers after the operator fixes the cause and re-enables it; shutdown does not mark it FAILED. Run TRM-007 on the release; if it passes, remove this entry.
 
 ---
 

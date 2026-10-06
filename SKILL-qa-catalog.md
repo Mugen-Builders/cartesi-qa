@@ -72,8 +72,8 @@ Each test's environment is **determined individually** from its markdown entry. 
 | State Persistence | `state-persistence.md` | All testnet | `SP-001..005` |
 | Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet |
 | CLI (User) | `cli.md` | All devnet | `CLI-*` |
-| Terminal States | `terminal-states.md` | Mixed | `TRM-001/006` dual; `TRM-002..005` devnet |
-| PRT Service | `prt.md` | Mixed | `PRT-001` testnet; `PRT-002/004` dual; `PRT-003/005` devnet |
+| Terminal States | `terminal-states.md` | Mixed | `TRM-001/006/007` dual; `TRM-002..005` devnet |
+| PRT Service | `prt.md` | Mixed | `PRT-001/010` testnet; `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet |
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 
