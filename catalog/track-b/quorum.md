@@ -5,7 +5,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 > **Scope boundary:**
 > - This file covers one app across multiple validators, including voting, winning-claim staging, and acceptance timing.
 > - Multiple applications on one node remain in `track-b/multi-app.md`.
-> - PRT-specific paths are out of scope for this cycle.
+> - Reference-node PRT service paths are in `track-b/prt.md`.
 
 ---
 

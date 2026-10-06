@@ -75,6 +75,7 @@ const TESTS = [
   ['INP-008',  'B', 'Inputs',           'USDC withdrawal request input — L1 accepts, node feeds machine, machine reports successful request', 'testnet'],
   ['INP-009',  'B', 'Inputs',           'Inputs from the same transaction are identified by tx hash + log index and correctly filterable via JSON-RPC', 'devnet'],
   ['INP-009',  'B', 'Inputs',           'Inputs from the same transaction are identified by tx hash + log index and correctly filterable via JSON-RPC', 'testnet'],
+  ['INP-010', 'B', 'Inputs',            'Dropped or altered InputAdded log caught by the sealed epoch window check, no endless retry', 'devnet'],
 
   // ── Outputs ──────────────────────────────────────────────────────────────────
   ['OUT-001',  'B', 'Outputs',          'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected',                              'devnet'],
@@ -89,6 +90,10 @@ const TESTS = [
   ['OUT-005',  'B', 'Outputs',          'Arbitrary blob output accepted and retrievable through JSON-RPC with exact bytes', 'testnet'],
   ['OUT-006',  'B', 'Outputs',          'Voucher-address output filter uses its DB index (EXPLAIN shows index scan), matches only intended voucher/delegate-call-voucher', 'devnet'],
   ['OUT-006',  'B', 'Outputs',          'Voucher-address output filter uses its DB index (EXPLAIN shows index scan), matches only intended voucher/delegate-call-voucher', 'testnet'],
+  ['OUT-007', 'B', 'Outputs',           'Reports from rejected inputs kept and retrievable through JSON-RPC and the CLI', 'devnet'],
+  ['OUT-007', 'B', 'Outputs',           'Reports from rejected inputs kept and retrievable through JSON-RPC and the CLI', 'testnet'],
+  ['OUT-008', 'B', 'Outputs',           'Reports emitted before a terminal outcome are kept and retrievable', 'devnet'],
+  ['OUT-009', 'B', 'Outputs',           'Input with 20k reports or 20k notices persists completely, no crash-loop, not reprocessed on restart', 'devnet'],
 
   // ── Egress ───────────────────────────────────────────────────────────────────
   ['EGR-001',  'B', 'Egress',           'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
@@ -121,15 +126,27 @@ const TESTS = [
   ['CFG-004',  'B', 'Configuration',    'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level',   'testnet'],
   ['CFG-005',  'B', 'Configuration',    'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error',                        'testnet'],
   ['CFG-006',  'B', 'Configuration',    'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output',    'testnet'],
-  ['CFG-007',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1 — evm-reader retries once then logs clear failure, no panic',               'testnet'],
-  ['CFG-008',  'B', 'Configuration',    'CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL custom value — reconnect timing matches config',                        'testnet'],
   ['CFG-009',  'B', 'Configuration',    'CARTESI_AUTH_KIND=private_key set explicitly — claimer signs and submits claims, no auth errors',               'testnet'],
+  ['CFG-010', 'B', 'Configuration',     'Separate PRT signer (CARTESI_PRT_AUTH_*): missing settings fail at startup, PRT and claimer signers kept apart', 'devnet'],
+  ['CFG-010', 'B', 'Configuration',     'Separate PRT signer (CARTESI_PRT_AUTH_*): missing settings fail at startup, PRT and claimer signers kept apart', 'testnet'],
+  ['CFG-011', 'B', 'Configuration',     'Claimer key is not the Authority owner: recoverable config failure naming signer and on-chain owner', 'testnet'],
+  ['CFG-012', 'B', 'Configuration',     'Database URL with an unencoded # or a repeated parameter rejected with a clear message (pgx v5.11)', 'testnet'],
+  ['CFG-013', 'B', 'Configuration',     'Mnemonic-derived addresses identical to alpha.12 after the BIP-32 rewrite; account index 2^31 rejected', 'devnet'],
+  ['CFG-014', 'B', 'Configuration',     'Saved chain/observation/submission settings: a changed value is rejected, not silently applied', 'testnet'],
 
   // ── Services ─────────────────────────────────────────────────────────────────
   ['SVC-001',  'B', 'Services',         'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],
   ['SVC-002',  'B', 'Services',         'Dirty restart of each service under active workload — no data loss, no stuck state', 'testnet'],
   ['SVC-003',  'B', 'Services',         'AWS KMS signer produces a valid signature on an EIP-1559 (dynamic-fee) network', 'testnet'],
   ['SVC-004',  'B', 'Services',         'KMS authentication failure delays claimer startup (bounded by CARTESI_MAX_STARTUP_TIME) instead of crash-looping', 'testnet'],
+  ['SVC-005', 'B', 'Services',          'Single-process node: a service that fails to start stops the whole node with an error naming the service', 'devnet'],
+  ['SVC-005', 'B', 'Services',          'Single-process node: a service that fails to start stops the whole node with an error naming the service', 'testnet'],
+  ['SVC-006', 'B', 'Services',          'SIGTERM/SIGINT under load: exit code 0 on clean shutdown, every service error logged, clean resume', 'devnet'],
+  ['SVC-006', 'B', 'Services',          'SIGTERM/SIGINT under load: exit code 0 on clean shutdown, every service error logged, clean resume', 'testnet'],
+  ['SVC-007', 'B', 'Services',          '/livez and /readyz semantics, readiness staleness budget, split-service container healthchecks', 'devnet'],
+  ['SVC-007', 'B', 'Services',          '/livez and /readyz semantics, readiness staleness budget, split-service container healthchecks', 'testnet'],
+  ['SVC-008', 'B', 'Services',          'One failed or terminal application does not make the node not ready', 'devnet'],
+  ['SVC-008', 'B', 'Services',          'One failed or terminal application does not make the node not ready', 'testnet'],
 
   // ── State Persistence ────────────────────────────────────────────────────────
   ['SP-001',   'B', 'State Persistence','Hard-kill all containers mid-execution — node recovers to consistent state', 'testnet'],
@@ -189,6 +206,10 @@ const TESTS = [
   ['JRP-014',  'B', 'JSON-RPC API',     'List epochs with multiple statuses at once — JSON-RPC and CLI results match', 'testnet'],
   ['JRP-015',  'B', 'JSON-RPC API',     'Missing resource returns -31001, unknown application returns -31002 (replacing former -32001/-32002)', 'devnet'],
   ['JRP-015',  'B', 'JSON-RPC API',     'Missing resource returns -31001, unknown application returns -31002 (replacing former -32001/-32002)', 'testnet'],
+  ['JRP-016', 'B', 'JSON-RPC API',      'v3 contract state matches the chain and the OpenRPC schema, terminal application states included', 'devnet'],
+  ['JRP-016', 'B', 'JSON-RPC API',      'v3 contract state matches the chain and the OpenRPC schema, terminal application states included', 'testnet'],
+  ['JRP-017', 'B', 'JSON-RPC API',      'Successful responses omit "error": null; viem and the Cartesi SDK still parse responses', 'devnet'],
+  ['JRP-017', 'B', 'JSON-RPC API',      'Successful responses omit "error": null; viem and the Cartesi SDK still parse responses', 'testnet'],
 
   // ── Multi-App ────────────────────────────────────────────────────────────────
   ['MA-001',   'B', 'Multi-App',        'Heavy app does not starve light app under concurrent load', 'testnet'],
@@ -215,16 +236,25 @@ const TESTS = [
   ['ILC-004',  'B', 'Internal CLI',     'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'testnet'],
   ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'devnet'],
   ['ILC-005',  'B', 'Internal CLI',     'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'testnet'],
-  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'devnet'],
-  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --async — payload accepted and decoded correctly in async mode', 'testnet'],
+  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --no-wait: payload accepted, returns without a receipt; old --async flag rejected', 'devnet'],
+  ['ILC-006',  'B', 'Internal CLI',     'cartesi-rollups-cli send --hex --no-wait: payload accepted, returns without a receipt; old --async flag rejected', 'testnet'],
   ['ILC-007',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'testnet'],
   ['ILC-008',  'B', 'Internal CLI',     'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'testnet'],
   ['ILC-009',  'B', 'Internal CLI',     'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'testnet'],
+  ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'devnet'],
   ['ILC-010',  'B', 'Internal CLI',     'cartesi-rollups-cli contract output includes v3 fields (enabled/status/withdrawal config/foreclose markers)', 'testnet'],
   ['ILC-011',  'B', 'Internal CLI',     'CLI transaction gas limit is estimated by default; CARTESI_BLOCKCHAIN_GAS_LIMIT overrides it', 'devnet'],
   ['ILC-011',  'B', 'Internal CLI',     'CLI transaction gas limit is estimated by default; CARTESI_BLOCKCHAIN_GAS_LIMIT overrides it', 'testnet'],
   ['ILC-012',  'B', 'Internal CLI',     'Self-hosted deployment failure surfaces the original on-chain revert reason, not a generic error', 'devnet'],
   ['ILC-012',  'B', 'Internal CLI',     'Self-hosted deployment failure surfaces the original on-chain revert reason, not a generic error', 'testnet'],
+  ['ILC-013', 'B', 'Internal CLI',      'refund returns an unfinalized deposit after foreclosure; repeated and finalized-deposit refunds rejected', 'devnet'],
+  ['ILC-013', 'B', 'Internal CLI',      'refund returns an unfinalized deposit after foreclosure; repeated and finalized-deposit refunds rejected', 'testnet'],
+  ['ILC-014', 'B', 'Internal CLI',      'foreclose/provedriveroot/withdraw confirm before acting; app status explains a FAILED app blocking foreclosure', 'devnet'],
+  ['ILC-014', 'B', 'Internal CLI',      'foreclose/provedriveroot/withdraw confirm before acting; app status explains a FAILED app blocking foreclosure', 'testnet'],
+  ['ILC-015', 'B', 'Internal CLI',      'deploy application with a direct InputBox (Authority, Quorum, PRT); --no-wait prints the predicted address only', 'testnet'],
+  ['ILC-016', 'B', 'Internal CLI',      'send and execute --proof-file by address without database access; stdout carries only the result', 'devnet'],
+  ['ILC-016', 'B', 'Internal CLI',      'send and execute --proof-file by address without database access; stdout carries only the result', 'testnet'],
+  ['ILC-017', 'B', 'Internal CLI',      'read shows PRT match advance events matching the chain', 'devnet'],
 
   // ── Machine Tool ────────────────────────────────────────────────────────────
   ['MTL-001',  'B', 'Machine Tool',     'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'devnet'],
@@ -281,6 +311,27 @@ const TESTS = [
   ['FOR-023',  'B', 'Foreclosure',      'Deposit to a foreclosed application (Ether/ERC-20/ERC-721/ERC-1155) is refunded in full to the original depositor', 'testnet'],
   ['FOR-024',  'B', 'Foreclosure',      'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'devnet'],
   ['FOR-024',  'B', 'Foreclosure',      'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'testnet'],
+  ['FOR-025', 'B', 'Foreclosure',       'Terminal application recovered through foreclosure: prior balances withdrawn, post-terminal deposit refunded', 'devnet'],
+  ['FOR-025', 'B', 'Foreclosure',       'Terminal application recovered through foreclosure: prior balances withdrawn, post-terminal deposit refunded', 'testnet'],
+
+  // ── Terminal States ─────────────────────────────────────────────────────────
+  ['TRM-001', 'B', 'Terminal States',   'Unhandled exception in a template app: record the resulting state; no later input executed', 'devnet'],
+  ['TRM-001', 'B', 'Terminal States',   'Unhandled exception in a template app: record the resulting state; no later input executed', 'testnet'],
+  ['TRM-002', 'B', 'Terminal States',   'Guest halts the machine: MACHINE_HALTED, no input executed before or after a restart', 'devnet'],
+  ['TRM-003', 'B', 'Terminal States',   'Unexpected manual yield: UNEXPECTED_YIELD, no later input executed', 'devnet'],
+  ['TRM-004', 'B', 'Terminal States',   'Mcycle overflow: MCYCLE_OVERFLOW, or record that it is not reachable in practice', 'devnet'],
+  ['TRM-005', 'B', 'Terminal States',   'Accepted input with an invalid outputs root: INVALID_OUTPUTS_ROOT recorded once, no claim, survives restart', 'devnet'],
+  ['TRM-006', 'B', 'Terminal States',   'Operator view of each terminal state: CLI status, JSON-RPC and log identify state, input and next step', 'devnet'],
+  ['TRM-006', 'B', 'Terminal States',   'Operator view of each terminal state: CLI status, JSON-RPC and log identify state, input and next step', 'testnet'],
+
+  // ── PRT Service (reference node) ────────────────────────────────────────────
+  ['PRT-001', 'B', 'PRT',               'Undisputed PRT epochs settle on a public testnet inside the join window', 'testnet'],
+  ['PRT-002', 'B', 'PRT',               'Node recovers its own root bond once, also across a restart; join/stage/accept go first when low on funds', 'devnet'],
+  ['PRT-002', 'B', 'PRT',               'Node recovers its own root bond once, also across a restart; join/stage/accept go first when low on funds', 'testnet'],
+  ['PRT-003', 'B', 'PRT',               'Reference node alone does not defend a disputed epoch: record the outcome and any operator warning', 'devnet'],
+  ['PRT-004', 'B', 'PRT',               'Sling-driven dispute visible through JSON-RPC, matching on-chain events', 'devnet'],
+  ['PRT-004', 'B', 'PRT',               'Sling-driven dispute visible through JSON-RPC, matching on-chain events', 'testnet'],
+  ['PRT-005', 'B', 'PRT',               'Node started after the epoch-0 join window: record whether the app recovers and what the node reports', 'devnet'],
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // TRACK C — Exploratory Charters  (2-hour time-boxed sessions)

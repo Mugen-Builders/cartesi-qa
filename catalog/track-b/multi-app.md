@@ -8,14 +8,14 @@ Tests for running multiple applications on a single node.
 >
 > **Consensus-specific tests:** Quorum behavior lives in `track-b/quorum.md`.
 >
-> **Cycle note:** PRT-specific paths are out of scope for this cycle.
+> **Cycle note:** multi-app restart with PRT applications is covered by CI (`TestRestartMultiAppPrt`); PRT service paths are in `track-b/prt.md`.
 
 ---
 
 ## MA-001 — Heavy app does not starve light app
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
 - **Steps:**
@@ -26,7 +26,7 @@ Tests for running multiple applications on a single node.
 ## MA-002 — Restart with multiple apps, many pending inputs
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** restart processing order under real workloads; CI's restart tests use small input counts.
 - **Steps:**

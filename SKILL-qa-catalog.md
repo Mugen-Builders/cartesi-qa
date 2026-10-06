@@ -58,7 +58,7 @@ Each test's environment is **determined individually** from its markdown entry. 
 | Suite | File | Current Pattern | Examples |
 |-------|------|-----------------|----------|
 | Outputs | `outputs.md` | All dual | `OUT-001..004` |
-| Configuration | `configuration.md` | All testnet | `CFG-001..009` |
+| Configuration | `configuration.md` | Mixed | `CFG-001..006/009/011/012/014` testnet; `CFG-010` dual; `CFG-013` devnet (`CFG-007/008` removed: WS settings no longer exist) |
 | Egress | `egress.md` | All dual | `EGR-001..004` |
 | Foreclosure | `foreclose.md` | All dual | `FOR-001..014` |
 | Inputs | `inputs.md` | All dual | `INP-001..004` |
@@ -72,6 +72,8 @@ Each test's environment is **determined individually** from its markdown entry. 
 | State Persistence | `state-persistence.md` | All testnet | `SP-001..005` |
 | Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet |
 | CLI (User) | `cli.md` | All devnet | `CLI-*` |
+| Terminal States | `terminal-states.md` | Mixed | `TRM-001/006` dual; `TRM-002..005` devnet |
+| PRT Service | `prt.md` | Mixed | `PRT-001` testnet; `PRT-002/004` dual; `PRT-003/005` devnet |
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 

@@ -56,6 +56,8 @@ Every test entry includes:
 | `track-b/internal-cli.md` | Operator CLI (`cartesi-rollups-cli`): db, app lifecycle, on-chain ops |
 | `track-b/machine-tool.md` | Machine tool (`cartesi-rollups-machine-tool`): replay and accounts-drive proof generation |
 | `track-b/foreclose.md` | Foreclosure lifecycle and emergency withdrawal recovery path |
+| `track-b/terminal-states.md` | Applications whose machine reaches a terminal state (exception, halt, unexpected yield, mcycle overflow, invalid outputs root) |
+| `track-b/prt.md` | Reference node PRT service: claims to Dave consensus, root bond recovery, observing disputes |
 
 ## Growing and pruning the catalog
 

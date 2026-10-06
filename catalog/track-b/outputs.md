@@ -9,7 +9,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-001 — Oversized notice (>2MB)
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
 - **Steps:**
@@ -19,7 +19,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-002 — Boundary notice (exactly 2MB)
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** classic off-by-one territory.
 - **Steps:**
@@ -40,7 +40,7 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 ## OUT-004 — Report during advance and during inspect
 
 - **Risk:** L
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** diagnostic visibility; confirm reports surface in both contexts.
 - **Steps:**
@@ -70,6 +70,40 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   2. Filter outputs by that voucher address.
   3. Run `EXPLAIN` on the underlying query.
 - **Expected:** only vouchers/delegate-call-vouchers targeting that address are returned — no notices with coincidentally matching payload bytes. `EXPLAIN` shows an index scan, not a sequential scan.
+
+
+## OUT-007 — Reports from rejected inputs are kept and retrievable
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 keeps reports from rejected and terminal inputs (#801). Before that, a rejected input's reports were dropped, and that is usually where an app explains why it rejected.
+- **Steps:**
+  1. Send an input that the app rejects after emitting one or more reports.
+  2. Query that input's reports through JSON-RPC and the CLI.
+- **Expected:** every report comes back with the right input index; no notice or voucher from the rejected input does.
+
+## OUT-008 — Reports from a terminal input are kept
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** same change (#801) for inputs that end the machine in a terminal state.
+- **Steps:**
+  1. Make an app emit a report and then raise an unhandled exception on the same input (see TRM-001).
+  2. Query reports for that input.
+- **Expected:** the report emitted before the exception is retrievable.
+
+## OUT-009 — One input with a very large number of outputs and reports
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** alpha.13 stores large output and report sets with PostgreSQL `COPY` (#801). A per-input set large enough to hit database limits was flagged by static analysis in the a13-stack cycle (NREG-01) as a possible crash-loop; this is the standing check.
+- **Steps:**
+  1. Send one input that emits 20,000 small reports, and another that emits 20,000 small notices.
+  2. Restart the node after each is processed.
+- **Expected:** both persist completely (counts match through JSON-RPC), the node does not crash or crash-loop, and the restart does not process them again.
 
 ---
 

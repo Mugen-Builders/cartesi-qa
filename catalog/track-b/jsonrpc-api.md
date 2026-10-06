@@ -166,6 +166,30 @@ Tests for the `cartesi_*` JSON-RPC API surface: pagination edge cases, error cod
   2. Fetch any resource for an application that is not registered.
 - **Expected:** (1) returns `-31001`; (2) returns `-31002`. Error messages name the missing resource/application.
 
+
+## JRP-016 — v3 contract state is exposed consistently with the chain
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** breaking change in alpha.13 (#798, "expose v3 contract state"); the schema changed under existing SDK clients.
+- **Steps:**
+  1. For an Authority, a Quorum and a PRT application, read application and epoch state through JSON-RPC.
+  2. Compare each field with the contracts' on-chain views at the same block.
+  3. Compare the responses with the OpenRPC document from `rpc.discover`.
+- **Expected:** values match the chain, every field has its documented type, and the terminal application states (`GUEST_EXCEPTION`, `MACHINE_HALTED`, `MCYCLE_OVERFLOW`, `UNEXPECTED_YIELD`, `INVALID_OUTPUTS_ROOT`) are in the schema.
+
+## JRP-017 — Successful responses omit `"error": null`
+
+- **Risk:** L
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** go-ethereum v1.17.5+ rejects a response with `"error": null`, so alpha.13 removes that member (#800). Clients other than go-ethereum (viem, the Cartesi SDKs) are not in the node's CI.
+- **Steps:**
+  1. Call a few methods and inspect the raw responses.
+  2. Call the same methods from viem and from the Cartesi SDK.
+- **Expected:** successful responses have `result` and no `error` member; error responses still follow JRP-004; every client parses both.
+
 ---
 
-<!-- Add PRT-specific methods (cartesi_listTournaments etc.) when PRT testing comes into scope. -->
+<!-- PRT dispute visibility through JSON-RPC is PRT-004 in track-b/prt.md. -->

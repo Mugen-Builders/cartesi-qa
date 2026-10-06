@@ -9,7 +9,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-001 — Deposit with massive `execLayerData`
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
 - **Steps:**
@@ -20,7 +20,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-002 — Malformed / empty payload
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** error-handling UX; node should not crash on garbage input.
 - **Steps:**
@@ -41,7 +41,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-004 — ERC721 with malformed metadata
 
 - **Risk:** L
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.
 - **Steps:**
@@ -51,7 +51,7 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 ## INP-005 — Direct InputBox input with massive payload
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** stress-level payload sizing through direct `InputBox.addInput` is expensive and environment-sensitive.
 - **Steps:**
@@ -105,6 +105,18 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   1. Use a custom contract to submit two or more inputs for the same application in a single transaction.
   2. List/filter inputs by that transaction hash via JSON-RPC.
 - **Expected:** every input from the transaction is returned, each with a distinct log index, correctly ordered. No input is merged, dropped, or duplicated.
+
+
+## INP-010 — A missing input log is caught by the sealed epoch window check
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** alpha.13 validates every sealed epoch window against the on-chain input count and reports conflicting input identities instead of retrying forever (#798, "verify sealed epoch windows"). CI's anvil never drops or alters logs.
+- **Steps:**
+  1. Put a proxy in front of the RPC that drops one `InputAdded` log from one `eth_getLogs` response.
+  2. Separately, have the proxy return an altered log for an input the node already stored.
+- **Expected:** (1) the node detects the count mismatch for that window and does not move its cursor past it, and recovers once the proxy stops dropping. (2) reported as a conflicting input identity with a clear error, not an endless retry. The sling node documents that it does not make this check (`qa-slingnode-catalog` PRV-004); the two results together are the stack comparison.
 
 ---
 

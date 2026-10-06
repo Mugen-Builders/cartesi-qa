@@ -24,11 +24,11 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-002 — Per-input snapshots
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** feature-flag behavior; needs visual confirmation.
+- **Why-not-CI:** feature-flag behavior; needs visual confirmation. CI covers the PRT variant (`TestSnapshotPolicyEveryInputPrt`); this checks Authority on a real chain.
 - **Steps:**
-  1. Configure `--save-snapshot=every-input`.
+  1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_INPUT`.
   2. Run, observe snapshot creation.
   3. Kill and restart from an input-level snapshot.
 - **Expected:** snapshots created per input; restart from one resumes correctly.
@@ -36,11 +36,11 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-003 — Per-epoch snapshots
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** as above, different granularity.
+- **Why-not-CI:** as above, different granularity. CI covers the PRT variant (`TestSnapshotPolicyEveryEpochPrt`).
 - **Steps:**
-  1. Configure `--save-snapshot=every-epoch`.
+  1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_EPOCH`.
   2. Run across multiple epochs.
   3. Restart from an epoch snapshot.
 - **Expected:** snapshot per epoch; restart resumes correctly.

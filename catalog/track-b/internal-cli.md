@@ -32,7 +32,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-003 — `app remove` transitions app to DISABLED
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
@@ -63,15 +63,18 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   2. Run `cartesi-rollups-cli execute` with the voucher reference.
 - **Expected:** voucher executed on-chain. Transaction receipt returned.
 
-## ILC-006 — `send --hex --async` flag combination
+## ILC-006 — `send --hex --no-wait` flag combination
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** flag interaction; async send path not tested by CI's synchronous lifecycle tests.
+- **Why-not-CI:** flag interaction; the no-wait send path is not exercised by CI's lifecycle tests, which wait for receipts.
 - **Steps:**
-  1. Send a hex-encoded payload with `cartesi-rollups-cli send --hex --async`.
-- **Expected:** payload accepted and decoded correctly. Async mode returns without waiting for processing.
+  1. Send a hex-encoded payload with `cartesi-rollups-cli send --hex --no-wait`.
+  2. Run the same command with the removed `--async` flag.
+- **Expected:** (1) payload accepted and decoded correctly; the command returns the transaction hash without waiting for a receipt. (2) rejected as an unknown flag with a clear message.
+- **Notes:**
+  - alpha.13 replaced `--async` with `--no-wait` (cartesi/rollups-node#798, "unify transaction submission"). Scripts using `--async` break on upgrade.
 
 ---
 
@@ -101,7 +104,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-009 — `read epochs` shows v3 epoch states
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** new staged and foreclosed epoch states visible only after the lifecycle runs; CI does not inspect via the operator CLI.
 - **Steps:**
@@ -113,7 +116,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 ## ILC-010 — `contract` output shows v3 fields
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** JSON shape of the contract output changed; CI does not assert the full field set.
 - **Steps:**
@@ -142,6 +145,64 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   1. Trigger a self-hosted application deployment that will fail on-chain (e.g. invalid constructor argument or insufficient funds).
   2. Inspect the error surfaced by the CLI.
 - **Expected:** the CLI reports the original on-chain revert reason, not a generic or masked error.
+
+
+## ILC-013 — `refund` returns an unfinalized deposit after foreclosure
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** new command in alpha.13 (#798). CI covers the refund lifecycle on anvil (`TestRefundLifecycle`); this is the operator path on a real chain, exporting the input through JSON-RPC as the command's own example does.
+- **Steps:**
+  1. Foreclose an application that has at least one deposit that is not finalized (see FOR-024).
+  2. Export that deposit's complete input through JSON-RPC and run `cartesi-rollups-cli refund <app> <input-index>`.
+  3. Run it again for the same input, and once for a finalized deposit.
+- **Expected:** (2) success is reported only after the `RefundIssued` event for that index, and the depositor receives the funds. (3) both are rejected by the contract with a clear message.
+
+## ILC-014 — Recovery commands confirm before acting and explain a FAILED app
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 moved `foreclose`, `provedriveroot` and `withdraw` to the shared transaction path, requires the matching event before reporting success, and explains when FAILED blocks foreclosure work (#798). Operator UX, not asserted by CI.
+- **Steps:**
+  1. Run `foreclose`, `provedriveroot` and `withdraw` without `--yes`, then with it.
+  2. With an application in FAILED state, run them again and check `app status`.
+- **Expected:** (1) each asks for confirmation and says what it will do; results go to stdout, progress to stderr. (2) the status output explains that FAILED blocks foreclosure work and what repair is needed before clearing it.
+
+## ILC-015 — Deploy an application with a direct InputBox
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** new deploy path in alpha.13 (#798); CI deploys on anvil only. The CLI side of DEP-006.
+- **Steps:**
+  1. Deploy and register an Authority, a Quorum and a PRT application with `cartesi-rollups-cli deploy application` against the alpha.10 factories.
+  2. Repeat one deploy with `--no-wait`.
+- **Expected:** (1) each application is deployed, registered and processes an input. (2) the command prints the factory-predicted address and does not register it as confirmed; registration happens only after a successful receipt.
+
+## ILC-016 — `send` and `execute` by address, without database access
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 lets `send` and `execute --proof-file` run without the node's database or API (#798). That is how anyone outside the operator's machine uses the CLI.
+- **Steps:**
+  1. From a machine with no database access, `send` an input by application address.
+  2. Save an output and its proof to a file and run `execute --proof-file`.
+  3. Pipe the stdout of both commands into another program.
+- **Expected:** both succeed and report success only after the matching on-chain event; stdout carries only the result, so piping works.
+
+## ILC-017 — `read` shows PRT match advance events
+
+- **Risk:** L
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** new read command in alpha.13 (#798) for following disputes from the operator CLI.
+- **Steps:**
+  1. Run a dispute between the sling node and an adversary on a PRT application.
+  2. Read the match advance events with the CLI.
+- **Expected:** every on-chain match advance appears, in order, with values matching the chain.
 
 ---
 

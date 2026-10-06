@@ -6,7 +6,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 > - Regular voucher and withdrawal execution remains in `track-b/egress.md`.
 > - This file covers emergency flow after foreclosure: drive-root proof, account proof withdrawal, and related state/cursor behavior.
 > - Quorum-specific vote divergence/classification tests are covered in `track-b/multi-app.md`.
-> - PRT-specific paths are out of scope for this cycle.
+> - Reference-node PRT service paths are in `track-b/prt.md`; the dispute game itself is covered by the sling node catalog (`Mugen-Builders/qa-slingnode-catalog`).
 
 ---
 
@@ -315,6 +315,23 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   2. Submit a deposit input in a block at or before the frozen last-processed block (finalized).
   3. Submit a deposit input in a block after it (non-finalized).
 - **Expected:** the finalized deposit is refundable via the emergency withdrawal (accounts drive) path; the non-finalized deposit is refunded directly on the base layer. Neither is double-refunded or dropped.
+
+
+---
+
+## Terminal Applications
+
+### FOR-025 — Application in a terminal state is recovered through foreclosure
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** CI tests terminal states and foreclosure separately. An application stuck in a terminal state is the main reason to foreclose, so the whole operator path needs one end-to-end run.
+- **Steps:**
+  1. Drive an application with user balances into a terminal state (see `terminal-states.md`).
+  2. Send a deposit after the terminal input.
+  3. Foreclose, prove the accounts-drive root, run an emergency withdrawal for an account with balance, and refund the post-terminal deposit (ILC-013).
+- **Expected:** balances credited before the terminal input can be withdrawn; the deposit sent after it is refunded; the node keeps indexing the application's L1 events throughout.
 
 ---
 

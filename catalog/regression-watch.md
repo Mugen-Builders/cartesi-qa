@@ -20,6 +20,7 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** on a testnet with a per-transaction gas cap below 30M, run `cartesi-rollups-cli execute` and `cartesi-rollups-cli send --hex`. The fix landed in node PR [#787](https://github.com/cartesi/rollups-node/pull/787) (default to estimated gas, with `CARTESI_BLOCKCHAIN_GAS_LIMIT` as an explicit override) but only on `next/2.0` — the upstream issue is still open because that branch hasn't reached a tagged release yet. Confirm it actually resolves the original failure on alpha13, not just that the code changed.
 - **Pass condition:** both commands submit successfully with an estimated gas limit; the override env var still works when set. Remove this entry and close the upstream issue.
 - **Fail condition:** the same pre-flight rejection still occurs — note the network and update the upstream issue.
+- **Status (2026-10-06):** the fix shipped in v2.0.0-alpha.13. Issue #786 is still open because #787 merged into `next/2.0`, which does not auto-close issues. Check on the release, then close the issue.
 
 ## RW-002 — Two or more `addInput` calls in one transaction wedge the app permanently
 
@@ -28,6 +29,7 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** submit a transaction that calls `InputBox.addInput` two or more times for the same application (spambox-style). The fix is believed to have landed in node PR [#789](https://github.com/cartesi/rollups-node/pull/789) ("Fix input tx reference" — inputs now identified by transaction hash **+ log index**). Confirm on alpha13 that every input from the transaction is processed, in order, with no rollback/retry loop.
 - **Pass condition:** all inputs from the transaction are processed correctly, node stays healthy. Remove this entry.
 - **Fail condition:** the app still wedges (rollback/retry loop, or inputs dropped/duplicated) — record the exact failure mode and re-open tracking with the node team.
+- **Status (2026-10-06):** #789 shipped in v2.0.0-alpha.13. INP-009 and INP-010 check the same area as standing tests.
 
 ## RW-003 — `machine-tool prove accounts-drive` rejects account balances the contract and machine ledger both accept
 
@@ -36,6 +38,7 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** this needs re-evaluating against the contracts v3.0.0-alpha.8 account re-encoding (see `track-b/foreclose.md` FOR-022), which widened the USD account balance field from a 64-bit to a 96-bit value — that changes the shape of the mismatch and may not be the same fix. Confirm with the node team whether the tooling-side check was updated to match, independent of the contracts-side widening.
 - **Pass condition:** the tool generates a valid proof for every balance the contract and ledger accept, with no drive-wide DoS from a single high-balance account. Remove this entry.
 - **Fail condition:** the mismatch (or the drive-wide blocking behavior) persists — record whether the contracts alpha.8+ re-encoding changed the failure boundary, and keep this under private disclosure, not a public issue.
+- **Status (2026-10-06):** not fixed in v2.0.0-alpha.13 as far as the merged PRs show. #798 moved the CLI and machine tool to the final v3 USD account layout (commit "use v3 withdrawal account layout"), and the open #797 rewrites machine-tool replay and proving; re-check on alpha.13 and again when #797 lands.
 
 ## RW-004 — Execution-parameter (wall-clock) failures should mark the app FAILED, not the current behavior
 
@@ -44,6 +47,7 @@ Known issues and specific behavior questions from prior cycles that need one re-
 - **To check:** trigger a wall-clock/execution-parameter failure (not a guest-decided outcome) and confirm the app transitions to a `FAILED` state an operator can recover from by adjusting config and restarting, rather than the previously observed behavior. The deterministic-outcomes rework in node PR [#794](https://github.com/cartesi/rollups-node/pull/794) is a plausible candidate mechanism (it does add fencing for applications whose persisted records contradict execution) but has not been confirmed to be the same fix described here — verify directly against this specific failure mode rather than assuming the PR covers it.
 - **Pass condition:** the app reaches `FAILED` on this failure mode and resumes cleanly after an operator fix. Remove this entry.
 - **Fail condition:** the app does not recover as described — record the actual observed state transition and follow up with the node team.
+- **Status (2026-10-06):** no merged PR in v2.0.0-alpha.13 names this fix. alpha.13 does explain the FAILED health gate in `app status` (ILC-014); check whether that is the operator path the node team meant.
 
 ---
 
