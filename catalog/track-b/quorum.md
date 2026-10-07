@@ -9,17 +9,17 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
 
 ---
 
-## QUO-001 — Pending quorum votes do not misclassify the app
+## QUO-001 — Pending quorum votes do not mark the app DIVERGED during honest divergence; only a different winning claim does (CLAIM_REJECTED + DIVERGED)
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** real quorum timing and vote-arrival divergence are hard to model deterministically in CI.
 - **Steps:**
-  1. Run quorum with peers voting at different times for the same claim window.
-  2. Observe node classification while votes are still pending.
-  3. Continue until majority staging is reached.
-- **Expected:** no false `INOPERABLE` during honest pending divergence. Final classification follows majority outcome.
+  1. Run a Quorum application with several validators voting at different times for the same epoch, with at least one validator voting for a different claim than the local node.
+  2. While votes are still pending, read the application status and the local epoch (`cartesi-rollups-cli app status $APP`, `cartesi_listEpochs`) and the claimer log.
+  3. Continue until a claim is staged by the majority; repeat with the majority on the local node's claim and with the majority on the other claim.
+- **Expected:** while votes are pending the application stays `OK` and the local epoch stays `CLAIM_SUBMITTED`; a differing vote from another validator is only logged. When the local claim wins, the epoch is staged and accepted normally. When a different claim wins before the local one is staged, the local epoch becomes `CLAIM_REJECTED` and the application `DIVERGED` with a reason describing the divergence.
 
 ## QUO-002 — Winning quorum claim stages before acceptance
 
@@ -33,7 +33,7 @@ Tests for Quorum consensus behavior when multiple validators are voting on the s
   3. Let the winning claim become staged.
   4. Wait for the staging period to elapse.
   5. Observe the claimer send `acceptClaim` for the winning claim.
-- **Expected:** the submitted claim does not stage immediately. A winning claim from quorum voting is staged first, then accepted after the staging period. If the local node's claim loses, the node classifies it accordingly without treating the honest divergence as `INOPERABLE`.
+- **Expected:** the submitted claim does not stage immediately. A winning claim from quorum voting is staged first, then accepted after the staging period. If the local node's claim loses, the node classifies it accordingly as described in QUO-001 (`CLAIM_REJECTED` and `DIVERGED`), and does not mark the application while votes are still pending.
 
 ## QUO-003 — Quorum claim submission requires a valid machine validity proof
 

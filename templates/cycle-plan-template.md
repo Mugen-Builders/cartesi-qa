@@ -44,8 +44,8 @@ Use this table for features where lifecycle correctness matters more than comman
 
 | Lane | What to test | Expected signal | Owner | Target |
 |---|---|---|---|---|
-| Staging | Authority submit/stage/accept timing | `CLAIM_COMPUTED -> CLAIM_SUBMITTED -> CLAIM_STAGED -> CLAIM_ACCEPTED` | (tester) | Week 1 |
-| Quorum | Majority staging and divergence classification | No false `INOPERABLE` for honest pending vote differences | (tester) | Week 1 |
+| Staging | Authority submit/stage/accept timing | `CLAIM_COMPUTED -> CLAIM_STAGED -> CLAIM_ACCEPTED` (submit and stage in one transaction) | (tester) | Week 1 |
+| Quorum | Majority staging and divergence classification | App stays `OK` while votes are pending; only a different winning claim gives `CLAIM_REJECTED` + `DIVERGED` | (tester) | Week 1 |
 | Foreclosure | Foreclose before/during/after claim work | App becomes `FORECLOSED`; impossible non-accepted work becomes `CLAIM_FORECLOSED` | (tester) | Week 1 |
 | Emergency withdrawals | Prove drive root, withdraw accounts, restart scanner | Rows persist once, cursors advance with rows, API reads match | (tester) | Week 1 |
 | Ops paths | Bad signer, bad proof, bad/missing config | Clear errors, no hidden partial state | (tester) | Week 1 |

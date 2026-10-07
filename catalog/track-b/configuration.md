@@ -94,7 +94,7 @@ Tests for environment variables, startup validation, and feature flags.
 - **Environment:** devnet + testnet
 - **Why-not-CI:** breaking change in alpha.13 (#798): PRT submission needs its own auth settings and never falls back to `CARTESI_AUTH_*`. With claim submission enabled, standalone startup resolves PRT credentials even when only Authority or Quorum applications are registered.
 - **Steps:**
-  1. Start the standalone node with claim submission enabled, only Authority applications registered, and only the claimer's `CARTESI_AUTH_*` settings (an alpha.12-style config).
+  1. Start the standalone node with claim submission enabled, only Authority applications registered, and only the claimer's `CARTESI_AUTH_*` settings.
   2. Add `CARTESI_PRT_AUTH_KIND` and its key settings for a different account and run a PRT application.
   3. With a mnemonic, leave both account indexes at their defaults; then configure both to the same address.
   4. Restart with claim submission disabled and no PRT auth settings.
@@ -118,22 +118,24 @@ Tests for environment variables, startup validation, and feature flags.
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** pgx v5.11 (#800) parses database URLs like libpq, and the node rejects a URL with `#` or a repeated parameter. A password with `#` that worked on alpha.12 stops working on upgrade.
+- **Why-not-CI:** pgx v5.11 (#800) parses database URLs like libpq, and the node rejects a URL with `#` or a repeated parameter.
 - **Steps:**
   1. Set `CARTESI_DATABASE_CONNECTION` with a password containing an unencoded `#`, then percent-encoded.
   2. Set it with a repeated query parameter.
 - **Expected:** the unencoded `#` and the repeated parameter are rejected at startup with a message saying what is wrong and how to fix it; the percent-encoded password works.
 
-## CFG-013 — Mnemonic key derivation is unchanged after the BIP-32 rewrite
+## CFG-013 — Mnemonic-derived addresses match the standard derivation (as computed by cast) for every account index; account index 2^31 is rejected
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
-- **Why-not-CI:** alpha.13 replaced the BIP-32 library with an internal implementation (#800) and states that derived keys do not change. If they did, the node would sign with an address other than the registered claimer or owner.
+- **Why-not-CI:** the derivation must agree with external wallets for the indexes operators actually use, at the CLI and at each service; CI checks a few known test accounts.
 - **Steps:**
-  1. With one mnemonic, derive the claimer and PRT addresses on alpha.12 and alpha.13 for account indexes 0, 1, 6 and a large valid index.
-  2. Set the account index to 2^31.
-- **Expected:** (1) identical addresses on both versions for every index. (2) rejected with a clear message.
+  1. For a test mnemonic and indexes 0..19, 100, 1000, 65535 and 2^31 - 1, compute the expected address: `cast wallet address --mnemonic "$MNEMONIC" --mnemonic-index N`.
+  2. For each index, send an input with `CARTESI_AUTH_KIND=mnemonic`, `CARTESI_AUTH_MNEMONIC`, `CARTESI_AUTH_MNEMONIC_ACCOUNT_INDEX=N`: `cartesi-rollups-cli send $APP_ADDRESS idx$N --yes --json`, and read the sender with `cast tx <hash> from`.
+  3. Start the claimer (`CARTESI_AUTH_*`) and the PRT service (`CARTESI_PRT_AUTH_*`) with a few of these indexes and read the logged submitter identity.
+  4. Repeat with index 2^31, 2^31 + 6 and 2^32 - 1 for the CLI, the claimer and the PRT service.
+- **Expected:** every derived address equals cast's for the same index, at the CLI and at both services (including 2^31 - 1). Index 2^31 and above are rejected at startup with a message that the account index must be below 2^31; nothing is signed or sent.
 
 ## CFG-014 — Saved service settings are not silently changed
 

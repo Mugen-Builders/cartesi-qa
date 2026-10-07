@@ -64,17 +64,18 @@ Tests for deploying applications across environments: local Anvil, self-hosted n
   4. Restart services once and confirm state and cursors recover cleanly.
 - **Expected:** fork-based deployment succeeds, app processes inputs correctly, and restart preserves consistent state in the forked environment.
 
-## DEP-006 — Deploy against contracts alpha.10 using the `inputBox` factory parameter
+## DEP-006 — Deploy against contracts alpha.10 using the inputBox factory parameter
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** `IApplicationFactory`/`ISelfHostedApplicationFactory` replaced the `bytes dataAvailability` parameter with `IInputBox inputBox` (breaking change); CI fixtures on this repo were updated in lockstep and won't catch a stale node-side caller.
+- **Why-not-CI:** the factories (`IApplicationFactory`, `ISelfHostedApplicationFactory`, the PRT app factory) take the InputBox address as a deployment parameter; CI fixtures use one canned deployment and do not check the three deployment paths against the emitted event and the deployed contract.
 - **Steps:**
-  1. Deploy a new application against the alpha.10 factory, passing the input box contract address.
-  2. Confirm the deployment event/receipt reports the input box correctly (not a decoded `dataAvailability` byte array).
-  3. Send an input and confirm the app processes it normally.
-- **Expected:** deployment succeeds with the new parameter shape, the app is fully functional, and no code path still expects the old `dataAvailability` encoding.
+  1. Deploy one application per path: self-hosted (`cartesi-rollups-cli deploy application $NAME $TEMPLATE --epoch-length 5 --claim-staging-period 10`), with an existing consensus (`--consensus <address>`) through the ApplicationFactory, and PRT (`--prt`).
+  2. For each, decode the `ApplicationCreated` event from the deployment receipt (`cast receipt`, `cast abi-decode`) and read `getInputBox()` on the new application (`cast call $APP 'getInputBox()(address)'`).
+  3. Compare with the configured `CARTESI_CONTRACTS_INPUT_BOX_ADDRESS` and with the application record (`iinputbox_address` in `cartesi-rollups-cli app list` / `cartesi_getApplication`).
+  4. Send an input to each application and confirm it is processed.
+- **Expected:** all three deployments succeed; the event's `inputBox` field, `getInputBox()` and the node record all hold the configured InputBox address; each application processes its input normally.
 
 ---
 
