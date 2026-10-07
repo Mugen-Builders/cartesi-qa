@@ -24,11 +24,11 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-002 — Per-input snapshots
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** feature-flag behavior; needs visual confirmation.
+- **Why-not-CI:** feature-flag behavior; needs visual confirmation. CI covers the PRT variant (`TestSnapshotPolicyEveryInputPrt`); this checks Authority on a real chain.
 - **Steps:**
-  1. Configure `--save-snapshot=every-input`.
+  1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_INPUT`.
   2. Run, observe snapshot creation.
   3. Kill and restart from an input-level snapshot.
 - **Expected:** snapshots created per input; restart from one resumes correctly.
@@ -36,11 +36,11 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 ## SP-003 — Per-epoch snapshots
 
 - **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** as above, different granularity.
+- **Why-not-CI:** as above, different granularity. CI covers the PRT variant (`TestSnapshotPolicyEveryEpochPrt`).
 - **Steps:**
-  1. Configure `--save-snapshot=every-epoch`.
+  1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_EPOCH`.
   2. Run across multiple epochs.
   3. Restart from an epoch snapshot.
 - **Expected:** snapshot per epoch; restart resumes correctly.
@@ -104,6 +104,19 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   2. Hard-kill the advancer process mid-processing.
   3. Restart it and let it catch up.
 - **Expected:** machine state and database state remain aligned after restart — no input is silently skipped, double-applied, or left in an intermediate state.
+
+
+## SP-009 — Corrupted saved snapshot falls back to template replay
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** alpha.13 logs and skips an invalid or inaccessible snapshot and rebuilds from the template by canonical replay; a replay contradiction then marks the application FAILED. CI has unit fixtures for these faults, not a run against a real snapshot directory.
+- **Steps:**
+  1. With `snapshot_policy` set to `EVERY_EPOCH`, run several epochs.
+  2. Stop the node, corrupt the latest snapshot directory (truncate a file), and restart.
+  3. Repeat with the snapshot directory unreadable (permissions).
+- **Expected:** the node logs the skipped snapshot, replays from the template, and reaches the same state as before; record how long the replay takes. It must not load the corrupted snapshot or silently diverge.
 
 ---
 

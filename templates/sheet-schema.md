@@ -14,7 +14,7 @@ The durable master list. One row per test that exists in `catalog/*.md`. Run-agn
 |---|---|---|
 | ID | text | Stable ID matching the catalog entry (e.g. `CLI-001`) |
 | Name | text | Short name matching catalog |
-| Component | dropdown | cli, inputs, outputs, egress, configuration, state-persistence, multi-app, inspect-service, services, deployment |
+| Component | dropdown | cli, inputs, outputs, egress, configuration, state-persistence, multi-app, quorum, inspect-service, services, deployment, jsonrpc-api, internal-cli, machine-tool, foreclose, terminal-states, prt (one per `catalog/track-b/*.md` file) |
 | Track | dropdown | A, B |
 | Risk | dropdown | H, M, L |
 | Why-not-CI | text | One-line justification |

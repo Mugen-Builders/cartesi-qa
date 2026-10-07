@@ -39,15 +39,19 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
   1. Run `cartesi create myapp --branch nonexistent-branch-xyz`.
 - **Expected:** clear message that the branch was not found. Not a generic git error.
 
-## CLI-004 — ERC-20 deposit resolves `IERC20Metadata`/`IERC20Errors` ABI after contracts alpha.10
+## CLI-004 — ERC-20 deposit approves and deposits through Erc20Portal on a devnet from rollups-contracts v3.0.0-alpha.10
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
-- **Why-not-CI:** regresses a real window between contracts alpha.7 and alpha.9, where those OpenZeppelin interfaces stopped being published and broke this exact CLI path; not something the CLI's own CI catches since it depends on the contracts package version.
+- **Why-not-CI:** the CLI and rollups-contracts are released separately; whether the CLI's portal address and ABI match a given contracts release is not covered by either repository's CI.
 - **Steps:**
-  1. Run `cartesi deposit` (or equivalent ERC-20 deposit command) against an application built with contracts alpha.10 artifacts.
-- **Expected:** the command resolves the ERC-20 ABI and completes the deposit without an ABI-not-found or missing-interface error.
+  1. Start a devnet whose contracts come from rollups-contracts v3.0.0-alpha.10 and deploy an application on it. Note the Erc20Portal and InputBox addresses of that deployment.
+  2. Mint test tokens to a user account and record the user's and the application's token balances and `getNumberOfInputs(app)` on the InputBox.
+  3. Run `cartesi deposit erc20 <amount> --token <token> --from <user> --application <app> --rpc-url <devnet rpc>`.
+  4. Check the approval (spender = that deployment's Erc20Portal), the deposit transaction (sent to the Erc20Portal), balances, the InputBox input count and the node's input list.
+- **Expected:** the CLI approves the Erc20Portal of the alpha.10 deployment and deposits through it: the user's balance drops by the amount, the application's balance grows by the amount, a new input appears in the InputBox and in the node, and the application processes it. The success message corresponds to that mined deposit; no ABI or function-resolution error.
 
 <!-- Add more entries as the team identifies manual-worthy CLI tests.
      Remember the filter: if CI covers it, don't add it here. -->
+

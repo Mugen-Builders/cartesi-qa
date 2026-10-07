@@ -32,7 +32,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-003 — Missing `CARTESI_AUTH_PRIVATE_KEY`
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** partial-failure behavior — what does the rest of the node do when the claimer can't start?
 - **Steps:**
@@ -40,11 +40,14 @@ Tests for environment variables, startup validation, and feature flags.
   2. Observe which services come up.
   3. Supply the key later and restart the claimer.
 - **Expected:** claimer fails fast with a clear message. Other services start normally. Document the recovery path when the key is provided.
+- **Notes:**
+  - Re-check the expected result on alpha.13 before marking Fail. In the single-process node, a service initialization failure now shuts the whole supervisor down (cartesi/rollups-node#785), so "other services start normally" may only still hold with split services (`compose.individual-services.yaml`). Record which behavior each mode shows and update this entry.
+  - PRT has its own signer settings since alpha.13 (`CARTESI_PRT_AUTH_*`); this test is about the claimer's. See CFG-010.
 
 ## CFG-004 — Wrong `CARTESI_BLOCKCHAIN_ID`
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** startup validation clarity; CI doesn't test mismatched chain IDs.
 - **Steps:**
@@ -54,7 +57,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-005 — Invalid `CARTESI_DATABASE_CONNECTION`
 
 - **Risk:** H
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** fast-fail behavior and error clarity.
 - **Steps:**
@@ -64,7 +67,7 @@ Tests for environment variables, startup validation, and feature flags.
 ## CFG-006 — Custom `CARTESI_ADVANCER_POLLING_INTERVAL`
 
 - **Risk:** L
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** observable timing behavior in logs; CI doesn't check real timing.
 - **Steps:**
@@ -72,38 +75,78 @@ Tests for environment variables, startup validation, and feature flags.
   2. Observe advancer logs and measure effective interval.
 - **Expected:** configured interval is respected. Also verify: does the effective interval match what `--help` claims? (See `../regression-watch.md` RW-004 for the specific prior-cycle discrepancy.)
 
-## CFG-007 — `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES` limits WS reconnect attempts
-
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
-- **Environment:** testnet
-- **Why-not-CI:** real network failure simulation; CI doesn't drop the WS endpoint.
-- **Steps:**
-  1. Set `CARTESI_BLOCKCHAIN_WS_MAX_RETRIES=1`.
-  2. Start the node, then kill the WS endpoint.
-- **Expected:** evm-reader retries once, logs a clear failure message after exhausting retries. No panic. Document the log format.
-
-## CFG-008 — `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` controls retry delay
-
-- **Risk:** L
-- **Last Scheduled Test:** v2-alpha12
-- **Environment:** testnet
-- **Why-not-CI:** timing-dependent; CI doesn't simulate WS outages.
-- **Steps:**
-  1. Set a short `CARTESI_BLOCKCHAIN_WS_RECONNECT_INTERVAL` (e.g., 2s).
-  2. Interrupt the WS connection and observe reconnect timing in logs.
-- **Expected:** reconnect attempts happen at the configured interval, not the default.
-
 ## CFG-009 — `CARTESI_AUTH_KIND=private_key` explicit auth path
 
 - **Risk:** L
-- **Last Scheduled Test:** v2-alpha12
+- **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** explicit flag validation; confirm the private_key auth path is used for claim signing when set explicitly (vs. implicit default).
 - **Steps:**
   1. Start node with `CARTESI_AUTH_KIND=private_key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.
   2. Observe claim submission.
 - **Expected:** claimer signs and submits claims normally. No auth errors in logs.
+
+
+## CFG-010 — Separate PRT signer (`CARTESI_PRT_AUTH_*`)
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** breaking change in alpha.13 (#798): PRT submission needs its own auth settings and never falls back to `CARTESI_AUTH_*`. With claim submission enabled, standalone startup resolves PRT credentials even when only Authority or Quorum applications are registered.
+- **Steps:**
+  1. Start the standalone node with claim submission enabled, only Authority applications registered, and only the claimer's `CARTESI_AUTH_*` settings.
+  2. Add `CARTESI_PRT_AUTH_KIND` and its key settings for a different account and run a PRT application.
+  3. With a mnemonic, leave both account indexes at their defaults; then configure both to the same address.
+  4. Restart with claim submission disabled and no PRT auth settings.
+- **Expected:** (1) fails at startup with a message naming the missing PRT auth settings, even though no PRT app exists. (2) PRT transactions are signed by the PRT account and claims by the claimer account. (3) defaults derive different addresses (claimer index 0, PRT index 6); the same address is accepted, with no nonce coordination between the two. (4) starts without resolving PRT signers.
+
+## CFG-011 — Claimer key is not the Authority owner
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** alpha.13 diagnoses this case after a submission revert (#798, "detect authority signer mismatch"). It is not a startup check, so the operator only learns about it when a claim fails.
+- **Steps:**
+  1. Start the claimer with a key that is not the owner of the application's Authority and let it try to submit a claim.
+  2. With a working claimer, transfer the Authority's ownership to another account while the node runs.
+- **Expected:** (1) after the revert, the claimer reads the owner at the configured and latest blocks, marks the application FAILED and logs the configured signer and the on-chain owner. (2) while the two owner views differ, the diagnosis waits; once they agree, same result as (1). Record how long the node runs before the operator can see the problem.
+- **Notes:**
+  - The diagnosis does not run at startup. If an earlier startup check is expected, that is a feature request, not a failure of this test.
+
+## CFG-012 — Database URL with `#` or a repeated parameter
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** pgx v5.11 (#800) parses database URLs like libpq, and the node rejects a URL with `#` or a repeated parameter.
+- **Steps:**
+  1. Set `CARTESI_DATABASE_CONNECTION` with a password containing an unencoded `#`, then percent-encoded.
+  2. Set it with a repeated query parameter.
+- **Expected:** the unencoded `#` and the repeated parameter are rejected at startup with a message saying what is wrong and how to fix it; the percent-encoded password works.
+
+## CFG-013 — Mnemonic-derived addresses match the standard derivation (as computed by cast) for every account index; account index 2^31 is rejected
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** the derivation must agree with external wallets for the indexes operators actually use, at the CLI and at each service; CI checks a few known test accounts.
+- **Steps:**
+  1. For a test mnemonic and indexes 0..19, 100, 1000, 65535 and 2^31 - 1, compute the expected address: `cast wallet address --mnemonic "$MNEMONIC" --mnemonic-index N`.
+  2. For each index, send an input with `CARTESI_AUTH_KIND=mnemonic`, `CARTESI_AUTH_MNEMONIC`, `CARTESI_AUTH_MNEMONIC_ACCOUNT_INDEX=N`: `cartesi-rollups-cli send $APP_ADDRESS idx$N --yes --json`, and read the sender with `cast tx <hash> from`.
+  3. Start the claimer (`CARTESI_AUTH_*`) and the PRT service (`CARTESI_PRT_AUTH_*`) with a few of these indexes and read the logged submitter identity.
+  4. Repeat with index 2^31, 2^31 + 6 and 2^32 - 1 for the CLI, the claimer and the PRT service.
+- **Expected:** every derived address equals cast's for the same index, at the CLI and at both services (including 2^31 - 1). Index 2^31 and above are rejected at startup with a message that the account index must be below 2^31; nothing is signed or sent.
+
+## CFG-014 — Saved service settings are not silently changed
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** alpha.13 stores and validates chain, observation policy and submission mode (#798, "validate saved service settings") and rejects changes instead of replacing them. Operators changing an env var on an existing deployment hit this.
+- **Steps:**
+  1. Start the node against a database, then restart it with a different `CARTESI_BLOCKCHAIN_ID`.
+  2. Restart it with a different observation or submission setting.
+- **Expected:** each change is rejected at startup with a message naming the stored and the requested value; nothing in the database is overwritten.
 
 ---
 
