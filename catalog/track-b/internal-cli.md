@@ -6,19 +6,20 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ---
 
-## ILC-001 — `db check` detects schema version mismatch
+## ILC-001 — The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary's, before doing anything else (no deploys or writes against it)
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
-- **Why-not-CI:** database migration integrity; CI always starts from a fresh schema.
+- **Why-not-CI:** database integrity; CI always starts from a fresh schema, and the "refuse before acting" ordering across node startup and DB-backed CLI commands is not asserted.
 - **Steps:**
-  1. Run `cartesi-rollups-cli db init` on a fresh database.
-  2. Manually alter the schema version in the migrations table.
-  3. Run `cartesi-rollups-cli db check`.
-- **Expected:** mismatch detected and reported clearly. Specific version numbers named.
-- **Notes:**
-  - alpha.12 and alpha.13 both report migration version 1: alpha.13 edited migration 000001 in place, so a version-number check cannot see the schema difference. ILC-018 covers running alpha.13 against an alpha.12 database.
+  1. Run `cartesi-rollups-cli db init` on a fresh database, then `cartesi-rollups-cli db check-version` and note the reported version.
+  2. Prepare databases whose schema is not the binary's, one at a time: (a) the recorded version changed (`UPDATE schema_migrations SET version = <other value>;`); (b) the right version with `dirty = true`; (c) the right version number but a table definition changed (for example a column dropped or an extra column added to `input`).
+  3. Against each, run `cartesi-rollups-cli db check-version`.
+  4. Start the node against each.
+  5. Run DB-backed CLI commands that would otherwise write or send transactions: `cartesi-rollups-cli deploy application $NAME $TEMPLATE` (register mode), `cartesi-rollups-cli app register ...`.
+  6. Check the chain (deployer nonce, no new contracts) and the database (no new rows).
+- **Expected:** (3) exits non-zero for every case with a message that says the schema is not the one the binary expects (naming the expected and found version, or the incomplete migration, or the mismatch found). (4) the node exits at startup with the same diagnosis before any service starts work: no input read, no claim, no transaction. (5) each command refuses before any on-chain transaction or database write. (6) nothing was deployed or written.
 
 ## ILC-002 — `app register` then `app list`
 
@@ -31,17 +32,18 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   2. List applications with `cartesi-rollups-cli app list`.
 - **Expected:** registered application appears with `ENABLED` status. Pagination flags (`--limit`, `--offset`) return correct slices.
 
-## ILC-003 — `app remove` transitions app to DISABLED
+## ILC-003 — cartesi-rollups-cli app status disabled then app remove: enabled=false stops processing; remove deletes only a disabled application
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** testnet
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
-  1. Register an application.
-  2. Remove it with `cartesi-rollups-cli app remove`.
-  3. Check status.
-- **Expected:** application transitions to `DISABLED` in the database. Services stop processing it.
+  1. Register an application and send it an input.
+  2. Run `cartesi-rollups-cli app remove $APP` while it is enabled.
+  3. Disable it: `cartesi-rollups-cli app status $APP disabled --yes`; send another input; read `cartesi-rollups-cli app list` and `cartesi_getApplication`.
+  4. Run `cartesi-rollups-cli app remove $APP` (answer the prompt, then with `--yes`).
+- **Expected:** (2) refused: the application must be disabled first; nothing changes. (3) the application shows `enabled: false` (its `status` is unchanged) and services stop processing it: the new input is not executed and no claim is sent for it. (4) the registration is deleted from the database and the application no longer appears in `app list`.
 
 ## ILC-004 — `validate` confirms notice proof on-chain
 
@@ -65,7 +67,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   2. Run `cartesi-rollups-cli execute` with the voucher reference.
 - **Expected:** voucher executed on-chain. Transaction receipt returned.
 
-## ILC-006 — `send --hex --no-wait` flag combination
+## ILC-006 — cartesi-rollups-cli send --hex --no-wait: payload accepted, returns without a receipt
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
@@ -73,10 +75,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 - **Why-not-CI:** flag interaction; the no-wait send path is not exercised by CI's lifecycle tests, which wait for receipts.
 - **Steps:**
   1. Send a hex-encoded payload with `cartesi-rollups-cli send --hex --no-wait`.
-  2. Run the same command with the removed `--async` flag.
-- **Expected:** (1) payload accepted and decoded correctly; the command returns the transaction hash without waiting for a receipt. (2) rejected as an unknown flag with a clear message.
-- **Notes:**
-  - alpha.13 replaced `--async` with `--no-wait` (cartesi/rollups-node#798, "unify transaction submission"). Scripts using `--async` break on upgrade.
+- **Expected:** payload accepted and decoded correctly; the command returns the transaction hash without waiting for a receipt.
 
 ---
 
@@ -113,18 +112,20 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   1. Run a node through a normal staging cycle.
   2. Run `cartesi-rollups-cli read epochs <app>`.
   3. Foreclose the application and run `read epochs` again.
-- **Expected:** (1) epochs appear with `CLAIM_SUBMITTED`, `CLAIM_STAGED`, `CLAIM_ACCEPTED` states as the cycle progresses; (2) after foreclosure the affected epoch reports `CLAIM_FORECLOSED`.
+- **Expected:** (1) for an Authority application, epochs move `CLAIM_COMPUTED` -> `CLAIM_STAGED` -> `CLAIM_ACCEPTED` as the cycle progresses (submission and staging happen in one transaction, so no separate submitted state is shown; a Quorum epoch shows `CLAIM_SUBMITTED` while votes are pending); (2) after foreclosure the epochs that were not accepted report `CLAIM_FORECLOSED`.
 
-## ILC-010 — `contract` output shows v3 fields
+## ILC-010 — cartesi-rollups-cli app list and cartesi_getApplication show the v3 fields (enabled, status, withdrawal config, foreclose markers); contract shows the on-chain view only
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** JSON shape of the contract output changed; CI does not assert the full field set.
+- **Why-not-CI:** operators read these surfaces to diagnose an application; CI does not assert the full field set of each one or the split between node-database state and on-chain state.
 - **Steps:**
-  1. Register and configure an application with a withdrawal config and guardian.
-  2. Run `cartesi-rollups-cli contract <app>` (or equivalent read command).
-- **Expected:** Output includes `enabled`, `status`, `claim_staging_period`, `withdrawal_config`, `foreclose_block`, `accounts_drive_proved_block`. No old single-state field present.
+  1. Deploy an application with a withdrawal config (guardian, builder, accounts-drive layout) and a staging period.
+  2. Run `cartesi-rollups-cli app list` (JSON) and `cartesi_getApplication`.
+  3. Foreclose the application and prove its accounts-drive root (`prove-drive-root`), then repeat step 2.
+  4. Run `cartesi-rollups-cli contract app $APP_ADDRESS --json` and `cartesi-rollups-cli contract consensus $CONSENSUS_ADDRESS --json`.
+- **Expected:** `app list` and `cartesi_getApplication` include `enabled`, `status`, `reason`, `claim_staging_period`, `withdrawal_config` (guardian, withdrawal output builder, accounts-drive layout), `foreclose_block` / `foreclose_transaction` and `accounts_drive_proved_block` / `accounts_drive_merkle_root`, with the foreclosure and drive-proof markers filled after step 3. No old single-state field is present. `contract` takes addresses only and shows on-chain values (owner, template hash, input box, consensus, `is_foreclosed`, guardian and withdrawal config; consensus type, staging period, staged/accepted claims) and no node-database fields.
 
 ## ILC-011 — Transaction gas limit is estimated by default; override via `CARTESI_BLOCKCHAIN_GAS_LIMIT`
 
@@ -211,18 +212,6 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   2. Read the match advance events with the CLI.
 - **Expected:** every on-chain match advance appears, in order, with values matching the chain.
 
-
-## ILC-018 — alpha.13 started against an alpha.12 database
-
-- **Risk:** H
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** alpha.13 has no upgrade migration and edits migration 000001 in place; both versions report migration version 1, so `db init` can say the database is already at the correct version. Operators reusing a database are the ones who hit this.
-- **Steps:**
-  1. Initialize a database with alpha.12 and register an application.
-  2. Point alpha.13 at that database and run `cartesi-rollups-cli db init`, `db check`, then start the node.
-  3. Initialize a new database name with alpha.13 and start again.
-- **Expected:** (2) record exactly what each step reports and where it first fails. A clean "correct version" followed by a confusing failure later is the documented limitation; the value is the operator symptom. (3) works. The operator docs should say "use a fresh database" if they do not already.
 
 ## ILC-019 — `refund` rejection paths
 

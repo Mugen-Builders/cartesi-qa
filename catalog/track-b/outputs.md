@@ -16,15 +16,18 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
   1. From inside the VM, emit a notice larger than 2MB.
 - **Expected:** emission fails with a clear error. HTTP 400 returned. Advancer marks the input rejected. Node does not crash.
 
-## OUT-002 — Boundary notice (exactly 2MB)
+## OUT-002 — Emit a notice at the 2 MiB output limit (the limit applies to the ABI-encoded output, so the largest notice payload is 2,097,056 B): accepted and fully retrievable; one byte more is rejected
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** classic off-by-one territory.
+- **Why-not-CI:** off-by-one territory at the machine output buffer; the usable payload is smaller than 2 MiB because the notice is ABI-encoded (4-byte selector, offset and length words, 32-byte padding), and CI does not emit outputs anywhere near that size.
 - **Steps:**
-  1. Emit a notice of exactly 2MB.
-- **Expected:** accepted. Query returns the full content.
+  1. From inside the VM, emit a notice whose payload is exactly 2,097,056 bytes of a known pattern (for example byte `i` = `i & 0xff`).
+  2. Fetch it with `cartesi_getOutput` (one output per call: two outputs of this size exceed the 10 MiB JSON-RPC response budget of a list call) and with `cartesi-rollups-cli read outputs $APP <index> --jsonrpc`.
+  3. Check that the payload matches the pattern byte for byte and that `keccak256(raw_data)` equals the output hash.
+  4. Emit a notice with a 2,097,057-byte payload.
+- **Expected:** (1) the 2,097,056-byte notice is accepted and stored; (2)–(3) both surfaces return the full payload, byte-exact, with a matching hash. (4) the 2,097,057-byte notice is rejected by the output buffer (the emit call fails, the input is rejected) and the node stays healthy.
 
 ## OUT-003 — Voucher with invalid destination
 

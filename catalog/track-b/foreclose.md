@@ -12,47 +12,52 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ## Staging
 
-### FOR-001 — Authority staging to acceptance lifecycle (happy path)
+### FOR-001 — Authority path: claim submitted and staged in the same transaction (CLAIM_COMPUTED -> CLAIM_STAGED), acceptClaim only after the staging period, then CLAIM_ACCEPTED
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** lifecycle timing against real block progression and staging windows is operator-facing and hard to validate in controlled CI timing.
+- **Why-not-CI:** lifecycle timing against real block progression and staging windows is operator-facing and hard to validate in controlled CI timing; the exact acceptance boundary (block B + P) needs on-chain probing.
 - **Steps:**
-  1. Process inputs until claim computation is available.
-  2. Trigger claim submission via the claimer.
-  3. Immediately observe the on-chain state: claim should be in `STAGED` (staging happens on submit for Authority).
-  4. Wait for the `claim_staging_period` blocks to elapse.
-  5. Wait for the claimer to send the `acceptClaim` transaction.
-  6. Observe the epoch reach `CLAIM_ACCEPTED`.
-- **Expected:** Claim reaches `STAGED` immediately on submission. Acceptance tx only succeeds after the staging period elapses. Lifecycle: `CLAIM_COMPUTED -> CLAIM_SUBMITTED -> CLAIM_STAGED` (immediate) → (wait period) → `CLAIM_ACCEPTED`.
+  1. Deploy an Authority application with a staging period P (for example `cartesi-rollups-cli deploy application $NAME $TEMPLATE --claim-staging-period 30 --epoch-length 5`).
+  2. Send an input and poll `cartesi_listEpochs` about once per second, recording each epoch status and the block at which it changed.
+  3. Read the consensus events: `cast logs --address $CONSENSUS` for `ClaimSubmitted`, `ClaimStaged` and `ClaimAccepted`; note the staging block B.
+  4. While the claim is staged, send `acceptClaim(address,uint256,bytes32)` from another account (`cast send $CONSENSUS 'acceptClaim(address,uint256,bytes32)' $APP <last block> <machine hash>`).
+  5. Probe the boundary with `cast call ... --block N` for N = B + P - 1 and N = B + P.
+  6. Wait for the node's own `acceptClaim`.
+- **Expected:** `ClaimSubmitted` and `ClaimStaged` are emitted by the same transaction in the same block; the node epoch moves `CLAIM_COMPUTED -> CLAIM_STAGED` (no intermediate status is visible for Authority). Acceptance before B + P reverts with `ClaimStagingPeriodNotOverYet`; it is allowed from B + P. The node sends `acceptClaim` only after the period, and the epoch reaches `CLAIM_ACCEPTED`.
 
 ---
 
 ## Foreclosure
 
-### FOR-002 — Foreclose before claim staging is complete
+### FOR-002 — Foreclose before the claim is staged: foreclosure markers set (foreclose_transaction / foreclose_block; there is no FORECLOSED app status) and work that cannot finalize is marked CLAIM_FORECLOSED
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** timing-sensitive operator action before staging is not reliably represented in CI happy-path coverage.
 - **Steps:**
-  1. Trigger foreclosure while claim work is still pre-staging.
-  2. Observe app and epoch transitions.
-- **Expected:** app transitions to `FORECLOSED` with foreclosure markers. Non-accepted claim work that cannot finalize is classified as `CLAIM_FORECLOSED`.
+  1. Deploy an Authority application with a guardian in its withdrawal config.
+  2. Stop the claimer so the next claim stays unsubmitted; send an input and wait until its epoch is `CLAIM_COMPUTED`.
+  3. As the guardian, foreclose: `cartesi-rollups-cli foreclose $APP --yes --json`.
+  4. Read the application (`cartesi-rollups-cli app status $APP`, `cartesi_getApplication`) and the epochs.
+  5. Start the claimer again and re-read the epochs, the claimer account nonce and the consensus events.
+- **Expected:** after the foreclosure is observed, `foreclose_block` and `foreclose_transaction` are set on the application; its `status` is unchanged by foreclosure (there is no `FORECLOSED` status). The computed epoch, and any later open epoch, become `CLAIM_FORECLOSED`. The claimer sends no claim for them (no `ClaimSubmitted`/`ClaimStaged` event, nonce unchanged) and logs that the claim was made terminal by the foreclosure.
 
-### FOR-003 — Foreclose during staged (not yet accepted) claim
+### FOR-003 — Foreclose during a staged (not yet accepted) claim: foreclosure markers set and the staged work that cannot finalize becomes CLAIM_FORECLOSED
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** staged-window timing and boundary behavior are difficult to assert deterministically in CI.
 - **Steps:**
-  1. Move an epoch to `CLAIM_STAGED`.
-  2. Trigger foreclosure before acceptance.
-  3. Observe app and epoch transitions.
-- **Expected:** app transitions to `FORECLOSED` with foreclosure markers. Staged claim that cannot finalize is classified as `CLAIM_FORECLOSED`.
+  1. Deploy an Authority application with a guardian and a staging period long enough to act in (for example 60 blocks).
+  2. Send an input and wait until its epoch is `CLAIM_STAGED` (note `staged_at_block`).
+  3. As the guardian, foreclose before the period ends: `cartesi-rollups-cli foreclose $APP --yes --json`.
+  4. Wait until the staging period would have ended; read the application, the epochs, the consensus events and the claimer account nonce.
+  5. Try `acceptClaim` for that claim on-chain (`cast call`) after the period.
+- **Expected:** `foreclose_block` and `foreclose_transaction` are set; the application `status` is unchanged by foreclosure. The staged epoch becomes `CLAIM_FORECLOSED` (keeping its `staged_at_block`); the node never sends `acceptClaim` for it; the on-chain claim stays staged and `acceptClaim` reverts with `ApplicationForeclosed`.
 
 ### FOR-004 — Foreclose after claim acceptance preserves accepted history
 
@@ -64,7 +69,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   1. Move an epoch to `CLAIM_ACCEPTED`.
   2. Trigger foreclosure after acceptance is finalized.
   3. Inspect accepted history and post-foreclosure state.
-- **Expected:** app transitions to `FORECLOSED` with foreclosure markers. Previously accepted history is preserved and not rewritten.
+- **Expected:** foreclosure markers (`foreclose_block`, `foreclose_transaction`) are set; the application `status` is unchanged by foreclosure. Previously accepted epochs stay `CLAIM_ACCEPTED` and accepted history is not rewritten.
 
 ### FOR-005 — Foreclose authorization boundary
 
@@ -213,7 +218,7 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   2. Submit the guardian foreclosure transaction so it is mined first.
   3. Allow the pending `acceptClaim` transaction to be mined after foreclosure.
   4. Observe app/epoch lifecycle and node failure recording.
-- **Expected:** both txs are accepted by mempool, foreclosure succeeds on L1, later `acceptClaim` reverts, node records failure cleanly, app is marked `FORECLOSED`, and staged claim is marked `CLAIM_FORECLOSED`.
+- **Expected:** both txs are accepted by mempool, foreclosure succeeds on L1, later `acceptClaim` reverts, node records failure cleanly, the application's foreclosure markers are set, and the staged claim is marked `CLAIM_FORECLOSED`.
 
 ### FOR-017 — Withdraw USDC after foreclosure via emergency path
 
@@ -274,48 +279,38 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ---
 
-## Accounts-Drive Encoding
-
-### FOR-022 — Accounts-drive account encoding: legacy 28-byte accounts are rejected, not misread
-
-- **Risk:** H
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet + testnet
-- **Why-not-CI:** this is a silent-corruption risk explicitly called out by the contracts author (a stale 28-byte account could decode into a garbage owner rather than failing loudly); needs deliberate testing against both old and new layouts.
-- **Steps:**
-  1. Prove the accounts-drive root and generate an account proof for an account built in the new 32-byte layout (12-byte little-endian `uint96` balance + 20-byte owner).
-  2. Submit the emergency withdrawal with that proof and confirm the correct owner and balance are used.
-  3. If a snapshot or fixture with a legacy 28-byte account layout is available, attempt the same flow against it.
-- **Expected:** (2) succeeds with the correct owner/balance decoded from the new layout; (3) reverts with `InvalidAccountSize` rather than resolving to an incorrect owner.
-
----
-
 ## Deposit Refunds
 
-### FOR-023 — Deposit to a foreclosed application is refunded to the original depositor
+### FOR-023 — Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund)
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** end-to-end refund behavior against a foreclosed application, across token types, needs real deployments and is not part of CI's happy-path lifecycle.
 - **Steps:**
-  1. Foreclose an application.
-  2. Deposit Ether, then an ERC-20, ERC-721, and ERC-1155 (single and batch) to the foreclosed application.
-  3. Observe the refund output issued for each deposit.
-- **Expected:** each deposit is decoded, validated against the input box, and refunded in full to the original depositor. No deposit is silently accepted or lost.
+  1. Deploy an application with a guardian and a long staging period, so deposits can be made in an epoch that will not be accepted before the foreclosure.
+  2. From different depositor accounts, deposit Ether, an ERC-20, an ERC-721 and an ERC-1155 (single and batch) to the application. Confirm their epoch is not `CLAIM_ACCEPTED`.
+  3. Save each deposit's complete input bytes: `cartesi-rollups-cli read inputs $APP <index> --jsonrpc | jq -r .data.raw_data > in<index>.hex`.
+  4. As the guardian, foreclose the application.
+  5. From a gas payer that is not the depositor, refund each deposit: `cartesi-rollups-cli refund $APP <index> --input-file in<index>.hex --yes --json`. Record depositor and application balances before and after.
+  6. After foreclosure, try one new deposit of each token type.
+- **Expected:** each unfinalized deposit can be refunded, and is refunded in full to its original depositor (not to the caller), with a `RefundIssued` event and `wasRefundForInputIssued(index)` true; the application balance drops by the same amount. Every deposit attempted after foreclosure reverts with `ApplicationForeclosed`: no input is added and the sender keeps the tokens. No deposit is silently accepted or lost.
 
 ### FOR-024 — Deposit refund boundary: finalized vs. non-finalized input
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** the finalized/non-finalized boundary is defined by the last-processed block number, a timing-sensitive on-chain concept CI's fixed-block fixtures don't naturally exercise.
+- **Why-not-CI:** the finalized/non-finalized boundary is set by which epoch consensus accepted last before the foreclosure, a timing-sensitive on-chain fact that CI's fixed-block fixtures don't naturally exercise.
 - **Steps:**
-  1. Foreclose an application.
-  2. Submit a deposit input in a block at or before the frozen last-processed block (finalized).
-  3. Submit a deposit input in a block after it (non-finalized).
-- **Expected:** the finalized deposit is refundable via the emergency withdrawal (accounts drive) path; the non-finalized deposit is refunded directly on the base layer. Neither is double-refunded or dropped.
-
+  1. Deploy an application with a guardian and a USD accounts drive (the guest credits deposits to accounts).
+  2. Before any foreclosure, deposit from user A and wait until that deposit's epoch is `CLAIM_ACCEPTED` (finalized).
+  3. Still before foreclosure, deposit from user B in a later epoch that is not accepted (non-finalized: the staging period has not elapsed, or the claim is not yet staged).
+  4. As the guardian, foreclose; confirm on chain which of the two inputs is finalized.
+  5. Try `cartesi-rollups-cli refund $APP <index> --input-file <file> --yes --json` for both deposits.
+  6. Generate the accounts-drive proofs from the last accepted epoch (`cartesi-rollups-machine-tool replay`, `prove accounts-drive`), run `cartesi-rollups-cli prove-drive-root`, then `cartesi-rollups-cli withdraw` for A and for B.
+  7. Repeat each successful refund and withdrawal.
+- **Expected:** A's finalized deposit cannot be refunded (`CannotRefundFinalizedInput`) and is recovered through the emergency withdrawal, from the accounts drive of the last accepted state. B's non-finalized deposit is refunded directly on the base layer, in full to B, and is not part of the accounts drive used for the withdrawal. Repeats are rejected; neither deposit is paid twice or dropped.
 
 ---
 
@@ -349,6 +344,31 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   2. Foreclose and try `refund` for that input (ILC-019 expects `CannotRefundFinalizedInput`).
   3. Check where the funds are: the application's token balance, the accounts drive, and any voucher.
 - **Expected:** refund is rejected as documented. Record that the funds sit in the application with no path back unless the app itself emitted a voucher; this is the case application developers must avoid by never rejecting portal deposits.
+
+---
+
+## Output Protocol Violations
+
+### FOR-027 — Application that breaks the output protocol is recovered through foreclosure and a fixed redeploy
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** CI checks the INVALID_OUTPUTS_ROOT detection (TRM-005) and foreclosure separately, with synthetic machines. This is the operator path for a real application bug: an app that emits outputs and then publishes a wrong outputs Merkle root in the tx buffer, followed by foreclosure, fund recovery and a redeploy with the fix. The end state of the node's epochs and the fate of the bad epoch's outputs are only visible end to end.
+- **Steps:**
+  1. Deploy an Authority application with an accounts drive and a guardian. Credit balances to two accounts with portal deposits and let that epoch be accepted.
+  2. In a later epoch, send an input that makes the application emit several outputs (at least one voucher and one notice) and then write a wrong outputs Merkle root to the tx buffer (value variant; repeat with the length variant if time allows).
+  3. Check the operator view: `cartesi_getApplication` and `cartesi-rollups-cli app status` show `INVALID_OUTPUTS_ROOT` with the epoch (and input) that caused it; no claim is submitted for that epoch; later inputs are not executed.
+  4. Try to validate and execute the voucher and notice from the bad epoch (`cartesi-rollups-cli validate` / `execute`, or `validateOutput` / `executeOutput` directly).
+  5. Foreclose with the guardian. Record the application status, the foreclosure markers and the status of every epoch after the last accepted one (`cartesi_listEpochs`), also after a node restart.
+  6. Prove the accounts-drive root for the last accepted epoch and run one emergency withdrawal per account; refund any deposit that was not finalized at foreclosure (ILC-013).
+  7. Deploy the same application with the bug fixed (new address) on the same node, send inputs and let an epoch be accepted.
+- **Expected:**
+  - Step 3: the application is in the terminal state `INVALID_OUTPUTS_ROOT`, the JSON-RPC and CLI identify the epoch, no claim is sent for it, and no later input is executed.
+  - Step 4: outputs from the bad epoch never validate or execute (they are not part of any accepted claim).
+  - Step 5: foreclosure succeeds and every epoch that can no longer finalize is classified `CLAIM_FORECLOSED`; none stays `CLOSED` or `OPEN` indefinitely. The state survives a restart.
+  - Step 6: each account withdraws exactly its balance from the last accepted epoch, once; non-finalized deposits are refunded.
+  - Step 7: the fixed application processes inputs and gets its claims accepted on the same node, unaffected by the foreclosed one.
 
 ---
 

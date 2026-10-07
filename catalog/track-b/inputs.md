@@ -6,16 +6,19 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 
 ---
 
-## INP-001 — Deposit with massive `execLayerData`
+## INP-001 — Deposit with execLayerData up to the InputBox 64 KiB input cap: accepted byte-exact at the cap, clear InputTooLarge revert above it, no silent truncation
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** gas-limit and VM-extraction boundary; real-network gas conditions matter.
+- **Why-not-CI:** the cap applies to the whole encoded input, not to `execLayerData`, so the largest usable value depends on each portal's payload layout; CI does not push portal deposits to that boundary or check the bytes end to end (L1 event, node API, machine).
 - **Steps:**
-  1. Construct a deposit with `execLayerData` sized near the practical upper bound.
-  2. Submit on-chain.
-- **Expected:** either accepted and processed correctly, or rejected with a clear error. No silent truncation, no node crash.
+  1. Compute the largest `execLayerData` length N for each portal. The InputBox rejects an input whose encoding (the `EvmAdvance` call: 292 bytes of header plus the portal payload padded to 32 bytes) exceeds 65,536 bytes. With rollups-contracts v3.0.0-alpha.10 this gives N = 65,164 for an Ether deposit (payload = 20 + 32 + N) and N = 65,144 for an ERC-20 deposit (payload = 72 + N).
+  2. Use an application that echoes the received `execLayerData` (for example in a notice). Deposit Ether with an N-byte deterministic pattern: `cast send $ETHER_PORTAL 'depositEther(address,bytes)' $APP 0x<N bytes> --value 0.1ether`.
+  3. Deposit an ERC-20 the same way (approve the Erc20Portal, then `depositErc20Tokens(address,address,uint256,bytes)` with N bytes).
+  4. For each deposit, read the input with `cartesi-rollups-cli read inputs $APP <index> --jsonrpc` and compare the tail of the payload with the bytes sent; compare the notice the application emitted with the bytes sent.
+  5. Repeat both deposits with N + 1 bytes and with a far larger value (for example 300,000 bytes).
+- **Expected:** at N the deposit is mined, the input is `ACCEPTED`, and the `execLayerData` bytes are identical on L1, in the node API and inside the machine. At N + 1 and above the transaction is rejected with `InputTooLarge(appContract, inputLength, maxInputLength)` naming both lengths; no input is created and no tokens move. No silent truncation; the node stays healthy.
 
 ## INP-002 — Malformed / empty payload
 

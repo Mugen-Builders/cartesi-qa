@@ -72,22 +72,23 @@ others. In alpha.13 the node **does not respond to disputes** (cartesi/rollups-n
 - **Environment:** devnet
 - **Why-not-CI:** found in the a13-stack cycle (A13-01): a PRT application with no join in epoch 0 was left unusable on a 300-block devnet window. Checked from the protocol side in `qa-slingnode-catalog` ADV-005.
 - **Steps:**
-  1. Deploy a PRT application and start the node only after epoch 0's join window has closed, with no other participant joining.
+  1. Deploy a PRT application and start the node only after epoch 0's join window has closed, while other participants keep the root tournament undecided (for example two adversaries with different commitments in a running match) and nobody joined the node's commitment. If nobody joins at all, the root finishes with no winner instead; that is PRT-009.
   2. Repeat with the sling node joining the same commitment in time and the reference node starting late.
 - **Expected:** (1) the join reverts on the closed window and, once latest and configured reads confirm the commitment never joined, the application is marked FAILED (missed join). Record whether later epochs can make progress. (2) no missed-join diagnosis, since a peer joined the same commitment.
 
 
-## PRT-006 — Default staging period 0 leaves no reaction window
+## PRT-006 — Default staging period 0: acceptance is allowed from the staging block on (the node accepts a few blocks later); a non-zero period waits until B + P
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** the CLI deploys with `--claim-staging-period` 0 by default, so time-based acceptance is possible immediately after staging. CI's sentry fixtures do not cover the period-zero case.
+- **Why-not-CI:** the exact eligibility block and the node's acceptance timing need on-chain probing at historic blocks; the zero default removes the guardian's reaction window, so operators need it confirmed.
 - **Steps:**
-  1. Deploy a PRT application with the default staging period.
-  2. Settle an epoch and record the blocks between stage and accept.
-  3. Deploy another with a non-zero period and repeat.
-- **Expected:** (1, 2) acceptance can follow staging immediately (possibly in the same block), so a guardian has no time to react to a wrong winner. (3) acceptance waits until block `B + P`. Record whether the CLI warns about the zero default; recommend a non-zero period in operator docs.
+  1. Deploy two PRT applications with the node as the only participant: one without `--claim-staging-period` (CLI default) and one with `--claim-staging-period 40`. Read `getClaimStagingPeriod()` on each consensus.
+  2. Let several epochs settle. For each, record the staging block B (`EpochStaged`), the acceptance block (`EpochSealed` of the next epoch) and their senders.
+  3. Probe acceptance with `cast call --block N <consensus> 'acceptStagedTournamentResult(uint256)' <epoch>` at N = B - 1, B, B + P - 1 and B + P.
+  4. Check the PRT service log at startup.
+- **Expected:** the default period is 0. With P = 0, acceptance is eligible from the staging block B itself (it reverts only before staging); stage and accept are separate transactions and the node accepts a few blocks after B. With P = 40, acceptance reverts with `ClaimStagingPeriodNotOverYet` up to B + P - 1 and is eligible from B + P; the node never accepts before B + P. The node warns once per application at startup when the staging period is zero.
 
 ## PRT-007 — All sentries agreeing accelerates acceptance
 
