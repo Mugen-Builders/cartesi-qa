@@ -71,7 +71,7 @@ Each test's environment is **determined individually** from its markdown entry. 
 | Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet; `DEP-006` dual |
 | Internal CLI | `internal-cli.md` | Mixed | `ILC-001..004`, `ILC-007..009`, `ILC-015`, `ILC-020` testnet; `ILC-005/006`, `ILC-010..014`, `ILC-016`, `ILC-019`, `ILC-021` dual; `ILC-017` devnet |
 | Machine Tool | `machine-tool.md` | All dual | `MTL-001..002` |
-| Foreclosure | `foreclose.md` | All dual | `FOR-001..021`, `FOR-023..026` |
+| Foreclosure | `foreclose.md` | All dual | `FOR-001..021`, `FOR-023..027` |
 | Terminal States | `terminal-states.md` | Mixed | `TRM-001`, `TRM-006/007` dual; `TRM-002..005` devnet |
 | PRT | `prt.md` | Mixed | `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001/010` testnet |
 

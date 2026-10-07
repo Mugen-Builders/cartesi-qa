@@ -333,6 +333,8 @@ const TESTS = [
   ['FOR-025',  'B', 'Foreclosure',       'Terminal application recovered through foreclosure: prior balances withdrawn, post-terminal deposit refunded', 'testnet'],
   ['FOR-026',  'B', 'Foreclosure',       'Deposit rejected by the app in an accepted epoch cannot be refunded; record where the funds remain', 'devnet'],
   ['FOR-026',  'B', 'Foreclosure',       'Deposit rejected by the app in an accepted epoch cannot be refunded; record where the funds remain', 'testnet'],
+  ['FOR-027',  'B', 'Foreclosure',       'App that emits outputs and then writes a wrong outputs Merkle root: INVALID_OUTPUTS_ROOT shown through JSON-RPC; after foreclosure, epochs that cannot finalize become CLAIM_FORECLOSED, balances from the last accepted epoch are withdrawable, outputs of the bad epoch never execute, and a fixed redeploy runs on the same node', 'devnet'],
+  ['FOR-027',  'B', 'Foreclosure',       'App that emits outputs and then writes a wrong outputs Merkle root: INVALID_OUTPUTS_ROOT shown through JSON-RPC; after foreclosure, epochs that cannot finalize become CLAIM_FORECLOSED, balances from the last accepted epoch are withdrawable, outputs of the bad epoch never execute, and a fixed redeploy runs on the same node', 'testnet'],
 
   // ── Terminal States ───────────────────────────────────────────────────────
   ['TRM-001',  'B', 'Terminal States',   'Unhandled exception in a template app: record the resulting state; no later input executed', 'devnet'],

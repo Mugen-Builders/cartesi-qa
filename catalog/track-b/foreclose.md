@@ -347,4 +347,29 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ---
 
+## Output Protocol Violations
+
+### FOR-027 — Application that breaks the output protocol is recovered through foreclosure and a fixed redeploy
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** CI checks the INVALID_OUTPUTS_ROOT detection (TRM-005) and foreclosure separately, with synthetic machines. This is the operator path for a real application bug: an app that emits outputs and then publishes a wrong outputs Merkle root in the tx buffer, followed by foreclosure, fund recovery and a redeploy with the fix. The end state of the node's epochs and the fate of the bad epoch's outputs are only visible end to end.
+- **Steps:**
+  1. Deploy an Authority application with an accounts drive and a guardian. Credit balances to two accounts with portal deposits and let that epoch be accepted.
+  2. In a later epoch, send an input that makes the application emit several outputs (at least one voucher and one notice) and then write a wrong outputs Merkle root to the tx buffer (value variant; repeat with the length variant if time allows).
+  3. Check the operator view: `cartesi_getApplication` and `cartesi-rollups-cli app status` show `INVALID_OUTPUTS_ROOT` with the epoch (and input) that caused it; no claim is submitted for that epoch; later inputs are not executed.
+  4. Try to validate and execute the voucher and notice from the bad epoch (`cartesi-rollups-cli validate` / `execute`, or `validateOutput` / `executeOutput` directly).
+  5. Foreclose with the guardian. Record the application status, the foreclosure markers and the status of every epoch after the last accepted one (`cartesi_listEpochs`), also after a node restart.
+  6. Prove the accounts-drive root for the last accepted epoch and run one emergency withdrawal per account; refund any deposit that was not finalized at foreclosure (ILC-013).
+  7. Deploy the same application with the bug fixed (new address) on the same node, send inputs and let an epoch be accepted.
+- **Expected:**
+  - Step 3: the application is in the terminal state `INVALID_OUTPUTS_ROOT`, the JSON-RPC and CLI identify the epoch, no claim is sent for it, and no later input is executed.
+  - Step 4: outputs from the bad epoch never validate or execute (they are not part of any accepted claim).
+  - Step 5: foreclosure succeeds and every epoch that can no longer finalize is classified `CLAIM_FORECLOSED`; none stays `CLOSED` or `OPEN` indefinitely. The state survives a restart.
+  - Step 6: each account withdraws exactly its balance from the last accepted epoch, once; non-finalized deposits are refunded.
+  - Step 7: the fixed application processes inputs and gets its claims accepted on the same node, unaffected by the foreclosed one.
+
+---
+
 <!-- Add more foreclosure-specific entries as charter findings become reproducible. -->
