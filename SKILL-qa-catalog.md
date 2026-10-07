@@ -53,27 +53,29 @@ then only a `testnet` row exists in the sheet; remove any orphaned `devnet` row.
 
 Each test's environment is **determined individually** from its markdown entry. Do not assume a suite-wide policy; always check the `Environment:` field in the markdown for each test.
 
-**Current environment snapshot (as of June 2026):**
+**Current environment snapshot (as of the v2-alpha13 cycle, October 2026):**
 
 | Suite | File | Current Pattern | Examples |
 |-------|------|-----------------|----------|
-| Outputs | `outputs.md` | All dual | `OUT-001..004` |
-| Configuration | `configuration.md` | Mixed | `CFG-001..006/009/011/012/014` testnet; `CFG-010` dual; `CFG-013` devnet (`CFG-007/008` removed: WS settings no longer exist) |
-| Egress | `egress.md` | All dual | `EGR-001..004` |
-| Foreclosure | `foreclose.md` | All dual | `FOR-001..014` |
-| Inputs | `inputs.md` | All dual | `INP-001..004` |
-| Inspect Service | `inspect-service.md` | All dual | `INS-001..006` |
-| JSON-RPC API | `jsonrpc-api.md` | All dual | `JRP-001..008` |
-| Machine Tool | `machine-tool.md` | All dual | `MTL-001..002` |
-| Internal CLI | `internal-cli.md` | Mixed | `ILC-001..004` testnet; `ILC-005/006/010` dual; `ILC-007..009` testnet |
+| CLI (User) | `cli.md` | All devnet | `CLI-001..004` |
+| Inputs | `inputs.md` | Mostly dual | `INP-001..009`, `INP-011` dual; `INP-010` devnet |
+| Outputs | `outputs.md` | Mostly dual | `OUT-001..007` dual; `OUT-008/009` devnet |
+| Egress | `egress.md` | All dual | `EGR-001..011` |
+| Configuration | `configuration.md` | Mixed | `CFG-001..006`, `CFG-009`, `CFG-011/012/014` testnet; `CFG-010` dual; `CFG-013` devnet |
+| Services | `services.md` | Mixed | `SVC-001..004` testnet; `SVC-005..008` dual; `SVC-009/010` devnet |
+| State Persistence | `state-persistence.md` | Mixed | `SP-001..005`, `SP-009` testnet; `SP-006..008` dual |
+| Inspect Service | `inspect-service.md` | All dual | `INS-001..008` |
+| JSON-RPC API | `jsonrpc-api.md` | All dual | `JRP-001..017`, `JRP-019/020` |
 | Multi-App | `multi-app.md` | All testnet | `MA-001..002` |
-| Quorum | `quorum.md` | All testnet | `QUO-001..002` |
-| Services | `services.md` | All testnet | `SVC-001..002` |
-| State Persistence | `state-persistence.md` | All testnet | `SP-001..005` |
-| Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet |
-| CLI (User) | `cli.md` | All devnet | `CLI-*` |
-| Terminal States | `terminal-states.md` | Mixed | `TRM-001/006/007` dual; `TRM-002..005` devnet |
-| PRT Service | `prt.md` | Mixed | `PRT-001/010` testnet; `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet |
+| Quorum | `quorum.md` | All testnet | `QUO-001..003` |
+| Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet; `DEP-006` dual |
+| Internal CLI | `internal-cli.md` | Mixed | `ILC-001..004`, `ILC-007..009`, `ILC-015`, `ILC-020` testnet; `ILC-005/006`, `ILC-010..014`, `ILC-016`, `ILC-019`, `ILC-021` dual; `ILC-017` devnet |
+| Machine Tool | `machine-tool.md` | All dual | `MTL-001..002` |
+| Foreclosure | `foreclose.md` | All dual | `FOR-001..021`, `FOR-023..026` |
+| Terminal States | `terminal-states.md` | Mixed | `TRM-001`, `TRM-006/007` dual; `TRM-002..005` devnet |
+| PRT | `prt.md` | Mixed | `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001/010` testnet |
+
+Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist).
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 
@@ -85,7 +87,7 @@ Each test's environment is **determined individually** from its markdown entry. 
 
 ### Regression Watch (`catalog/regression-watch.md` → spreadsheet `RW-*`)
 
-- **IDs**: `RW-001..007` (re-check every cycle).
+- **IDs**: `RW-001..004` (re-check every cycle).
 - **Purpose**: verify that fixed issues remain fixed.
 - **Spreadsheet row**: mark as ✅ (Done) once confirmed; remove the row if the issue is permanently closed.
 
@@ -270,4 +272,4 @@ When adding tests or updating the catalog:
 
 ---
 
-**Last updated:** June 2026 | **Session focus:** Track B environment policy and sheet synchronization.
+**Last updated:** October 2026 | **Session focus:** v2-alpha13 catalog corrections, sheet generator resynchronized.
