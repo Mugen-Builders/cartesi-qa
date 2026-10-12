@@ -6,7 +6,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 ---
 
-## ILC-001 — The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary's (including a dirty migration, also through db init), before doing anything else (no deploys or writes against it)
+## ILC-001 — The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary's, before doing anything else (no deploys or writes against it); db init on a dirty migration refuses or repairs it explicitly, never reporting the database as current
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13

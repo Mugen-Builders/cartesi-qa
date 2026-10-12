@@ -263,8 +263,8 @@ const TESTS = [
   ['DEP-006',  'B', 'Deployment',        'Deploy against contracts alpha.10 using the inputBox factory parameter', 'testnet'],
 
   // ── Internal CLI ──────────────────────────────────────────────────────────
-  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s (including a dirty migration, also through db init), before doing anything else (no deploys or writes against it)', 'devnet'],
-  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s (including a dirty migration, also through db init), before doing anything else (no deploys or writes against it)', 'testnet'],
+  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it); db init on a dirty migration refuses or repairs it explicitly, never reporting the database as current', 'devnet'],
+  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it); db init on a dirty migration refuses or repairs it explicitly, never reporting the database as current', 'testnet'],
   ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'devnet'],
   ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'testnet'],
   ['ILC-003',  'B', 'Internal CLI',      'cartesi-rollups-cli app status disabled then app remove: enabled=false stops processing; remove deletes only a disabled application', 'devnet'],
