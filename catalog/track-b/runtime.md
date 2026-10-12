@@ -1,18 +1,21 @@
 # Machine Runtime
 
 Tests for how the node runs the Cartesi Machine that an application's template defines:
-NVRAM ranges, drive labels versus fixed `/dev/pmemN` paths, read-only flash drives, removed
-MTD paths, the emulator mcycle limit, snapshot atomicity, and reproduction of the node's
-TX-buffer results with `cartesi-rollups-machine-tool`.
+NVRAM ranges, drive labels versus fixed `/dev/pmemN` paths, read-only flash drives and
+removed MTD paths.
 
-> **ID prefix:** `RT-*` (runtime). These tests cut across several components, so each entry
-> names its **Area** (Runtime, Deployment, Terminal States, State Persistence, Machine Tool),
-> which is the value of the spreadsheet's Area / Component column for that row.
+> **ID prefix:** `RT-*` (runtime): `RT-001..006`. These tests cut across several components,
+> so each entry names its **Area** (Runtime, Deployment, Terminal States), which is the value
+> of the spreadsheet's Area / Component column for that row.
 >
-> **Scope boundary:** terminal states reached by ordinary application failures are in
-> `track-b/terminal-states.md`; snapshot policies and crash recovery in general are in
-> `track-b/state-persistence.md`; the machine tool's replay and accounts-drive proof
-> commands in general are in `track-b/machine-tool.md`.
+> **Scope boundary:** terminal states reached by ordinary application failures, and the
+> emulator mcycle limit (TRM-004), are in `track-b/terminal-states.md`; snapshot policies,
+> crash recovery and snapshot atomicity (SP-008) are in `track-b/state-persistence.md`; the
+> machine tool's replay, including reproduction of the node's TX-buffer results (MTL-001),
+> and its accounts-drive proof commands are in `track-b/machine-tool.md`.
+>
+> **Retired:** `RT-008` (merged into TRM-004), `RT-009` (merged into SP-008) and `RT-010`
+> (merged into MTL-001).
 
 ---
 
@@ -96,50 +99,6 @@ TX-buffer results with `cartesi-rollups-machine-tool`.
   2. Deploy it, send an input that reads, then the input that writes, then another input.
   3. Read the advancer log, the input status and the application status.
 - **Expected:** the machine initializes and serves reads; the write fails inside the guest with an error the application can handle (a rejected input or report), with no panic during initialization; the node keeps processing later inputs.
-
-## RT-008 — Run an advance to the emulator mcycle limit. Confirm MCYCLE_OVERFLOW is recorded, or document why configured limits make it unreachable.
-
-- **Area:** Terminal States
-- **Risk:** L
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** CI reaches the limit only with a purpose-built machine; this checks what a deployed node does at the emulator boundary and which configured limits stop the advance first.
-- **Steps:**
-  1. Read the application's `advance_max_cycles` (`cartesi-rollups-cli app execution-parameters get`) and the advance deadline.
-  2. Build a machine whose `mcycle` starts close to the emulator limit, for example with `go run ./test/tooling/terminalmachine` in a rollups-node checkout at the tag under test (it sets `mcycle` near `UINT64_MAX` so the next advance crosses it), and deploy it.
-  3. Send an input; read the input status, `cartesi-rollups-cli app status`, `cartesi_getApplication` and the advancer log.
-  4. With an ordinary template, try to reach the limit by raising `advance_max_cycles` and the deadline, and record which limit stops the advance.
-- **Expected:** `MCYCLE_OVERFLOW` is recorded for the application with the input that caused it, and no later input is executed; or the configured limits (cycle cap, deadline) are documented as stopping any real advance before the emulator limit.
-
-## RT-009 — Kill the node during every-input and every-epoch snapshot writes. After 20 runs, each snapshot must be complete or absent, and no database pointer may reference a partial snapshot.
-
-- **Area:** State Persistence
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** timing a hard kill inside a snapshot write is chaos testing; CI's snapshot tests never interrupt a write.
-- **Steps:**
-  1. Set `snapshot_policy EVERY_INPUT` for an application with a large machine (so each write takes long enough to hit).
-  2. Send inputs and send `SIGKILL` to the node while a snapshot directory under `CARTESI_SNAPSHOTS_DIR` is being written; restart. Repeat 20 times.
-  3. After each run, list the snapshot directories, check each for completeness (all files present, loadable with `cartesi-machine --load=<dir>`), and query the database pointers: `SELECT index, snapshot_uri FROM input WHERE snapshot_uri IS NOT NULL;`.
-  4. Repeat steps 2 and 3 with `snapshot_policy EVERY_EPOCH`, killing during the epoch snapshot write.
-- **Expected:** after every run each snapshot directory is either complete or absent; no `snapshot_uri` names a partial directory; every restart resumes from a complete snapshot (or the template) and reaches the same state.
-
-## RT-010 — Replay an epoch with accepted, rejected, and multi-output inputs. Confirm machine-tool reproduces the node's TX-buffer block and output hashes.
-
-- **Area:** Machine Tool
-- **Risk:** H
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** CI does not run the machine tool against an epoch that mixes accepted and rejected inputs; this is the independent check of what the node claims.
-- **Steps:**
-  1. In one epoch, send an accepted input, an input the application rejects, and an input that emits several outputs (vouchers and notices); let the epoch reach `CLAIM_ACCEPTED`.
-  2. Record from the node each input's `machine_hash` and `tx_buffer_data_block`, the epoch's `tx_buffer_data_block` and machine hash, and each output's hash and proof (`cartesi_listInputs`, `cartesi_listEpochs`, `cartesi_listOutputs`).
-  3. Run `cartesi-rollups-machine-tool replay --template <path> --application <app> --to-epoch <N> --store <dir>` (and `--to-input-index` for each input); from each stored machine read the root hash, the TX-buffer data block and the output hashes.
-  4. Compare with the node's values and with the claim on chain.
-- **Expected:** the machine tool reproduces the node's machine hash, TX-buffer data block and output hashes for the epoch and for every input, including the rejected one and the multi-output one.
-- **Notes:**
-  - In alpha.13, `replay` selects inputs with completion status `ACCEPTED` only (`collectReplayInputs` in `cmd/cartesi-rollups-machine-tool/main.go`). The rejected input is in the epoch to check that skipping it still reproduces the node's values.
 
 ---
 

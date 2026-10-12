@@ -176,10 +176,10 @@ const TESTS = [
   ['SP-006',   'B', 'State Persistence', 'Startup replay reconciles persisted history against re-execution with no discrepancy', 'testnet'],
   ['SP-007',   'B', 'State Persistence', 'Node fences an application whose persisted outcome contradicts real execution; other apps keep processing', 'devnet'],
   ['SP-007',   'B', 'State Persistence', 'Node fences an application whose persisted outcome contradicts real execution; other apps keep processing', 'testnet'],
-  ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing', 'devnet'],
-  ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing', 'testnet'],
-  ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped; node replays from the template to the same state', 'devnet'],
-  ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped; node replays from the template to the same state', 'testnet'],
+  ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing, including kills during every-input and every-epoch snapshot writes (each snapshot complete or absent, no database pointer to a partial snapshot)', 'devnet'],
+  ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing, including kills during every-input and every-epoch snapshot writes (each snapshot complete or absent, no database pointer to a partial snapshot)', 'testnet'],
+  ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped and the node replays from the template to the same state; corruption that keeps the hash tree intact is detected by page-level verification, or the required operator check is documented', 'devnet'],
+  ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped and the node replays from the template to the same state; corruption that keeps the hash tree intact is detected by page-level verification, or the required operator check is documented', 'testnet'],
 
   // ── Inspect Service ───────────────────────────────────────────────────────
   ['INS-001',  'B', 'Inspect Service',   'POST /inspect with exactly-2MB payload — accepted and processed', 'devnet'],
@@ -263,8 +263,8 @@ const TESTS = [
   ['DEP-006',  'B', 'Deployment',        'Deploy against contracts alpha.10 using the inputBox factory parameter', 'testnet'],
 
   // ── Internal CLI ──────────────────────────────────────────────────────────
-  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it)', 'devnet'],
-  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it)', 'testnet'],
+  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s (including a dirty migration, also through db init), before doing anything else (no deploys or writes against it)', 'devnet'],
+  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s (including a dirty migration, also through db init), before doing anything else (no deploys or writes against it)', 'testnet'],
   ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'devnet'],
   ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'testnet'],
   ['ILC-003',  'B', 'Internal CLI',      'cartesi-rollups-cli app status disabled then app remove: enabled=false stops processing; remove deletes only a disabled application', 'devnet'],
@@ -304,8 +304,8 @@ const TESTS = [
   ['ILC-021',  'B', 'Internal CLI',      'deposit erc20 --approve checks Approval then InputAdded; rejects --no-wait; names the failing step', 'testnet'],
 
   // ── Machine Tool ──────────────────────────────────────────────────────────
-  ['MTL-001',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'devnet'],
-  ['MTL-001',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool replay writes deterministic snapshot for accepted epoch', 'testnet'],
+  ['MTL-001',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool replay writes a deterministic snapshot for an accepted epoch and reproduces the node\'s TX-buffer block and output hashes for accepted, rejected and multi-output inputs', 'devnet'],
+  ['MTL-001',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool replay writes a deterministic snapshot for an accepted epoch and reproduces the node\'s TX-buffer block and output hashes for accepted, rejected and multi-output inputs', 'testnet'],
   ['MTL-002',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw', 'devnet'],
   ['MTL-002',  'B', 'Machine Tool',      'cartesi-rollups-machine-tool prove accounts-drive outputs proofs accepted by prove-drive-root and withdraw', 'testnet'],
 
@@ -352,8 +352,8 @@ const TESTS = [
   ['FOR-020',  'B', 'Foreclosure',       'Authority claim submission rejects a malformed machine Merkle proof (InvalidMachineMerkleProof)', 'testnet'],
   ['FOR-021',  'B', 'Foreclosure',       'Authority claim submission rejects a siblings array of the wrong length (InvalidSiblingsArrayLength)', 'devnet'],
   ['FOR-021',  'B', 'Foreclosure',       'Authority claim submission rejects a siblings array of the wrong length (InvalidSiblingsArrayLength)', 'testnet'],
-  ['FOR-023',  'B', 'Foreclosure',       'Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund)', 'devnet'],
-  ['FOR-023',  'B', 'Foreclosure',       'Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund)', 'testnet'],
+  ['FOR-023',  'B', 'Foreclosure',       'Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund), with RefundIssued matching the built output for Ether, ERC-20, ERC-721 and ERC-1155 single and batch', 'devnet'],
+  ['FOR-023',  'B', 'Foreclosure',       'Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund), with RefundIssued matching the built output for Ether, ERC-20, ERC-721 and ERC-1155 single and batch', 'testnet'],
   ['FOR-024',  'B', 'Foreclosure',       'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'devnet'],
   ['FOR-024',  'B', 'Foreclosure',       'Deposit refund boundary: finalized deposits refund via emergency withdrawal, non-finalized refund directly on L1', 'testnet'],
   ['FOR-025',  'B', 'Foreclosure',       'Terminal application recovered through foreclosure: prior balances withdrawn, post-terminal deposit refunded', 'devnet'],
@@ -413,26 +413,22 @@ const TESTS = [
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // NEW ADDITIONS  (Track B entries added in the v2-alpha13 cycle)
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // Catalog entries: RT-* in catalog/track-b/runtime.md, SP-011 in
-  // state-persistence.md, SVC-013 in services.md, ILC-022/023 in internal-cli.md,
-  // FOR-028..031 in foreclose.md. These rows keep the cycle sheet's order and sit
-  // after the regression-watch block (their own track, so _orderedTestsForSheet()
-  // does not move them into Track B). FOR-031 was FOR-027 in the cycle sheet.
+  // Catalog entries: RT-001..006 in catalog/track-b/runtime.md, SVC-013 in
+  // services.md, ILC-022 in internal-cli.md, FOR-028..030 in foreclose.md. These
+  // rows keep the cycle sheet's order and sit after the regression-watch block
+  // (their own track, so _orderedTestsForSheet() does not move them into Track B).
+  // Retired by merging: RT-008 into TRM-004, RT-009 into SP-008, RT-010 into
+  // MTL-001, SP-011 into SP-009, ILC-023 into ILC-001, FOR-031 (the cycle sheet's
+  // FOR-027) into FOR-023.
   ['RT-001',   'new_additions', 'Runtime',          'Deploy an app with an NVRAM range. Read and write it, take a snapshot, restart, and confirm replay produces the same state.', 'devnet'],
   ['RT-002',   'new_additions', 'Runtime',          'Confirm the machine hash used for claims includes the NVRAM range. Confirm accounts-drive proofs still work beside that range.', 'devnet'],
   ['RT-005',   'new_additions', 'Runtime',          'Run equivalent templates using drive labels and fixed /dev/pmemN paths. Confirm both behave the same before and after replacing a labeled memory range.', 'devnet'],
   ['RT-006',   'new_additions', 'Runtime',          'Deploy a template with a read-only flash drive. A guest write must fail cleanly without an initialization panic.', 'devnet'],
   ['RT-003',   'new_additions', 'Deployment',       'Change the initial NVRAM contents and verify getTemplateHash behaves as documented. Deploy the template and confirm the registered hash matches.', 'devnet'],
   ['RT-004',   'new_additions', 'Terminal States',  'Start a template that still references removed MTD paths. Confirm build or first advance fails clearly, records the reason, and never hangs.', 'devnet'],
-  ['RT-008',   'new_additions', 'Terminal States',  'Run an advance to the emulator mcycle limit. Confirm MCYCLE_OVERFLOW is recorded, or document why configured limits make it unreachable.', 'devnet'],
-  ['RT-009',   'new_additions', 'State Persistence', 'Kill the node during every-input and every-epoch snapshot writes. After 20 runs, each snapshot must be complete or absent, and no database pointer may reference a partial snapshot.', 'devnet'],
-  ['RT-010',   'new_additions', 'Machine Tool',     'Replay an epoch with accepted, rejected, and multi-output inputs. Confirm machine-tool reproduces the node\'s TX-buffer block and output hashes.', 'devnet'],
-  ['SP-011',   'new_additions', 'State Persistence', 'Corrupt snapshot data without changing its hash tree. Confirm page-level verification detects it, or document the required operator check.', 'devnet'],
   ['SVC-013',  'new_additions', 'Services',         'Exhaust chain-client retries with a credential-bearing RPC URL. Confirm node and CLI error logs redact the URL path and key.', 'testnet'],
   ['ILC-022',  'new_additions', 'Internal CLI',     'Inject transient 429, 502, and timeout errors during deploy, send, execute, and refund. Confirm retries use backoff, preserve any broadcast hash, and complete deploy registration.', 'devnet'],
   ['ILC-022',  'new_additions', 'Internal CLI',     'Inject transient 429, 502, and timeout errors during deploy, send, execute, and refund. Confirm retries use backoff, preserve any broadcast hash, and complete deploy registration.', 'testnet'],
-  ['ILC-023',  'new_additions', 'Internal CLI',     'Run db init on a dirty migration. Confirm it refuses or performs an explicit repair and never reports the database as current.', 'devnet'],
-  ['FOR-031',  'new_additions', 'Foreclosure',      'After foreclosure, refund unfinalized ETH, ERC-721, ERC-1155 single, and ERC-1155 batch deposits. Confirm balances and ownership return exactly and RefundIssued matches the built output.', 'devnet'],
   ['FOR-028',  'new_additions', 'Foreclosure',      'Refund a deposit made by a contract and, when available, an EIP-7702 account. Missing receiver hooks must revert clearly without marking the refund complete, so retry remains possible.', 'devnet'],
   ['FOR-029',  'new_additions', 'Foreclosure',      'Add several inputs in one transaction. Confirm lookup by transaction hash returns all inputs, a non-deposit refund fails with UnknownInputSender, and the deposit refunds successfully.', 'devnet'],
   ['FOR-030',  'new_additions', 'Foreclosure',      'Mine a refund and claim acceptance for the same deposit epoch in one block. Confirm exactly one succeeds and node state matches chain state.', 'devnet'],

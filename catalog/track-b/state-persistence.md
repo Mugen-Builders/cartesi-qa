@@ -93,43 +93,37 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Restart the node.
 - **Expected:** the affected application is fenced (its processing halts, application-failure state is recorded) rather than the node crashing or silently accepting the contradictory record. Other, unrelated applications on the same node continue processing normally.
 
-## SP-008 — Advancer preserves machine-database alignment after a crash mid-processing
+## SP-008 — Advancer preserves machine-database alignment after a hard crash mid-processing, including kills during every-input and every-epoch snapshot writes (each snapshot complete or absent, no database pointer to a partial snapshot)
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** timing a hard-kill mid-advance and asserting alignment afterward is a chaos-style scenario outside CI's deterministic run.
+- **Why-not-CI:** timing a hard-kill mid-advance and asserting alignment afterward is a chaos-style scenario outside CI's deterministic run; timing a hard kill inside a snapshot write is chaos testing too, and CI's snapshot tests never interrupt a write.
 - **Steps:**
   1. Submit a burst of inputs so the advancer has active work queued.
   2. Hard-kill the advancer process mid-processing.
   3. Restart it and let it catch up.
-- **Expected:** machine state and database state remain aligned after restart — no input is silently skipped, double-applied, or left in an intermediate state.
+  4. Set `snapshot_policy EVERY_INPUT` for an application with a large machine (so each write takes long enough to hit).
+  5. Send inputs and send `SIGKILL` to the node while a snapshot directory under `CARTESI_SNAPSHOTS_DIR` is being written; restart. Repeat 20 times.
+  6. After each run, list the snapshot directories, check each for completeness (all files present, loadable with `cartesi-machine --load=<dir>`), and query the database pointers: `SELECT index, snapshot_uri FROM input WHERE snapshot_uri IS NOT NULL;`.
+  7. Repeat steps 5 and 6 with `snapshot_policy EVERY_EPOCH`, killing during the epoch snapshot write.
+- **Expected:** machine state and database state remain aligned after restart — no input is silently skipped, double-applied, or left in an intermediate state. After every snapshot-write kill each snapshot directory is either complete or absent; no `snapshot_uri` names a partial directory; every restart resumes from a complete snapshot (or the template) and reaches the same state.
 
 
-## SP-009 — Corrupted saved snapshot falls back to template replay
+## SP-009 — Corrupted or unreadable saved snapshot is skipped and the node replays from the template to the same state; corruption that keeps the hash tree intact is detected by page-level verification, or the required operator check is documented
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** alpha.13 logs and skips an invalid or inaccessible snapshot and rebuilds from the template by canonical replay; a replay contradiction then marks the application FAILED. CI has unit fixtures for these faults, not a run against a real snapshot directory.
+- **Why-not-CI:** alpha.13 logs and skips an invalid or inaccessible snapshot and rebuilds from the template by canonical replay; a replay contradiction then marks the application FAILED. CI has unit fixtures for these faults, not a run against a real snapshot directory. Steps 2 and 3 break a snapshot so that it cannot load; the corruption in steps 4 to 6 keeps the stored hash tree consistent, so only a check of the page data against the tree can find it. CI does not tamper with snapshot files.
 - **Steps:**
   1. With `snapshot_policy` set to `EVERY_EPOCH`, run several epochs.
   2. Stop the node, corrupt the latest snapshot directory (truncate a file), and restart.
   3. Repeat with the snapshot directory unreadable (permissions).
-- **Expected:** the node logs the skipped snapshot, replays from the template, and reaches the same state as before; record how long the replay takes. It must not load the corrupted snapshot or silently diverge.
-
-## SP-011 — Corrupt snapshot data without changing its hash tree. Confirm page-level verification detects it, or document the required operator check.
-
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** SP-009 breaks a snapshot so that it cannot load; this corruption keeps the stored hash tree consistent, so only a check of the page data against the tree can find it. CI does not tamper with snapshot files.
-- **Steps:**
-  1. With `snapshot_policy` set to `EVERY_EPOCH` (or `EVERY_INPUT`), run until a snapshot exists under `CARTESI_SNAPSHOTS_DIR`; record the latest input's `machine_hash`.
-  2. Stop the node. In that snapshot, change bytes in a memory range's data file (for example a page of the RAM or flash-drive `.bin` file that the application reads later) and leave the hash-tree files (`.dht`, `.dpt`) and `config.json` untouched.
-  3. Restart the node; read the advancer log and the application status, then send inputs that read the corrupted page.
-  4. Separately, try the checks an operator could run: loading the snapshot with `cartesi-machine --load=<dir>` and computing its hash, removing the hash-tree files so the hash is recomputed, and an independent replay from the template (`cartesi-rollups-machine-tool replay`) compared with the node's `machine_hash`.
-- **Expected:** page-level verification detects the corruption before the snapshot is used (the snapshot is skipped and the node replays from the template, as in SP-009); or the operator check that detects it is documented, with the command and how long it takes.
+  4. With `snapshot_policy` set to `EVERY_EPOCH` (or `EVERY_INPUT`), run until a snapshot exists under `CARTESI_SNAPSHOTS_DIR`; record the latest input's `machine_hash`. Stop the node. In that snapshot, change bytes in a memory range's data file (for example a page of the RAM or flash-drive `.bin` file that the application reads later) and leave the hash-tree files (`.dht`, `.dpt`) and `config.json` untouched.
+  5. Restart the node; read the advancer log and the application status, then send inputs that read the corrupted page.
+  6. Separately, try the checks an operator could run: loading the snapshot with `cartesi-machine --load=<dir>` and computing its hash, removing the hash-tree files so the hash is recomputed, and an independent replay from the template (`cartesi-rollups-machine-tool replay`) compared with the node's `machine_hash`.
+- **Expected:** (2, 3) the node logs the skipped snapshot, replays from the template, and reaches the same state as before; record how long the replay takes. It must not load the corrupted snapshot or silently diverge. (4 to 6) page-level verification detects the corruption before the snapshot is used (the snapshot is skipped and the node replays from the template, as in steps 2 and 3); or the operator check that detects it is documented, with the command and how long it takes.
 
 ---
 

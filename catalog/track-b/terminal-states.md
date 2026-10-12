@@ -60,10 +60,13 @@ L1 events, and exposes the state and its proof data through JSON-RPC.
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
-- **Why-not-CI:** same reason as TRM-001. Likely expensive to reach with a real application.
+- **Why-not-CI:** same reason as TRM-001. Likely expensive to reach with a real application. CI reaches the limit only with a purpose-built machine; this checks what a deployed node does at the emulator boundary and which configured limits stop the advance first.
 - **Steps:**
-  1. Reach mcycle overflow with a purpose-built machine configuration, recording how it was reached.
-- **Expected:** `MCYCLE_OVERFLOW`, with the same checks as TRM-002. If overflow is not reachable in practice, record that and keep this entry as evidence-checked against CI.
+  1. Read the application's `advance_max_cycles` (`cartesi-rollups-cli app execution-parameters get`) and the advance deadline.
+  2. Reach mcycle overflow with a purpose-built machine configuration, recording how it was reached: for example build a machine whose `mcycle` starts close to the emulator limit with `go run ./test/tooling/terminalmachine` in a rollups-node checkout at the tag under test (it sets `mcycle` near `UINT64_MAX` so the next advance crosses it), and deploy it.
+  3. Send an input, then more inputs; read the input status, `cartesi-rollups-cli app status`, `cartesi_getApplication` and the advancer log. Restart the node and read them again.
+  4. With an ordinary template, try to reach the limit by raising `advance_max_cycles` and the deadline, and record which limit stops the advance.
+- **Expected:** `MCYCLE_OVERFLOW` is recorded for the application with the input that caused it, with the same checks as TRM-002 (no later input is executed, before or after the restart). If overflow is not reachable in practice, record that the configured limits (cycle cap, deadline) stop any real advance before the emulator limit, and keep this entry as evidence-checked against CI.
 - **Notes:**
   - A configured mcycle target that coincides with the emulator boundary can also produce this completion. A configured limit that aborts the advance before the emulator boundary is TRM-007, not this test.
 
