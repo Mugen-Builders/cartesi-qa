@@ -14,7 +14,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** chaos-style test; disaster-recovery behavior is operational.
 - **Steps:**
   1. While the node is actively processing inputs, hard-kill all containers.
@@ -25,8 +25,8 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** feature-flag behavior; needs visual confirmation. CI covers the PRT variant (`TestSnapshotPolicyEveryInputPrt`); this checks Authority on a real chain.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** feature-flag behavior; needs visual confirmation. CI covers the PRT variant (`TestSnapshotPolicyEveryInputPrt`); this checks Authority on a running node (devnet or testnet).
 - **Steps:**
   1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_INPUT`.
   2. Run, observe snapshot creation.
@@ -37,7 +37,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** as above, different granularity. CI covers the PRT variant (`TestSnapshotPolicyEveryEpochPrt`).
 - **Steps:**
   1. Set the policy with `cartesi-rollups-cli app execution-parameters set <app> snapshot_policy EVERY_EPOCH`.
@@ -49,11 +49,11 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** resync under real chain conditions; catch-up behavior not exercised in CI.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** resync after a long gap; catch-up behavior not exercised in CI.
 - **Steps:**
   1. Run node, let it claim several epochs.
-  2. Stop the claimer specifically, let >5 more epochs pass.
+  2. Stop the claimer specifically, let >5 more epochs pass (on a devnet, send inputs and mine the blocks with `cast rpc anvil_mine <n>`).
   3. Restart the claimer.
 - **Expected:** claimer catches up without error. Document the catch-up time.
 
@@ -61,12 +61,12 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Feasibility:** run only when a suitable testnet or Anvil reorg setup is available.
-- **Why-not-CI:** hard to simulate in CI; needs a testnet that will reorg.
+- **Environment:** devnet + testnet
+- **Feasibility:** on a devnet the reorg is created with anvil; on a testnet, run only when one that reorgs is available.
+- **Why-not-CI:** CI does not reorg the chain under a running node.
 - **Steps:**
-  1. Process inputs on a testnet susceptible to reorgs (or simulate via Anvil).
-  2. Trigger/wait for a reorg of the relevant block range.
+  1. Process inputs on the node.
+  2. Reorg the block range that holds some of them. On a devnet use anvil: `cast rpc anvil_reorg <depth> '[]'` (or `evm_snapshot` before the inputs, `evm_revert` after them, then mine a different set of blocks and inputs). On a testnet, wait for a natural reorg of that range.
 - **Expected:** evm-reader rewinds correctly. No duplicated or lost inputs. Node state consistent with the new chain.
 
 ## SP-006 — Startup replay reconciles persisted history against re-execution
@@ -110,7 +110,7 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** alpha.13 logs and skips an invalid or inaccessible snapshot and rebuilds from the template by canonical replay; a replay contradiction then marks the application FAILED. CI has unit fixtures for these faults, not a run against a real snapshot directory.
 - **Steps:**
   1. With `snapshot_policy` set to `EVERY_EPOCH`, run several epochs.

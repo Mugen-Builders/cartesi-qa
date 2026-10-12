@@ -41,15 +41,22 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
   1. From two separate wallets, submit inputs in the same block.
 - **Expected:** both inputs processed in the on-chain ordering. No duplication, no dropped input.
 
-## INP-004 — ERC721 with malformed metadata
+## INP-004 — ERC-721 deposit with arbitrary base/exec layer data (empty, binary, truncated JSON, large) through the ERC721 portal: input accepted, app response consistent
 
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** app-logic-dependent; needs human judgment on whether observed behavior is correct.
 - **Steps:**
-  1. Deposit an ERC721 with malformed or unexpected metadata bytes.
-- **Expected:** input accepted by the contract; app's response is consistent with its defined handling. Document the observed behavior.
+  1. Deploy an application that handles Erc721Portal deposits and reports what it received (for example the `jplgarcia/tester` dapp, which echoes the base and exec layer data in a notice). Its portal address must be the Erc721Portal of the contracts release under test.
+  2. Mint four ERC-721 tokens to the depositor and approve the portal for each: `cast send $TOKEN "approve(address,uint256)" $ERC721_PORTAL $ID`.
+  3. Deposit each token with different free-form data bytes. The "metadata" here is the `baseLayerData` and `execLayerData` arguments of the portal deposit, chosen by the depositor; nothing is written inside the machine: `cast send $ERC721_PORTAL "depositErc721Token(address,address,uint256,bytes,bytes)" $TOKEN $APP $ID <baseLayerData> <execLayerData>` with:
+     a. both empty: `0x` and `0x`;
+     b. non-UTF-8 binary: `0xff00fe80c3` and `0x0001`;
+     c. truncated JSON text: `$(cast from-utf8 '{"name":"x","image":')` and `0x00000000`;
+     d. large: 4,000 bytes of a known pattern and `0xdeadbeef` (stay below the 64 KiB input cap, see INP-001).
+  4. For each deposit check `ownerOf(id)` on the token, the input in `cartesi_listInputs` / `cartesi-rollups-cli read inputs $APP` (sender = Erc721Portal; payload = token, depositor, token id, then `abi.encode(baseLayerData, execLayerData)`), and the application's outputs, reports and status.
+- **Expected:** every deposit transaction succeeds, the token is owned by the application, and the input is accepted by the contract and read by the node with exactly the bytes sent. The application's response is consistent with its defined handling (document it per case), and the application and node stay healthy.
 
 ## INP-005 — Direct InputBox input with massive payload
 
@@ -110,17 +117,19 @@ Tests for input handling: generic payloads, ETH deposits, ERC20/ERC721/ERC1155 d
 - **Expected:** every input from the transaction is returned, each with a distinct log index, correctly ordered. No input is merged, dropped, or duplicated.
 
 
-## INP-010 — A missing input log is caught by the sealed epoch window check
+## INP-010 — RPC proxy drops one InputAdded log: the sealed-epoch input count check catches it and the node does not advance; an input whose stored record no longer matches the chain marks the app CORRUPTED
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
 - **Why-not-CI:** alpha.13 validates every sealed epoch window against the on-chain input count and reports conflicting input identities instead of retrying forever (#798, "verify sealed epoch windows"). CI's anvil never drops or alters logs.
 - **Steps:**
-  1. Put a proxy in front of the RPC that drops one `InputAdded` log from one `eth_getLogs` response.
-  2. Separately, have the proxy return an altered log for an input the node already stored.
-- **Expected:** (1) the node detects the count mismatch for that window, does not move its cursor past it, and recovers once the proxy stops dropping. (2) the application is marked CORRUPTED with a clear error (alpha.13 has no general reorg rollback), not an endless retry. The sling node documents that it does not make this check (`qa-slingnode-catalog` PRV-004); the two results together are the stack comparison.
-
+  1. Setup: a devnet with the application under test and a healthy sibling application on the same node. Put a small JSON-RPC proxy in front of the RPC used by the evm-reader only (set `CARTESI_BLOCKCHAIN_HTTP_ENDPOINT` of the evm-reader to the proxy; the other services keep the direct RPC). The proxy forwards every request unchanged, except that it can (a) remove from an `eth_getLogs` response the log whose `transactionHash` matches a configured value, and (b) rewrite the `transactionHash` and `logIndex` of a configured log. It logs every change it makes.
+  2. Dropped log: with the proxy in pass-through, send two inputs X and Y in the same open epoch and confirm both are stored. Configure the proxy to drop Y's `InputAdded` log, then advance the chain until that epoch is sealed on-chain (`cast rpc anvil_mine <n>`; for PRT, until the epoch's tournament settles). Watch the evm-reader log, `cartesi-rollups-cli read epochs $APP`, the application status and `/readyz`. Then put the proxy back in pass-through.
+  3. Altered stored input, database variant: stop the evm-reader, send two new inputs P and Q, then change a stored input of the same application so that its L1 log identity is P's: `UPDATE input SET transaction_hash = decode('<P tx hash without 0x>', 'hex'), log_index = <P log index> WHERE epoch_application_id = <app id> AND index = <stored input index>;` and start the evm-reader. (A completed input's payload, status and hashes are protected by a database trigger; the transaction hash and log index are not.)
+  4. Altered stored input, proxy variant (on a fresh stack): configure the proxy to rewrite the `InputAdded` log of a new input P so that its `transactionHash` and `logIndex` are those of an input the node already stored, then send P.
+  5. After steps 3 and 4, read `cartesi-rollups-cli app status $APP`, `cartesi_getApplication`, the evm-reader log, inspect for the application, and the sibling application's progress.
+- **Expected:** (2) the node detects the input count mismatch for that epoch window with an error naming the epoch, the expected and the received count; it stores no epoch with the wrong inputs, does not move past that window, and recovers once the proxy stops dropping. (3)–(4) the application is marked CORRUPTED with a clear error naming the conflicting input identity (alpha.13 has no general reorg rollback), not an endless retry; its later inputs are not executed and the sibling application keeps processing. The sling node documents that it does not make this check (`qa-slingnode-catalog` PRV-004); the two results together are the stack comparison.
 
 ## INP-011 — Input sent between stage and accept lands in the next epoch
 

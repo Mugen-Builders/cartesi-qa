@@ -19,17 +19,6 @@ Tests for voucher execution on L1, notice validation, and L2-to-L1 finalization.
   2. Attempt to execute the same voucher again.
 - **Expected:** second attempt reverts with a clear reason.
 
-## EGR-002 — Validate notice and execute voucher with `block: latest` vs `finalized`
-
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet + testnet
-- **Why-not-CI:** behavior differs by mode; needs human check on both. Applies to both notice validation and voucher execution — confirm both operations work in each mode.
-- **Steps:**
-  1. Validate the same notice once with `block: latest` and once with `block: finalized`.
-  2. Execute a voucher with `block: latest` and then with `block: finalized`.
-- **Expected:** all four calls succeed under expected conditions. Document any latency difference between modes.
-
 ## EGR-003 — Execute with insufficient L1 gas
 
 - **Risk:** M

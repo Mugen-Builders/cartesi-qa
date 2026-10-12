@@ -57,25 +57,25 @@ Each test's environment is **determined individually** from its markdown entry. 
 
 | Suite | File | Current Pattern | Examples |
 |-------|------|-----------------|----------|
-| CLI (User) | `cli.md` | All devnet | `CLI-001..004` |
+| CLI (User) | `cli.md` | All devnet | `CLI-001`, `CLI-003/004` |
 | Inputs | `inputs.md` | Mostly dual | `INP-001..009`, `INP-011` dual; `INP-010` devnet |
-| Outputs | `outputs.md` | Mostly dual | `OUT-001..007` dual; `OUT-008/009` devnet |
-| Egress | `egress.md` | All dual | `EGR-001..011` |
-| Configuration | `configuration.md` | Mixed | `CFG-001..006`, `CFG-009`, `CFG-011/012/014` testnet; `CFG-010` dual; `CFG-013` devnet |
-| Services | `services.md` | Mixed | `SVC-001..004` testnet; `SVC-005..008` dual; `SVC-009/010` devnet |
-| State Persistence | `state-persistence.md` | Mixed | `SP-001..005`, `SP-009` testnet; `SP-006..008` dual |
+| Outputs | `outputs.md` | Mostly dual | `OUT-002..007` dual; `OUT-008/009` devnet |
+| Egress | `egress.md` | All dual | `EGR-001`, `EGR-003..011` |
+| Configuration | `configuration.md` | Mostly dual | `CFG-001..006`, `CFG-009..012`, `CFG-014` dual; `CFG-013` devnet |
+| Services | `services.md` | Mixed | `SVC-001/002`, `SVC-005..008` dual; `SVC-003/004` testnet; `SVC-009/010` devnet |
+| State Persistence | `state-persistence.md` | All dual | `SP-001..009` |
 | Inspect Service | `inspect-service.md` | All dual | `INS-001..008` |
 | JSON-RPC API | `jsonrpc-api.md` | All dual | `JRP-001..017`, `JRP-019/020` |
-| Multi-App | `multi-app.md` | All testnet | `MA-001..002` |
-| Quorum | `quorum.md` | All testnet | `QUO-001..003` |
+| Multi-App | `multi-app.md` | All dual | `MA-001..002` |
+| Quorum | `quorum.md` | All dual | `QUO-001..003` |
 | Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet; `DEP-006` dual |
-| Internal CLI | `internal-cli.md` | Mixed | `ILC-001..004`, `ILC-007..009`, `ILC-015`, `ILC-020` testnet; `ILC-005/006`, `ILC-010..014`, `ILC-016`, `ILC-019`, `ILC-021` dual; `ILC-017` devnet |
+| Internal CLI | `internal-cli.md` | Mostly dual | `ILC-001..016`, `ILC-019..021` dual; `ILC-017` devnet |
 | Machine Tool | `machine-tool.md` | All dual | `MTL-001..002` |
 | Foreclosure | `foreclose.md` | All dual | `FOR-001..021`, `FOR-023..027` |
 | Terminal States | `terminal-states.md` | Mixed | `TRM-001`, `TRM-006/007` dual; `TRM-002..005` devnet |
-| PRT | `prt.md` | Mixed | `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001/010` testnet |
+| PRT | `prt.md` | Mixed | `PRT-002/004/006/010` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001` testnet |
 
-Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist).
+Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist); `CLI-002` (dependencies are installed inside the Docker build, so a missing dependency on the host is not a real user path); `OUT-001` (application-dependent; the node-side output limit and error -105 are covered by `OUT-002`); `EGR-002` (`latest` vs `finalized` latency depends on chain finality, not on a node property).
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 
@@ -123,8 +123,8 @@ The sheet is built from a JavaScript array of test tuples:
 [
   ['ID',      'Track', 'Area',  'Description', 'Environment'],
   ['SMK-001', 'A',     'Smoke', 'Check node startup…', 'devnet'],
-  ['OUT-001', 'B',     'Outputs', 'Handle >2MB notice…', 'devnet'],
-  ['OUT-001', 'B',     'Outputs', 'Handle >2MB notice…', 'testnet'],  // dual tuple
+  ['OUT-002', 'B',     'Outputs', 'Emit a notice at the 2 MiB output limit…', 'devnet'],
+  ['OUT-002', 'B',     'Outputs', 'Emit a notice at the 2 MiB output limit…', 'testnet'],  // dual tuple
   …
 ]
 ```
@@ -168,11 +168,11 @@ const text = fs.readFileSync('sheets/qa-template-setup.gs', 'utf8');
 
 // Define expected counts per ID (1 for single-env, 2 for dual-env)
 const expectedCounts = {
-  'OUT-001': 2,      // dual
-  'CFG-001': 1,      // testnet only
-  'MA-001': 1,       // testnet only
+  'OUT-002': 2,      // dual
+  'CFG-001': 2,      // dual
+  'SVC-003': 1,      // testnet only
   'ILC-005': 2,      // dual
-  'ILC-001': 1,      // testnet only
+  'ILC-017': 1,      // devnet only
   // … add all test IDs
 };
 
@@ -243,7 +243,7 @@ Do not auto-commit intermediate changes; always validate manually first.
 | Mistake | Symptom | Fix |
 |---------|---------|-----|
 | Assuming a suite has a fixed policy | Adding rows based on "Configuration tests should always be testnet-only" | Always check the `Environment:` field in the markdown for each individual test. |
-| Extra row for single-env test | Row count mismatch; e.g., `ILC-001` has 2 rows but markdown says `testnet` only | Read the markdown and remove the `devnet` row for that ID. |
+| Extra row for single-env test | Row count mismatch; e.g., `SVC-003` has 2 rows but markdown says `testnet` only | Read the markdown and remove the `devnet` row for that ID. |
 | Missing row for dual-env test | Row count is 1 but markdown says `devnet + testnet` | Add a matching row with the missing environment. |
 | Markdown `Environment:` field missing or wrong | Sheet rows are inconsistent with test descriptions or intended scope | Check the markdown source; ensure every test has an explicit `Environment:` line. |
 | Sheet row added without markdown source | Orphaned row for a test ID that doesn't exist in markdown | Verify the test exists in the markdown file; remove the row if it doesn't. |
@@ -272,4 +272,4 @@ When adding tests or updating the catalog:
 
 ---
 
-**Last updated:** October 2026 | **Session focus:** v2-alpha13 catalog corrections, sheet generator resynchronized.
+**Last updated:** October 2026 | **Session focus:** v2-alpha13 catalog corrections, sheet generator resynchronized; review feedback: `CLI-002`, `OUT-001`, `EGR-002` retired, seven entries clarified, 33 testnet-only entries opened to devnet.

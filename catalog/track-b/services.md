@@ -12,7 +12,7 @@ Tests for individual node services: advancer, claimer, evm-reader, validator, js
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** per-service restart behavior matters to operators.
 - **Steps:**
   1. For each service (advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt):
@@ -27,7 +27,7 @@ Tests for individual node services: advancer, claimer, evm-reader, validator, js
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** partial-failure recovery under real conditions; CI restart tests use minimal input counts and do not apply concurrent load.
 - **Steps:**
   1. For each service (advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt):

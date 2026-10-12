@@ -16,8 +16,8 @@ Tests for running multiple applications on a single node.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** scheduling fairness under real workloads; CI's controlled Anvil environment does not apply meaningful compute pressure.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** scheduling fairness under real workloads; CI's integration tests do not apply meaningful compute pressure.
 - **Steps:**
   1. Deploy a compute-heavy app and a light app on the same node.
   2. Load both with inputs.
@@ -27,7 +27,7 @@ Tests for running multiple applications on a single node.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** restart processing order under real workloads; CI's restart tests use small input counts.
 - **Steps:**
   1. Queue many inputs to two apps.

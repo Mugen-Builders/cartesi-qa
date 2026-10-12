@@ -128,11 +128,11 @@ others. In alpha.13 the node **does not respond to disputes** (cartesi/rollups-n
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** PRT submission tracking is in memory, with no fee replacement and no retry deadline for a known pending transaction; anvil never leaves transactions pending.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** PRT submission tracking is in memory, with no fee replacement and no retry deadline for a known pending transaction; anvil with automine never leaves a transaction pending.
 - **Steps:**
-  1. Get a PRT join or accept transaction stuck in the mempool (low fee during a fee spike).
-  2. Watch the node for 100+ blocks; then make the transaction disappear from the mempool.
+  1. Get a PRT join or accept transaction stuck pending. On a testnet: a low fee during a fee spike. On a devnet: put a small JSON-RPC proxy in front of the PRT service's RPC (`CARTESI_BLOCKCHAIN_HTTP_ENDPOINT` of the PRT service only) that answers the PRT `eth_sendRawTransaction` with its hash without forwarding it, and answers lookups of that hash as pending (`eth_getTransactionByHash` with `blockNumber: null`, `eth_getTransactionReceipt` null) while anvil keeps mining (`anvil --block-time 1` or `cast rpc anvil_mine`).
+  2. Watch the node for 100+ blocks; then make the transaction disappear (devnet: switch the proxy to answer `null` to both lookups).
 - **Expected:** while it is known and pending, the node does not replace or retry it (documented). After both transaction and receipt lookups return not found for 64 blocks, tracking is released. Record whether this costs a join window or clock, and whether the log makes the stuck state visible.
 
 ## PRT-011 — Reader mode does not broadcast
