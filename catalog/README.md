@@ -57,6 +57,7 @@ Every test entry includes:
 | `track-b/machine-tool.md` | Machine tool (`cartesi-rollups-machine-tool`): replay and accounts-drive proof generation |
 | `track-b/foreclose.md` | Foreclosure lifecycle and emergency withdrawal recovery path |
 | `track-b/terminal-states.md` | Applications whose machine reaches a terminal state (exception, halt, unexpected yield, mcycle overflow, invalid outputs root) |
+| `track-b/runtime.md` | Machine runtime (`RT-*`): NVRAM ranges, drive labels vs `/dev/pmemN`, read-only flash drives, removed MTD paths, mcycle limit, snapshot atomicity, machine-tool TX-buffer reproduction; each entry names its area |
 | `track-b/prt.md` | Reference node PRT service: claims to Dave consensus, root bond recovery, observing disputes |
 
 ## Growing and pruning the catalog

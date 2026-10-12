@@ -378,4 +378,63 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ---
 
+## Refund Edge Cases
+
+### FOR-028 — Refund a deposit made by a contract and, when available, an EIP-7702 account. Missing receiver hooks must revert clearly without marking the refund complete, so retry remains possible.
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** the refund output is executed in the same transaction as `issueRefund`, so a depositor contract that cannot receive the asset makes the whole refund revert; CI refunds to EOAs only.
+- **Steps:**
+  1. Deploy depositor contracts that deposit Ether, an ERC-721 and an ERC-1155 to the application through the portals: one set that implements the receiver hooks (`receive`, `onERC721Received`, `onERC1155Received` / `onERC1155BatchReceived`) and one set that does not.
+  2. On a devnet with the Prague hardfork (`anvil --hardfork prague`), delegate an EOA to a contract without the hooks (EIP-7702, `cast send --auth`) and make the same deposits from it.
+  3. Keep all these deposits unfinalized and foreclose the application (as in FOR-023).
+  4. Refund each deposit with `cartesi-rollups-cli refund $APP <index> --input-file in<index>.hex --yes --json`; record the CLI error, the revert data (`cast run <tx>` or `cast call` of `issueRefund`) and `wasRefundForInputIssued(index)`.
+  5. Re-delegate the EIP-7702 account to an implementation with the hooks and retry its refunds.
+- **Expected:** deposits from contracts with the hooks are refunded to the contract. Where a hook is missing, `issueRefund` reverts with an error the CLI can name, nothing is paid and `wasRefundForInputIssued(index)` stays false; after the EIP-7702 account gains the hooks, the retry succeeds and pays the full amount once.
+
+### FOR-029 — Add several inputs in one transaction. Confirm lookup by transaction hash returns all inputs, a non-deposit refund fails with UnknownInputSender, and the deposit refunds successfully.
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** a refund needs the exact input index and bytes; when one transaction adds several inputs, the operator has to find them by transaction hash, and CI does not refund inputs from a multi-input transaction.
+- **Steps:**
+  1. From a helper contract, in one transaction, add a plain input (`InputBox.addInput`), make an Ether deposit through the portal, and add another plain input to the application.
+  2. Look the inputs up by transaction hash: `cartesi-rollups-cli read inputs $APP --transaction-hash <tx>` and `cartesi_listInputs` filtered by the same hash; note each index, log index and sender.
+  3. Keep the epoch unfinalized and foreclose the application.
+  4. Export each input's complete bytes and run `cartesi-rollups-cli refund $APP <index> --input-file <file> --yes --json` for a plain input, then for the deposit.
+- **Expected:** both lookups return all three inputs with distinct indexes and log indexes, in on-chain order. The plain-input refund fails with `UnknownInputSender` and pays nothing; the deposit is refunded in full to its depositor.
+
+### FOR-030 — Mine a refund and claim acceptance for the same deposit epoch in one block. Confirm exactly one succeeds and node state matches chain state.
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** a same-block race between finalizing an epoch and refunding one of its deposits depends on transaction order inside a block; CI mines one transaction per block.
+- **Steps:**
+  1. Deploy an application with a guardian and a short staging period; make a deposit and let its epoch's claim be staged but not accepted.
+  2. On anvil, turn off automine (`cast rpc evm_setAutomine false`) once the staging period has passed.
+  3. Order A: queue the guardian's `foreclose`, then `issueRefund` for the deposit (`cartesi-rollups-cli refund ... --no-wait` or `cast send`), then `acceptClaim` for that epoch (the node's, or `cast send $CONSENSUS 'acceptClaim(address,uint256,bytes32)' ...`), using fees to fix the order; mine one block (`cast rpc evm_mine`).
+  4. Order B (fresh deployment): queue `acceptClaim`, then `foreclose`, then `issueRefund`; mine one block.
+  5. After each, read every receipt, `wasRefundForInputIssued(index)`, the consensus events, `cartesi_listEpochs`, `cartesi-rollups-cli read epochs` and the application's foreclosure markers, also after a node restart.
+- **Expected:** in each order exactly one of the refund and the claim acceptance succeeds, and the other reverts with a named error; the deposit is paid out at most once. The node's epoch status and foreclosure markers match the chain (an accepted epoch is `CLAIM_ACCEPTED`; an epoch that cannot finalize is `CLAIM_FORECLOSED`).
+
+### FOR-031 — After foreclosure, refund unfinalized ETH, ERC-721, ERC-1155 single, and ERC-1155 batch deposits. Confirm balances and ownership return exactly and RefundIssued matches the built output.
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** the refund output for each asset type is built by the refund output builder and executed by the application; CI's refund lifecycle does not compare the emitted output with the builder's for every asset type.
+- **Steps:**
+  1. Deposit Ether, an ERC-721, an ERC-1155 (single) and an ERC-1155 (batch, several ids and amounts) from EOAs, in an epoch that will not be accepted before the foreclosure; record balances and token owners.
+  2. Foreclose the application and save each deposit's complete input bytes.
+  3. Refund each deposit with `cartesi-rollups-cli refund $APP <index> --input-file in<index>.hex --yes --json`.
+  4. For each refund, decode `RefundIssued(inputIndex, input, output)` from the receipt and compare `output` with the builder's result: `cast call $(cast call $APP 'getRefundOutputBuilder()(address)') 'buildRefundOutput(address,address,bytes)(bytes)' $APP <portal> <payload>`.
+  5. Record balances, `ownerOf` and `balanceOf` for every id after the refunds.
+- **Expected:** each depositor gets back exactly what it deposited (Ether amount, the ERC-721 token, every ERC-1155 id and amount); the application's holdings drop by the same amounts; each `RefundIssued` carries the deposit's index, its input bytes and an output identical to the builder's.
+
+---
+
 <!-- Add more foreclosure-specific entries as charter findings become reproducible. -->

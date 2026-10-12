@@ -250,6 +250,32 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
   3. Run it for a token that returns `false` on `approve` or a deposit that reverts.
 - **Expected:** (1) the CLI checks the exact `Approval` event, then the matching `InputAdded` for the deposit (application, portal sender, index, payload). (2) rejected: `--approve` does not allow `--no-wait`. (3) the failing step is named and no deposit is reported.
 
+## ILC-022 — Inject transient 429, 502, and timeout errors during deploy, send, execute, and refund. Confirm retries use backoff, preserve any broadcast hash, and complete deploy registration.
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet + testnet
+- **Why-not-CI:** public providers rate-limit and drop connections; CI's anvil never answers 429 or 502, and CI does not interrupt the CLI between broadcast and receipt.
+- **Steps:**
+  1. Put a proxy between the CLI and the RPC that can return a single HTTP 429, a single HTTP 502, or drop or stall one connection, on a chosen request (before broadcast, on `eth_sendRawTransaction`, and while waiting for the receipt).
+  2. For each fault and position, run `cartesi-rollups-cli deploy application` (registration on), `send`, `execute` and `refund` (for `refund`, use an application foreclosed as in ILC-013).
+  3. Record the proxy's request log (timing between retries), the CLI's stdout, stderr and exit code, the transaction hashes the CLI printed, and the chain (`cast tx`, `cast receipt`, deployer nonce).
+  4. After each deploy, check `cartesi-rollups-cli app list` and `cartesi_getApplication`.
+- **Expected:** each transient error is retried with increasing delays and the command completes; a transaction already broadcast is not sent again, and its hash is the one reported; a deploy ends with the application deployed and registered, without a manual `app register`.
+
+## ILC-023 — Run db init on a dirty migration. Confirm it refuses or performs an explicit repair and never reports the database as current.
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** CI always starts from a fresh schema; a migration left dirty by an interrupted upgrade is an operator situation.
+- **Steps:**
+  1. Run `cartesi-rollups-cli db init` on a fresh database and `cartesi-rollups-cli db check-version`.
+  2. Mark the migration dirty: `UPDATE schema_migrations SET dirty = true;`.
+  3. Run `cartesi-rollups-cli db init`, then `cartesi-rollups-cli db init --upgrade`; record the output and exit code of each.
+  4. Read `schema_migrations` again, run `cartesi-rollups-cli db check-version`, and start the node.
+- **Expected:** (3) each `db init` either exits non-zero naming the dirty migration, or performs a repair that it states explicitly; it never prints that the database is at the correct version while the migration is dirty. (4) the dirty flag is unchanged after a refusal, or cleared only by a stated repair; `check-version` and the node agree with what `db init` reported.
+
 ---
 
-<!-- Add entries for execution-parameters set/get and db init when those paths become operator-relevant. -->
+<!-- Add entries for execution-parameters set/get when those paths become operator-relevant. -->
