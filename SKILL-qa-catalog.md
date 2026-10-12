@@ -63,20 +63,20 @@ Each test's environment is **determined individually** from its markdown entry. 
 | Egress | `egress.md` | All dual | `EGR-001`, `EGR-003..011` |
 | Configuration | `configuration.md` | Mostly dual | `CFG-001..006`, `CFG-009..012`, `CFG-014` dual; `CFG-013` devnet |
 | Services | `services.md` | Mixed | `SVC-001/002`, `SVC-005..008` dual; `SVC-003/004`, `SVC-013` testnet; `SVC-009/010` devnet |
-| State Persistence | `state-persistence.md` | Mostly dual | `SP-001..009` dual; `SP-011` devnet |
+| State Persistence | `state-persistence.md` | All dual | `SP-001..009` |
 | Inspect Service | `inspect-service.md` | All dual | `INS-001..008` |
 | JSON-RPC API | `jsonrpc-api.md` | All dual | `JRP-001..017`, `JRP-019/020` |
 | Multi-App | `multi-app.md` | All dual | `MA-001..002` |
 | Quorum | `quorum.md` | All dual | `QUO-001..003` |
 | Deployment | `deployment.md` | Mixed | `DEP-001/002` devnet; `DEP-003..005` testnet; `DEP-006` dual |
-| Internal CLI | `internal-cli.md` | Mostly dual | `ILC-001..016`, `ILC-019..022` dual; `ILC-017`, `ILC-023` devnet |
+| Internal CLI | `internal-cli.md` | Mostly dual | `ILC-001..016`, `ILC-019..022` dual; `ILC-017` devnet |
 | Machine Tool | `machine-tool.md` | All dual | `MTL-001..002` |
-| Foreclosure | `foreclose.md` | Mostly dual | `FOR-001..021`, `FOR-023..027` dual; `FOR-028..031` devnet |
+| Foreclosure | `foreclose.md` | Mostly dual | `FOR-001..021`, `FOR-023..027` dual; `FOR-028..030` devnet |
 | Terminal States | `terminal-states.md` | Mixed | `TRM-001`, `TRM-006/007` dual; `TRM-002..005` devnet |
 | PRT | `prt.md` | Mixed | `PRT-002/004/006/010` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001` testnet |
-| Machine Runtime | `runtime.md` | All devnet | `RT-001..006`, `RT-008..010` (each entry names its Area) |
+| Machine Runtime | `runtime.md` | All devnet | `RT-001..006` (each entry names its Area) |
 
-Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist); `CLI-002` (dependencies are installed inside the Docker build, so a missing dependency on the host is not a real user path); `OUT-001` (application-dependent; the node-side output limit and error -105 are covered by `OUT-002`); `EGR-002` (`latest` vs `finalized` latency depends on chain finality, not on a node property).
+Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist); `CLI-002` (dependencies are installed inside the Docker build, so a missing dependency on the host is not a real user path); `OUT-001` (application-dependent; the node-side output limit and error -105 are covered by `OUT-002`); `EGR-002` (`latest` vs `finalized` latency depends on chain finality, not on a node property); `RT-008` (merged into `TRM-004`), `RT-009` (merged into `SP-008`), `RT-010` (merged into `MTL-001`), `SP-011` (merged into `SP-009`), `ILC-023` (merged into `ILC-001`), `FOR-031` (merged into `FOR-023`).
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 
@@ -88,9 +88,9 @@ Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests
 
 ### New Additions (spreadsheet track `new_additions`)
 
-- **What:** Track B catalog entries added during the v2-alpha13 cycle from the team's sheet: `RT-001..006`, `RT-008..010` (`runtime.md`), `SP-011`, `SVC-013`, `ILC-022/023`, `FOR-028..031`. They follow every Track B rule above (markdown is the source of truth; one row per environment).
+- **What:** Track B catalog entries added during the v2-alpha13 cycle from the team's sheet: `RT-001..006` (`runtime.md`), `SVC-013`, `ILC-022`, `FOR-028..030`. The other cycle-sheet additions overlapped existing entries and were merged into them: `RT-008` into `TRM-004`, `RT-009` into `SP-008`, `RT-010` into `MTL-001`, `SP-011` into `SP-009`, `ILC-023` into `ILC-001`, `FOR-031` into `FOR-023`. They follow every Track B rule above (markdown is the source of truth; one row per environment).
 - **Sheet placement:** the generator gives them their own track, `new_additions`, so they form a final block after Regression Watch, in the cycle sheet's order, instead of being regrouped into the Track B devnet/testnet blocks.
-- **Renumbered:** the cycle sheet's `FOR-027` refund test is `FOR-031` (`FOR-027` is the output-protocol-violation entry).
+- **Renumbered:** the cycle sheet's `FOR-027` refund test became `FOR-031` (`FOR-027` is the output-protocol-violation entry), which is now merged into `FOR-023`.
 - **ID gaps:** `RT-007`, `SP-010`, `SVC-011` and `SVC-012` have no entry.
 
 ### Regression Watch (`catalog/regression-watch.md` → spreadsheet `RW-*`)
@@ -280,4 +280,4 @@ When adding tests or updating the catalog:
 
 ---
 
-**Last updated:** October 2026 | **Session focus:** v2-alpha13 catalog corrections, sheet generator resynchronized; review feedback: `CLI-002`, `OUT-001`, `EGR-002` retired, seven entries clarified, 33 testnet-only entries opened to devnet; 17 sheet-only tests added to the catalog (`runtime.md` and the `new_additions` sheet block).
+**Last updated:** October 2026 | **Session focus:** v2-alpha13 catalog corrections, sheet generator resynchronized; review feedback: `CLI-002`, `OUT-001`, `EGR-002` retired, seven entries clarified, 33 testnet-only entries opened to devnet; 17 sheet-only tests added to the catalog (`runtime.md` and the `new_additions` sheet block); six overlapping entries merged (`RT-008..010`, `SP-011`, `ILC-023`, `FOR-031` retired).

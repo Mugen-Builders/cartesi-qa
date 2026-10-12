@@ -287,20 +287,22 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
 
 ## Deposit Refunds
 
-### FOR-023 — Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund)
+### FOR-023 — Deposits after foreclosure revert at the InputBox (ApplicationForeclosed) for Ether/ERC-20/ERC-721/ERC-1155; deposits not yet finalized at foreclosure can be refunded in full to the depositor (issueRefund / cartesi-rollups-cli refund), with RefundIssued matching the built output for Ether, ERC-20, ERC-721 and ERC-1155 single and batch
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
-- **Why-not-CI:** end-to-end refund behavior against a foreclosed application, across token types, needs real deployments and is not part of CI's happy-path lifecycle.
+- **Why-not-CI:** end-to-end refund behavior against a foreclosed application, across token types, needs real deployments and is not part of CI's happy-path lifecycle. The refund output for each asset type is built by the refund output builder and executed by the application; CI's refund lifecycle does not compare the emitted output with the builder's for every asset type.
 - **Steps:**
   1. Deploy an application with a guardian and a long staging period, so deposits can be made in an epoch that will not be accepted before the foreclosure.
-  2. From different depositor accounts, deposit Ether, an ERC-20, an ERC-721 and an ERC-1155 (single and batch) to the application. Confirm their epoch is not `CLAIM_ACCEPTED`.
+  2. From different depositor accounts, deposit Ether, an ERC-20, an ERC-721 and an ERC-1155 (single, and batch with several ids and amounts) to the application. Confirm their epoch is not `CLAIM_ACCEPTED`. Record balances and token owners (`balanceOf`, `ownerOf`, and `balanceOf` for every ERC-1155 id).
   3. Save each deposit's complete input bytes: `cartesi-rollups-cli read inputs $APP <index> --jsonrpc | jq -r .data.raw_data > in<index>.hex`.
   4. As the guardian, foreclose the application.
   5. From a gas payer that is not the depositor, refund each deposit: `cartesi-rollups-cli refund $APP <index> --input-file in<index>.hex --yes --json`. Record depositor and application balances before and after.
-  6. After foreclosure, try one new deposit of each token type.
-- **Expected:** each unfinalized deposit can be refunded, and is refunded in full to its original depositor (not to the caller), with a `RefundIssued` event and `wasRefundForInputIssued(index)` true; the application balance drops by the same amount. Every deposit attempted after foreclosure reverts with `ApplicationForeclosed`: no input is added and the sender keeps the tokens. No deposit is silently accepted or lost.
+  6. For each refund, decode `RefundIssued(inputIndex, input, output)` from the receipt and compare `output` with the builder's result: `cast call $(cast call $APP 'getRefundOutputBuilder()(address)') 'buildRefundOutput(address,address,bytes)(bytes)' $APP <portal> <payload>`.
+  7. Record balances, `ownerOf` and `balanceOf` for every id after the refunds.
+  8. After foreclosure, try one new deposit of each token type.
+- **Expected:** each unfinalized deposit can be refunded, and is refunded in full to its original depositor (not to the caller), with a `RefundIssued` event and `wasRefundForInputIssued(index)` true; each depositor gets back exactly what it deposited (Ether amount, ERC-20 amount, the ERC-721 token, every ERC-1155 id and amount) and the application's holdings drop by the same amounts. Each `RefundIssued` carries the deposit's index, its input bytes and an output identical to the builder's. Every deposit attempted after foreclosure reverts with `ApplicationForeclosed`: no input is added and the sender keeps the tokens. No deposit is silently accepted or lost.
 
 ### FOR-024 — Deposit refund boundary: finalized vs. non-finalized input
 
@@ -420,20 +422,6 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   4. Order B (fresh deployment): queue `acceptClaim`, then `foreclose`, then `issueRefund`; mine one block.
   5. After each, read every receipt, `wasRefundForInputIssued(index)`, the consensus events, `cartesi_listEpochs`, `cartesi-rollups-cli read epochs` and the application's foreclosure markers, also after a node restart.
 - **Expected:** in each order exactly one of the refund and the claim acceptance succeeds, and the other reverts with a named error; the deposit is paid out at most once. The node's epoch status and foreclosure markers match the chain (an accepted epoch is `CLAIM_ACCEPTED`; an epoch that cannot finalize is `CLAIM_FORECLOSED`).
-
-### FOR-031 — After foreclosure, refund unfinalized ETH, ERC-721, ERC-1155 single, and ERC-1155 batch deposits. Confirm balances and ownership return exactly and RefundIssued matches the built output.
-
-- **Risk:** H
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet
-- **Why-not-CI:** the refund output for each asset type is built by the refund output builder and executed by the application; CI's refund lifecycle does not compare the emitted output with the builder's for every asset type.
-- **Steps:**
-  1. Deposit Ether, an ERC-721, an ERC-1155 (single) and an ERC-1155 (batch, several ids and amounts) from EOAs, in an epoch that will not be accepted before the foreclosure; record balances and token owners.
-  2. Foreclose the application and save each deposit's complete input bytes.
-  3. Refund each deposit with `cartesi-rollups-cli refund $APP <index> --input-file in<index>.hex --yes --json`.
-  4. For each refund, decode `RefundIssued(inputIndex, input, output)` from the receipt and compare `output` with the builder's result: `cast call $(cast call $APP 'getRefundOutputBuilder()(address)') 'buildRefundOutput(address,address,bytes)(bytes)' $APP <portal> <payload>`.
-  5. Record balances, `ownerOf` and `balanceOf` for every id after the refunds.
-- **Expected:** each depositor gets back exactly what it deposited (Ether amount, the ERC-721 token, every ERC-1155 id and amount); the application's holdings drop by the same amounts; each `RefundIssued` carries the deposit's index, its input bytes and an output identical to the builder's.
 
 ---
 
