@@ -99,16 +99,19 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   - If both epochs have the same post-epoch machine state, the proof may still validate. Use epochs with different post-epoch machine states.
 - **Expected:** proof is rejected. No accounts-drive-root anchor is recorded.
 
-### FOR-007 — Wrong app proof reuse is rejected
+### FOR-007 — A valid accounts-drive root proof (prove-drive-root) generated for app A is rejected when submitted to app B
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** cross-application operator mistakes are hard to represent in isolated CI fixtures.
 - **Steps:**
-  1. Generate a valid drive-root proof for app A.
-  2. Attempt to prove the same root/proof on app B.
-- **Expected:** request is rejected and app B recovery markers remain unchanged.
+  1. Deploy two applications A and B with an accounts drive (for example the node's ERC-20 withdrawal test dapp, `make applications/erc20-withdrawal-dapp`), give them different account balances so their machine states differ, let each reach an accepted epoch, and foreclose both with the guardian: `cartesi-rollups-cli foreclose <app> --yes`.
+  2. Generate A's drive-root proof for its last accepted epoch: `cartesi-rollups-machine-tool replay` of A up to that epoch, then `cartesi-rollups-machine-tool prove accounts-drive --snapshot <A snapshot> ... --out-drive-root-proof drive-root-A.json --out-withdraw-proof account-A.json` (see MTL-002). This test uses the drive-root proof (`drive-root-A.json`, submitted with `prove-drive-root` / `proveAccountsDriveMerkleRoot`), not the account withdrawal proof.
+  3. Record B's recovery markers: accounts-drive root and proof transaction in `cartesi_getApplication` / `cartesi-rollups-cli app list`, `cartesi-rollups-cli read withdrawals B`, and the on-chain token balances.
+  4. Submit A's proof to B: `cartesi-rollups-cli prove-drive-root B --proof-file drive-root-A.json --yes`. If the CLI stops it at gas estimation, send it again with a manual gas limit (`--gas-limit`, or `CARTESI_BLOCKCHAIN_GAS_LIMIT`) so the contract itself evaluates it.
+  5. Read B's markers again. As a control, generate B's own drive-root proof the same way and submit it to B.
+- **Expected:** A's proof is rejected by B (the transaction reverts with a clear error) and B's recovery markers are unchanged: no accounts-drive root recorded, no withdrawals, no balance change. B's own proof is then accepted.
 
 ### FOR-008 — Emergency withdraw before drive-root proof is rejected
 
@@ -157,16 +160,19 @@ Tests for the v3 foreclosure lifecycle and post-foreclosure emergency recovery p
   3. Restart services and reconcile state via API/CLI reads.
 - **Expected:** no duplicated or missing foreclosure/proof/withdrawal observations. Cursors progress monotonically.
 
-### FOR-012 — Emergency withdrawal API parity
+### FOR-012 — Emergency withdrawals read through the operator CLI (read withdrawals) and JSON-RPC (cartesi_listWithdrawals / cartesi_getWithdrawal) report the same rows, order and account indexes
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet + testnet
 - **Why-not-CI:** consistency between operator-facing and JSON-RPC read surfaces is primarily a UX and integration concern.
 - **Steps:**
-  1. Execute multiple emergency withdrawals with distinct account indexes.
-  2. Read withdrawal data via operator path and JSON-RPC methods.
-- **Expected:** both surfaces report consistent rows, ordering, and unique account indexes.
+  1. Foreclose an application with an accounts drive and at least four accounts with a balance (for example the node's ERC-20 withdrawal test dapp), and prove its drive root (`cartesi-rollups-cli prove-drive-root $APP --proof-file <drive-root proof> --yes`).
+  2. Execute emergency withdrawals for four accounts with distinct account indexes, in an order different from the account-index order (for example indexes 2, 0, 3, 1): `cartesi-rollups-cli withdraw $APP --proof-file <account proof> --yes`.
+  3. Operator CLI: `cartesi-rollups-cli read withdrawals $APP`, `read withdrawals $APP <account index>`, `--account-index <n>`, `--limit 2 --offset 1`, `--descending`; repeat each with `--jsonrpc`.
+  4. JSON-RPC: `cartesi_listWithdrawals` with no filter, with `account_index`, with `limit`/`offset` and with `descending`; `cartesi_getWithdrawal` for each withdrawn account index and for one that was never withdrawn.
+  5. Compare every row with the `Withdrawal` events on chain (`cast logs`).
+- **Expected:** both surfaces return the same rows with equal fields, in the same order for the same ordering and pagination parameters; each account index appears once; every row matches its on-chain `Withdrawal` event; a never-withdrawn index returns a not-found error on both surfaces.
 
 ---
 

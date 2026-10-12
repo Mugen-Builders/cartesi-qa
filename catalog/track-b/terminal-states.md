@@ -42,16 +42,18 @@ L1 events, and exposes the state and its proof data through JSON-RPC.
   3. Restart the node.
 - **Expected:** `MACHINE_HALTED`; no later input is executed, before or after the restart.
 
-## TRM-003 — Unexpected manual yield
+## TRM-003 — Unexpected manual yield (the machine yields with a reason other than accept or reject, e.g. the node's unexpected-yield test fixture): UNEXPECTED_YIELD, no later input executed
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
-- **Why-not-CI:** same reason as TRM-001, for a manual yield with a reason other than accepted or rejected.
+- **Why-not-CI:** CI asserts the state with this fixture inside the integration harness (`TestTerminalMachineStates`); this runs it on a deployed node and checks what the operator surfaces show, across restarts, next to a healthy application.
 - **Steps:**
-  1. Build an application that performs a manual yield with an unexpected reason on a specific input.
-  2. Send that input and more inputs after it.
-- **Expected:** `UNEXPECTED_YIELD`; no later input is executed.
+  1. In a checkout of rollups-node at the tag under test, build the fixture: `make applications/unexpected-yield-dapp` (it runs `go run ./test/tooling/terminalmachine unexpected-yield --output=applications/unexpected-yield-dapp`). The result is a stored machine snapshot of a synthetic 4 KiB-RAM machine that answers its first advance with a manual yield of reason 9, which is neither accepted nor rejected. Optionally, also use a guest program on a real rootfs that issues a manual yield with such a reason.
+  2. Deploy it as an Authority application next to a healthy sibling (for example `make applications/echo-dapp`): `cartesi-rollups-cli deploy application t-unexp applications/unexpected-yield-dapp`.
+  3. Send one input, then two more. Restart the advancer and send another input; restart the whole node and send another.
+  4. After each step read `cartesi-rollups-cli app status t-unexp`, `cartesi-rollups-cli read inputs t-unexp`, `cartesi_getApplication`, `cartesi_listInputs` and the advancer log.
+- **Expected:** `UNEXPECTED_YIELD`: the first input completes with that status and the application becomes `UNEXPECTED_YIELD`; no later input is executed, before or after the restarts (they stay unprocessed but are still indexed); the state is the same on every surface, and the sibling application keeps processing.
 
 ## TRM-004 — Mcycle overflow
 
@@ -65,17 +67,19 @@ L1 events, and exposes the state and its proof data through JSON-RPC.
 - **Notes:**
   - A configured mcycle target that coincides with the emulator boundary can also produce this completion. A configured limit that aborts the advance before the emulator boundary is TRM-007, not this test.
 
-## TRM-005 — Accepted input with an invalid outputs root
+## TRM-005 — Guest accepts an input but writes a wrong outputs Merkle root to the tx buffer (wrong value or wrong length; the node's invalid-outputs-root fixtures): INVALID_OUTPUTS_ROOT recorded once, no claim, survives restart
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
 - **Environment:** devnet
-- **Why-not-CI:** the commit that adds `INVALID_OUTPUTS_ROOT` (#798, "classify invalid outputs roots as terminal") says "live integration verification remains pending". CI uses native guest fixtures.
+- **Why-not-CI:** the commit that adds `INVALID_OUTPUTS_ROOT` (#798, "classify invalid outputs roots as terminal") says "live integration verification remains pending". CI runs the fixtures inside the integration harness; this runs them on a deployed node, with restarts, the chain's claim events and the operator surfaces.
 - **Steps:**
-  1. Build a guest that accepts an input while leaving an outputs root of the wrong length, and another with a wrong value (for example by writing the TX buffer directly).
-  2. Run each on an Authority application and on a PRT application.
-  3. Restart the node.
-- **Expected:** `INVALID_OUTPUTS_ROOT` is recorded once and does not change afterwards; L1 observation continues; no claim with the invalid root is submitted; the state survives the restart.
+  1. In a checkout of rollups-node at the tag under test, build the fixtures: `make invalid-outputs-root-dapps`. This creates `applications/invalid-outputs-root-dapp` (`terminalmachine invalid-outputs-root --kind=value`: accepts the input and leaves a wrong outputs root value in the TX buffer), `applications/invalid-outputs-root-length-dapp` (`--kind=length`: accepts while declaring a root of the wrong length) and `applications/invalid-template-outputs-root-dapp` (`--kind=template`: a template whose outputs root is zero).
+  2. Deploy the value and length fixtures as Authority applications and as PRT applications (`cartesi-rollups-cli deploy application <name> <snapshot dir>`), the template fixture once, and a healthy sibling (for example `make applications/echo-dapp`) on the same node.
+  3. Send one input to each application, then more inputs; wait for the epoch to close (a wrong value is found by the validator when the epoch closes; a wrong length is found when the input completes).
+  4. Restart the advancer, then the whole node, sending an input after each restart.
+  5. Read the application status and reason (`cartesi-rollups-cli app status`, `cartesi_getApplication`), the epochs (`cartesi-rollups-cli read epochs`), the advancer and validator logs, and the claim events of each application's consensus on chain (`cast logs`).
+- **Expected:** `INVALID_OUTPUTS_ROOT` is recorded once and does not change afterwards; L1 observation continues; no claim with the invalid root is submitted (none in the database or on chain); no later input is executed; the state survives the restarts; the sibling application keeps processing.
 
 ## TRM-006 — What an operator sees for a terminal application
 

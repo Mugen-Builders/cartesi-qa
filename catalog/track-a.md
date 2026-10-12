@@ -90,15 +90,17 @@ This ordered list is the source of truth for Track A execution sequence. The spr
 
 ## Phase 3 — Testnet Smoke
 
-### SMK-002 — Smoke (testnet): CLI path against deployed testnet app
+### SMK-002 — Smoke (testnet): one representative operator action against the deployed testnet app (send one input with cartesi-rollups-cli send, then read it back with read inputs and cartesi_listInputs)
 
 - **Risk:** H
 - **Environment:** testnet
 - **Why-not-CI:** CI does not cover operator CLI behavior against real public testnets.
 - **Steps:**
-  1. Use the deployed testnet app from `SMK-006`.
-  2. Run one representative CLI action against the testnet app (for example, read app state / read epochs / send one input).
-- **Expected:** CLI command succeeds against testnet endpoints with clear output and no local-only assumptions.
+  1. Use the application deployed by `SMK-006` (`$APP` = its name or address). Point the operator CLI at the testnet and at that node: `CARTESI_BLOCKCHAIN_HTTP_ENDPOINT=<testnet RPC>`, `CARTESI_DATABASE_CONNECTION=<the node's database>`, `CARTESI_JSONRPC_API_URL=<the node's JSON-RPC URL>`, and a funded sender in `CARTESI_AUTH_*` (for example `CARTESI_AUTH_KIND=private_key` with `CARTESI_AUTH_PRIVATE_KEY`).
+  2. Send one input: `cartesi-rollups-cli send $APP "smk-002 $(date +%s)" --yes`. Record the input index, block number and transaction hash it prints.
+  3. Once the node has read the block, read the input back from the database path: `cartesi-rollups-cli read inputs $APP <index>`, and through the JSON-RPC path: `cartesi-rollups-cli read inputs $APP <index> --jsonrpc`.
+  4. Query JSON-RPC directly: `curl -s -X POST $CARTESI_JSONRPC_API_URL -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"cartesi_listInputs","params":{"application":"<app>","descending":true,"limit":5}}'`.
+- **Expected:** the send command succeeds against the testnet endpoints with clear output and no local-only assumptions (no localhost default silently used). The input appears in steps 3 and 4 with the index and transaction hash printed in step 2, the sender account and a payload that decodes to the string sent, and it is processed by the application.
 
 ### SMK-003 — Smoke (testnet): one deposit of each token type
 
