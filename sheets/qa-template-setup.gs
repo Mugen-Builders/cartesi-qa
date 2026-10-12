@@ -26,7 +26,7 @@
 
 // ─── Test Data ────────────────────────────────────────────────────────────────
 // Format: [id, track, area, test name / description, environment]
-// Tracks: 'A' | 'B' | 'C' | 'Regression'
+// Tracks: 'A' | 'B' | 'C' | 'Regression' | 'new_additions'
 
 const TESTS = [
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -409,6 +409,33 @@ const TESTS = [
   ['RW-002',   'Regression', 'Inputs',            'Two or more addInput calls in one transaction wedge the app permanently (transaction_reference collision)', 'devnet'],
   ['RW-003',   'Regression', 'Machine Tool',      'machine-tool prove accounts-drive rejects account balances the contract and machine ledger both accept',   'devnet'],
   ['RW-004',   'Regression', 'Services',          'Execution-parameter (wall-clock) failures should mark the app FAILED, not the current behavior',           'devnet'],
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // NEW ADDITIONS  (Track B entries added in the v2-alpha13 cycle)
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // Catalog entries: RT-* in catalog/track-b/runtime.md, SP-011 in
+  // state-persistence.md, SVC-013 in services.md, ILC-022/023 in internal-cli.md,
+  // FOR-028..031 in foreclose.md. These rows keep the cycle sheet's order and sit
+  // after the regression-watch block (their own track, so _orderedTestsForSheet()
+  // does not move them into Track B). FOR-031 was FOR-027 in the cycle sheet.
+  ['RT-001',   'new_additions', 'Runtime',          'Deploy an app with an NVRAM range. Read and write it, take a snapshot, restart, and confirm replay produces the same state.', 'devnet'],
+  ['RT-002',   'new_additions', 'Runtime',          'Confirm the machine hash used for claims includes the NVRAM range. Confirm accounts-drive proofs still work beside that range.', 'devnet'],
+  ['RT-005',   'new_additions', 'Runtime',          'Run equivalent templates using drive labels and fixed /dev/pmemN paths. Confirm both behave the same before and after replacing a labeled memory range.', 'devnet'],
+  ['RT-006',   'new_additions', 'Runtime',          'Deploy a template with a read-only flash drive. A guest write must fail cleanly without an initialization panic.', 'devnet'],
+  ['RT-003',   'new_additions', 'Deployment',       'Change the initial NVRAM contents and verify getTemplateHash behaves as documented. Deploy the template and confirm the registered hash matches.', 'devnet'],
+  ['RT-004',   'new_additions', 'Terminal States',  'Start a template that still references removed MTD paths. Confirm build or first advance fails clearly, records the reason, and never hangs.', 'devnet'],
+  ['RT-008',   'new_additions', 'Terminal States',  'Run an advance to the emulator mcycle limit. Confirm MCYCLE_OVERFLOW is recorded, or document why configured limits make it unreachable.', 'devnet'],
+  ['RT-009',   'new_additions', 'State Persistence', 'Kill the node during every-input and every-epoch snapshot writes. After 20 runs, each snapshot must be complete or absent, and no database pointer may reference a partial snapshot.', 'devnet'],
+  ['RT-010',   'new_additions', 'Machine Tool',     'Replay an epoch with accepted, rejected, and multi-output inputs. Confirm machine-tool reproduces the node\'s TX-buffer block and output hashes.', 'devnet'],
+  ['SP-011',   'new_additions', 'State Persistence', 'Corrupt snapshot data without changing its hash tree. Confirm page-level verification detects it, or document the required operator check.', 'devnet'],
+  ['SVC-013',  'new_additions', 'Services',         'Exhaust chain-client retries with a credential-bearing RPC URL. Confirm node and CLI error logs redact the URL path and key.', 'testnet'],
+  ['ILC-022',  'new_additions', 'Internal CLI',     'Inject transient 429, 502, and timeout errors during deploy, send, execute, and refund. Confirm retries use backoff, preserve any broadcast hash, and complete deploy registration.', 'devnet'],
+  ['ILC-022',  'new_additions', 'Internal CLI',     'Inject transient 429, 502, and timeout errors during deploy, send, execute, and refund. Confirm retries use backoff, preserve any broadcast hash, and complete deploy registration.', 'testnet'],
+  ['ILC-023',  'new_additions', 'Internal CLI',     'Run db init on a dirty migration. Confirm it refuses or performs an explicit repair and never reports the database as current.', 'devnet'],
+  ['FOR-031',  'new_additions', 'Foreclosure',      'After foreclosure, refund unfinalized ETH, ERC-721, ERC-1155 single, and ERC-1155 batch deposits. Confirm balances and ownership return exactly and RefundIssued matches the built output.', 'devnet'],
+  ['FOR-028',  'new_additions', 'Foreclosure',      'Refund a deposit made by a contract and, when available, an EIP-7702 account. Missing receiver hooks must revert clearly without marking the refund complete, so retry remains possible.', 'devnet'],
+  ['FOR-029',  'new_additions', 'Foreclosure',      'Add several inputs in one transaction. Confirm lookup by transaction hash returns all inputs, a non-deposit refund fails with UnknownInputSender, and the deposit refunds successfully.', 'devnet'],
+  ['FOR-030',  'new_additions', 'Foreclosure',      'Mine a refund and claim acceptance for the same deposit epoch in one block. Confirm exactly one succeeds and node state matches chain state.', 'devnet'],
 ];
 
 // ─── Colours ──────────────────────────────────────────────────────────────────
@@ -421,11 +448,13 @@ const COLOR = {
   divB:       '#bf360c',   // dark orange
   divC:       '#6a1b9a',   // dark purple
   divReg:     '#880e4f',   // dark pink
+  divNew:     '#00695c',   // dark teal
 
   rowA1:      '#f1f8e9',   rowA2: '#e8f5e9',
   rowB1:      '#fff8f0',   rowB2: '#fff3e0',
   rowC1:      '#faf0ff',   rowC2: '#f3e5f5',
   rowReg1:    '#fdf0f4',   rowReg2: '#fce4ec',
+  rowNew1:    '#f0fbf9',   rowNew2: '#e0f2f1',
 
   border:     '#d0d0d0',
 };
@@ -588,8 +617,9 @@ function _writeDivider(s, row, track) {
     'B':          '▸  TRACK B — DEEP VALIDATION  ·  run on major releases or when a significant component changed',
     'C':          '▸  TRACK C — EXPLORATORY CHARTERS  ·  2-hour time-boxed sessions  ·  output = session note + upstream bugs',
     'Regression': '▸  REGRESSION WATCH  ·  re-check every cycle  ·  remove entry when issue is confirmed fixed upstream',
+    'new_additions': '▸  NEW ADDITIONS  ·  Track B entries added in the v2-alpha13 cycle  ·  same catalog rules as Track B',
   };
-  const BG = { 'A': COLOR.divA, 'B': COLOR.divB, 'C': COLOR.divC, 'Regression': COLOR.divReg };
+  const BG = { 'A': COLOR.divA, 'B': COLOR.divB, 'C': COLOR.divC, 'Regression': COLOR.divReg, 'new_additions': COLOR.divNew };
 
   const r = s.getRange(row, 1, 1, 10);
   r.setBackground(BG[track] || '#555555')
@@ -612,6 +642,7 @@ function _writeRow(s, row, id, track, area, name, env, ownerRange) {
     'B':          row % 2 === 0 ? COLOR.rowB1 : COLOR.rowB2,
     'C':          row % 2 === 0 ? COLOR.rowC1 : COLOR.rowC2,
     'Regression': row % 2 === 0 ? COLOR.rowReg1 : COLOR.rowReg2,
+    'new_additions': row % 2 === 0 ? COLOR.rowNew1 : COLOR.rowNew2,
   };
 
   const defaultStatus = 'Pending';

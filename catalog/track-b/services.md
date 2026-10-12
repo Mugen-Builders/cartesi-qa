@@ -141,6 +141,19 @@ Tests for individual node services: advancer, claimer, evm-reader, validator, js
   2. Restart the database and then the node.
 - **Expected:** the node exits with a non-zero code and a log line naming the unconfirmed write. After restart it rebuilds the machine from durable state and the input is processed exactly once.
 
+## SVC-013 — Exhaust chain-client retries with a credential-bearing RPC URL. Confirm node and CLI error logs redact the URL path and key.
+
+- **Risk:** H
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** testnet
+- **Why-not-CI:** public testnet providers put the API key in the URL path or query; CI's anvil URL carries no credential, and CI does not exhaust the chain client's retries.
+- **Steps:**
+  1. Configure the node with a provider URL that carries a key (for example `CARTESI_BLOCKCHAIN_HTTP_ENDPOINT=https://<provider>/v2/<key>`), routed through a local proxy you can stop; start the node and confirm it runs.
+  2. Stop the proxy (or make it return errors) long enough for the chain client to exhaust its retries in every service; collect all node log lines, including start-up and shutdown.
+  3. Run operator CLI commands that use the provider (`cartesi-rollups-cli send`, `deploy application`, `read` with chain access) against the same URL while it is unavailable; collect stdout and stderr.
+  4. Search all collected output for the key and the URL path: `grep -F '<key>'`.
+- **Expected:** no node or CLI output contains the key or the URL path: errors name the host (or a redacted URL) and the failure, so operators can share logs without leaking the credential.
+
 ---
 
 <!-- Add entries for specific service failure modes as discovered. -->

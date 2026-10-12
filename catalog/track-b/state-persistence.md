@@ -118,6 +118,19 @@ Tests for snapshots, restarts, crash recovery, resync, and chain reorganizations
   3. Repeat with the snapshot directory unreadable (permissions).
 - **Expected:** the node logs the skipped snapshot, replays from the template, and reaches the same state as before; record how long the replay takes. It must not load the corrupted snapshot or silently diverge.
 
+## SP-011 — Corrupt snapshot data without changing its hash tree. Confirm page-level verification detects it, or document the required operator check.
+
+- **Risk:** M
+- **Last Scheduled Test:** v2-alpha13
+- **Environment:** devnet
+- **Why-not-CI:** SP-009 breaks a snapshot so that it cannot load; this corruption keeps the stored hash tree consistent, so only a check of the page data against the tree can find it. CI does not tamper with snapshot files.
+- **Steps:**
+  1. With `snapshot_policy` set to `EVERY_EPOCH` (or `EVERY_INPUT`), run until a snapshot exists under `CARTESI_SNAPSHOTS_DIR`; record the latest input's `machine_hash`.
+  2. Stop the node. In that snapshot, change bytes in a memory range's data file (for example a page of the RAM or flash-drive `.bin` file that the application reads later) and leave the hash-tree files (`.dht`, `.dpt`) and `config.json` untouched.
+  3. Restart the node; read the advancer log and the application status, then send inputs that read the corrupted page.
+  4. Separately, try the checks an operator could run: loading the snapshot with `cartesi-machine --load=<dir>` and computing its hash, removing the hash-tree files so the hash is recomputed, and an independent replay from the template (`cartesi-rollups-machine-tool replay`) compared with the node's `machine_hash`.
+- **Expected:** page-level verification detects the corruption before the snapshot is used (the snapshot is skipped and the node replays from the template, as in SP-009); or the operator check that detects it is documented, with the command and how long it takes.
+
 ---
 
 <!-- Add entries for large-inputbox resync, RPC provider failure, WS liveness timeout, etc.
