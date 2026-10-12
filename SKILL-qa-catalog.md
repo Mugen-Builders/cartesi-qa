@@ -57,10 +57,10 @@ Each test's environment is **determined individually** from its markdown entry. 
 
 | Suite | File | Current Pattern | Examples |
 |-------|------|-----------------|----------|
-| CLI (User) | `cli.md` | All devnet | `CLI-001..004` |
+| CLI (User) | `cli.md` | All devnet | `CLI-001`, `CLI-003/004` |
 | Inputs | `inputs.md` | Mostly dual | `INP-001..009`, `INP-011` dual; `INP-010` devnet |
-| Outputs | `outputs.md` | Mostly dual | `OUT-001..007` dual; `OUT-008/009` devnet |
-| Egress | `egress.md` | All dual | `EGR-001..011` |
+| Outputs | `outputs.md` | Mostly dual | `OUT-002..007` dual; `OUT-008/009` devnet |
+| Egress | `egress.md` | All dual | `EGR-001`, `EGR-003..011` |
 | Configuration | `configuration.md` | Mixed | `CFG-001..006`, `CFG-009`, `CFG-011/012/014` testnet; `CFG-010` dual; `CFG-013` devnet |
 | Services | `services.md` | Mixed | `SVC-001..004` testnet; `SVC-005..008` dual; `SVC-009/010` devnet |
 | State Persistence | `state-persistence.md` | Mixed | `SP-001..005`, `SP-009` testnet; `SP-006..008` dual |
@@ -75,7 +75,7 @@ Each test's environment is **determined individually** from its markdown entry. 
 | Terminal States | `terminal-states.md` | Mixed | `TRM-001`, `TRM-006/007` dual; `TRM-002..005` devnet |
 | PRT | `prt.md` | Mixed | `PRT-002/004/006` dual; `PRT-003/005/007/008/009/011` devnet; `PRT-001/010` testnet |
 
-Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist).
+Retired IDs (do not reuse): `FOR-022`, `ILC-018`, `JRP-018` (cross-version tests; releases do not support backward compatibility); `CFG-007`, `CFG-008` (the `CARTESI_BLOCKCHAIN_WS_*` variables no longer exist); `CLI-002` (dependencies are installed inside the Docker build, so a missing dependency on the host is not a real user path); `OUT-001` (application-dependent; the node-side output limit and error -105 are covered by `OUT-002`); `EGR-002` (`latest` vs `finalized` latency depends on chain finality, not on a node property).
 
 **This is not prescriptive.** Future tests may deviate from the current pattern. Always verify the `Environment:` field in the markdown source for each individual test before adding or adjusting sheet rows.
 
@@ -123,8 +123,8 @@ The sheet is built from a JavaScript array of test tuples:
 [
   ['ID',      'Track', 'Area',  'Description', 'Environment'],
   ['SMK-001', 'A',     'Smoke', 'Check node startup…', 'devnet'],
-  ['OUT-001', 'B',     'Outputs', 'Handle >2MB notice…', 'devnet'],
-  ['OUT-001', 'B',     'Outputs', 'Handle >2MB notice…', 'testnet'],  // dual tuple
+  ['OUT-002', 'B',     'Outputs', 'Emit a notice at the 2 MiB output limit…', 'devnet'],
+  ['OUT-002', 'B',     'Outputs', 'Emit a notice at the 2 MiB output limit…', 'testnet'],  // dual tuple
   …
 ]
 ```
@@ -168,7 +168,7 @@ const text = fs.readFileSync('sheets/qa-template-setup.gs', 'utf8');
 
 // Define expected counts per ID (1 for single-env, 2 for dual-env)
 const expectedCounts = {
-  'OUT-001': 2,      // dual
+  'OUT-002': 2,      // dual
   'CFG-001': 1,      // testnet only
   'MA-001': 1,       // testnet only
   'ILC-005': 2,      // dual

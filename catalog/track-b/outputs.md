@@ -6,16 +6,6 @@ Tests for VM outputs: notices, vouchers, reports, and inspect responses.
 
 ---
 
-## OUT-001 — Oversized notice (>2MB)
-
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha13
-- **Environment:** devnet + testnet
-- **Why-not-CI:** boundary behavior at the VM output layer; error path not exercised by CI's echo-dapp.
-- **Steps:**
-  1. From inside the VM, emit a notice larger than 2MB.
-- **Expected:** emission fails with a clear error. HTTP 400 returned. Advancer marks the input rejected. Node does not crash.
-
 ## OUT-002 — Emit a notice at the 2 MiB output limit (the limit applies to the ABI-encoded output, so the largest notice payload is 2,097,056 B): accepted and fully retrievable; one byte more is rejected
 
 - **Risk:** M

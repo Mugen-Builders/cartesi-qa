@@ -17,18 +17,6 @@ Tests for the Cartesi CLI (`cartesi` command): build, run, deposit, send, status
   2. Run `cartesi doctor`.
 - **Expected:** exits non-zero with a human-readable message identifying Docker as the missing requirement. Not a stack trace.
 
-## CLI-002 — `cartesi build` with missing dependencies
-
-- **Risk:** M
-- **Last Scheduled Test:** v2-alpha12
-- **Environment:** devnet
-- **Why-not-CI:** CI environments come pre-provisioned; users don't. Error should point at the missing thing clearly.
-- **Steps:**
-  1. In a valid project, delete `node_modules` (or equivalent for the template).
-  2. Run `cartesi build`.
-- **Expected:** fails with an error message that identifies the missing dependency and suggests a remediation.
-
-
 ## CLI-003 — `cartesi create --branch` with invalid branch
 
 - **Risk:** L

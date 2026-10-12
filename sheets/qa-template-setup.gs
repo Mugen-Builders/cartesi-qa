@@ -54,7 +54,6 @@ const TESTS = [
 
   // ── CLI ───────────────────────────────────────────────────────────────────
   ['CLI-001',  'B', 'CLI',               'cartesi doctor with Docker stopped — error message is human-readable, not a stack trace', 'devnet'],
-  ['CLI-002',  'B', 'CLI',               'cartesi build with missing dependencies — error names the missing thing and how to fix it', 'devnet'],
   ['CLI-003',  'B', 'CLI',               'cartesi create --branch with a nonexistent branch — clear "not found" message', 'devnet'],
   ['CLI-004',  'B', 'CLI',               'ERC-20 deposit approves and deposits through Erc20Portal on a devnet from rollups-contracts v3.0.0-alpha.10', 'devnet'],
 
@@ -82,8 +81,6 @@ const TESTS = [
   ['INP-011',  'B', 'Inputs',            'Input sent between stage and accept lands in the next PRT epoch', 'testnet'],
 
   // ── Outputs ───────────────────────────────────────────────────────────────
-  ['OUT-001',  'B', 'Outputs',           'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected', 'devnet'],
-  ['OUT-001',  'B', 'Outputs',           'Emit notice >2MB — HTTP 400, IOCTL error -105, advancer marks input rejected', 'testnet'],
   ['OUT-002',  'B', 'Outputs',           'Emit a notice at the 2 MiB output limit (the limit applies to the ABI-encoded output, so the largest notice payload is 2,097,056 B): accepted and fully retrievable; one byte more is rejected', 'devnet'],
   ['OUT-002',  'B', 'Outputs',           'Emit a notice at the 2 MiB output limit (the limit applies to the ABI-encoded output, so the largest notice payload is 2,097,056 B): accepted and fully retrievable; one byte more is rejected', 'testnet'],
   ['OUT-003',  'B', 'Outputs',           'Voucher with invalid/reverting destination — clean L1 revert, node healthy', 'devnet'],
@@ -102,8 +99,6 @@ const TESTS = [
   // ── Egress ────────────────────────────────────────────────────────────────
   ['EGR-001',  'B', 'Egress',            'Execute same voucher twice — second attempt reverts with clear reason', 'devnet'],
   ['EGR-001',  'B', 'Egress',            'Execute same voucher twice — second attempt reverts with clear reason', 'testnet'],
-  ['EGR-002',  'B', 'Egress',            'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference', 'devnet'],
-  ['EGR-002',  'B', 'Egress',            'Notice validation and voucher execution with block:latest vs block:finalized — document latency difference', 'testnet'],
   ['EGR-003',  'B', 'Egress',            'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state', 'devnet'],
   ['EGR-003',  'B', 'Egress',            'Execute voucher with insufficient L1 gas — clean revert, no inconsistent node state', 'testnet'],
   ['EGR-004',  'B', 'Egress',            'Withdrawal voucher for amount exceeding contract balance — L1 revert, node records failure cleanly', 'devnet'],
