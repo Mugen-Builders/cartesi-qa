@@ -10,7 +10,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha12
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** cross-service log verification is visual; humans notice inconsistencies.
 - **Steps:**
   1. Start node with `CARTESI_LOG_LEVEL=debug`.
@@ -22,7 +22,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha12
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** UX concern — startup config logging is nice to have but is an INFO message; confirm what's lost at WARN.
 - **Steps:**
   1. Start node with `CARTESI_LOG_LEVEL=warn`.
@@ -33,7 +33,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** partial-failure behavior — what does the rest of the node do when the claimer can't start?
 - **Steps:**
   1. Start node without `CARTESI_AUTH_PRIVATE_KEY`.
@@ -48,7 +48,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** startup validation clarity; CI doesn't test mismatched chain IDs.
 - **Steps:**
   1. Start node with a `CARTESI_BLOCKCHAIN_ID` that does not match the connected RPC.
@@ -58,7 +58,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** fast-fail behavior and error clarity.
 - **Steps:**
   1. Start node with an unreachable or malformed database connection string.
@@ -68,7 +68,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** observable timing behavior in logs; CI doesn't check real timing.
 - **Steps:**
   1. Set a non-default polling interval.
@@ -79,7 +79,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** L
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** explicit flag validation; confirm the private_key auth path is used for claim signing when set explicitly (vs. implicit default).
 - **Steps:**
   1. Start node with `CARTESI_AUTH_KIND=private_key` and a valid `CARTESI_AUTH_PRIVATE_KEY`.
@@ -104,7 +104,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** alpha.13 diagnoses this case after a submission revert (#798, "detect authority signer mismatch"). It is not a startup check, so the operator only learns about it when a claim fails.
 - **Steps:**
   1. Start the claimer with a key that is not the owner of the application's Authority and let it try to submit a claim.
@@ -117,7 +117,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** pgx v5.11 (#800) parses database URLs like libpq, and the node rejects a URL with `#` or a repeated parameter.
 - **Steps:**
   1. Set `CARTESI_DATABASE_CONNECTION` with a password containing an unencoded `#`, then percent-encoded.
@@ -141,7 +141,7 @@ Tests for environment variables, startup validation, and feature flags.
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** alpha.13 stores and validates chain, observation policy and submission mode (#798, "validate saved service settings") and rejects changes instead of replacing them. Operators changing an env var on an existing deployment hit this.
 - **Steps:**
   1. Start the node against a database, then restart it with a different `CARTESI_BLOCKCHAIN_ID`.

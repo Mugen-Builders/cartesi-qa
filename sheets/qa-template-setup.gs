@@ -119,22 +119,34 @@ const TESTS = [
   ['EGR-011',  'B', 'Egress',            'Attempt ERC-1155 withdrawal above app-contract balance — clear L1 revert and clean node failure record', 'testnet'],
 
   // ── Configuration ─────────────────────────────────────────────────────────
+  ['CFG-001',  'B', 'Configuration',     'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services', 'devnet'],
   ['CFG-001',  'B', 'Configuration',     'CARTESI_LOG_LEVEL=debug — debug messages appear consistently across all services', 'testnet'],
+  ['CFG-002',  'B', 'Configuration',     'CARTESI_LOG_LEVEL=warn — info suppressed; document which startup markers disappear', 'devnet'],
   ['CFG-002',  'B', 'Configuration',     'CARTESI_LOG_LEVEL=warn — info suppressed; document which startup markers disappear', 'testnet'],
+  ['CFG-003',  'B', 'Configuration',     'Missing CARTESI_AUTH_PRIVATE_KEY — claimer fails fast with clear message, other services start normally', 'devnet'],
   ['CFG-003',  'B', 'Configuration',     'Missing CARTESI_AUTH_PRIVATE_KEY — claimer fails fast with clear message, other services start normally', 'testnet'],
+  ['CFG-004',  'B', 'Configuration',     'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level', 'devnet'],
   ['CFG-004',  'B', 'Configuration',     'Wrong CARTESI_BLOCKCHAIN_ID — evm-reader error names both chain IDs with timestamp + log level', 'testnet'],
+  ['CFG-005',  'B', 'Configuration',     'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error', 'devnet'],
   ['CFG-005',  'B', 'Configuration',     'Invalid CARTESI_DATABASE_CONNECTION — services fail fast, no hang, host named in error', 'testnet'],
+  ['CFG-006',  'B', 'Configuration',     'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output', 'devnet'],
   ['CFG-006',  'B', 'Configuration',     'Custom CARTESI_ADVANCER_POLLING_INTERVAL — effective interval matches config and --help output', 'testnet'],
+  ['CFG-009',  'B', 'Configuration',     'CARTESI_AUTH_KIND=private_key set explicitly — claimer signs and submits claims, no auth errors', 'devnet'],
   ['CFG-009',  'B', 'Configuration',     'CARTESI_AUTH_KIND=private_key set explicitly — claimer signs and submits claims, no auth errors', 'testnet'],
   ['CFG-010',  'B', 'Configuration',     'Separate PRT signer: with submission enabled, startup needs CARTESI_PRT_AUTH_* even with only Authority apps; no fallback', 'devnet'],
   ['CFG-010',  'B', 'Configuration',     'Separate PRT signer: with submission enabled, startup needs CARTESI_PRT_AUTH_* even with only Authority apps; no fallback', 'testnet'],
+  ['CFG-011',  'B', 'Configuration',     'Claimer key not the Authority owner: after a submission revert the app is marked FAILED, naming signer and owner', 'devnet'],
   ['CFG-011',  'B', 'Configuration',     'Claimer key not the Authority owner: after a submission revert the app is marked FAILED, naming signer and owner', 'testnet'],
+  ['CFG-012',  'B', 'Configuration',     'Database URL with an unencoded # or a repeated parameter rejected with a clear message (pgx v5.11)', 'devnet'],
   ['CFG-012',  'B', 'Configuration',     'Database URL with an unencoded # or a repeated parameter rejected with a clear message (pgx v5.11)', 'testnet'],
   ['CFG-013',  'B', 'Configuration',     'Mnemonic-derived addresses match the standard derivation (as computed by cast) for every account index; account index 2^31 is rejected', 'devnet'],
+  ['CFG-014',  'B', 'Configuration',     'Saved chain/observation/submission settings: a changed value is rejected, not silently applied', 'devnet'],
   ['CFG-014',  'B', 'Configuration',     'Saved chain/observation/submission settings: a changed value is rejected, not silently applied', 'testnet'],
 
   // ── Services ──────────────────────────────────────────────────────────────
+  ['SVC-001',  'B', 'Services',          'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'devnet'],
   ['SVC-001',  'B', 'Services',          'Clean restart of each service individually while node is idle (7 services: advancer, claimer, evm-reader, validator, jsonrpc-api, database, prt)', 'testnet'],
+  ['SVC-002',  'B', 'Services',          'Dirty restart of each service under active workload — no data loss, no stuck state', 'devnet'],
   ['SVC-002',  'B', 'Services',          'Dirty restart of each service under active workload — no data loss, no stuck state', 'testnet'],
   ['SVC-003',  'B', 'Services',          'AWS KMS signer produces a valid signature on an EIP-1559 (dynamic-fee) network', 'testnet'],
   ['SVC-004',  'B', 'Services',          'KMS authentication failure delays claimer startup (bounded by CARTESI_MAX_STARTUP_TIME) instead of crash-looping', 'testnet'],
@@ -150,10 +162,15 @@ const TESTS = [
   ['SVC-010',  'B', 'Services',          'Database lost during an advance result write: node exits fatally by design; restart processes the input exactly once', 'devnet'],
 
   // ── State Persistence ─────────────────────────────────────────────────────
+  ['SP-001',   'B', 'State Persistence', 'Hard-kill all containers mid-execution — node recovers to consistent state', 'devnet'],
   ['SP-001',   'B', 'State Persistence', 'Hard-kill all containers mid-execution — node recovers to consistent state', 'testnet'],
+  ['SP-002',   'B', 'State Persistence', 'Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'devnet'],
   ['SP-002',   'B', 'State Persistence', 'Per-input snapshots (--save-snapshot=every-input) — snapshot per input, restart from one resumes correctly', 'testnet'],
+  ['SP-003',   'B', 'State Persistence', 'Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'devnet'],
   ['SP-003',   'B', 'State Persistence', 'Per-epoch snapshots (--save-snapshot=every-epoch) — snapshot per epoch, restart from one resumes correctly', 'testnet'],
+  ['SP-004',   'B', 'State Persistence', 'Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'devnet'],
   ['SP-004',   'B', 'State Persistence', 'Claimer resync after >5 epochs offline — catches up without error, document catch-up time', 'testnet'],
+  ['SP-005',   'B', 'State Persistence', 'L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'devnet'],
   ['SP-005',   'B', 'State Persistence', 'L1 chain reorganization (testnet or Anvil simulation) — no duplicated or lost inputs, state consistent with new chain', 'testnet'],
   ['SP-006',   'B', 'State Persistence', 'Startup replay reconciles persisted history against re-execution with no discrepancy', 'devnet'],
   ['SP-006',   'B', 'State Persistence', 'Startup replay reconciles persisted history against re-execution with no discrepancy', 'testnet'],
@@ -161,6 +178,7 @@ const TESTS = [
   ['SP-007',   'B', 'State Persistence', 'Node fences an application whose persisted outcome contradicts real execution; other apps keep processing', 'testnet'],
   ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing', 'devnet'],
   ['SP-008',   'B', 'State Persistence', 'Advancer preserves machine-database alignment after a hard crash mid-processing', 'testnet'],
+  ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped; node replays from the template to the same state', 'devnet'],
   ['SP-009',   'B', 'State Persistence', 'Corrupted or unreadable saved snapshot is skipped; node replays from the template to the same state', 'testnet'],
 
   // ── Inspect Service ───────────────────────────────────────────────────────
@@ -222,12 +240,17 @@ const TESTS = [
   ['JRP-020',  'B', 'JSON-RPC API',      'Requests without id get id:null responses (no notification semantics)', 'testnet'],
 
   // ── Multi-App ─────────────────────────────────────────────────────────────
+  ['MA-001',   'B', 'Multi-App',         'Heavy app does not starve light app under concurrent load', 'devnet'],
   ['MA-001',   'B', 'Multi-App',         'Heavy app does not starve light app under concurrent load', 'testnet'],
+  ['MA-002',   'B', 'Multi-App',         'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'devnet'],
   ['MA-002',   'B', 'Multi-App',         'Restart node with many pending inputs across two apps — document processing order (serial vs fair)', 'testnet'],
 
   // ── Quorum ────────────────────────────────────────────────────────────────
+  ['QUO-001',  'B', 'Quorum',            'Pending quorum votes do not mark the app DIVERGED during honest divergence; only a different winning claim does (CLAIM_REJECTED + DIVERGED)', 'devnet'],
   ['QUO-001',  'B', 'Quorum',            'Pending quorum votes do not mark the app DIVERGED during honest divergence; only a different winning claim does (CLAIM_REJECTED + DIVERGED)', 'testnet'],
+  ['QUO-002',  'B', 'Quorum',            'Winning quorum claim stages first, then acceptClaim after staging period', 'devnet'],
   ['QUO-002',  'B', 'Quorum',            'Winning quorum claim stages first, then acceptClaim after staging period', 'testnet'],
+  ['QUO-003',  'B', 'Quorum',            'Quorum.submitClaim enforces the same machine validity proof requirement as Authority under multi-validator voting', 'devnet'],
   ['QUO-003',  'B', 'Quorum',            'Quorum.submitClaim enforces the same machine validity proof requirement as Authority under multi-validator voting', 'testnet'],
 
   // ── Deployment ────────────────────────────────────────────────────────────
@@ -240,16 +263,23 @@ const TESTS = [
   ['DEP-006',  'B', 'Deployment',        'Deploy against contracts alpha.10 using the inputBox factory parameter', 'testnet'],
 
   // ── Internal CLI ──────────────────────────────────────────────────────────
+  ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it)', 'devnet'],
   ['ILC-001',  'B', 'Internal CLI',      'The node and cartesi-rollups-cli db check-version refuse a database whose schema differs from the binary\'s, before doing anything else (no deploys or writes against it)', 'testnet'],
+  ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'devnet'],
   ['ILC-002',  'B', 'Internal CLI',      'cartesi-rollups-cli app register then app list — appears as ENABLED, pagination flags correct', 'testnet'],
+  ['ILC-003',  'B', 'Internal CLI',      'cartesi-rollups-cli app status disabled then app remove: enabled=false stops processing; remove deletes only a disabled application', 'devnet'],
   ['ILC-003',  'B', 'Internal CLI',      'cartesi-rollups-cli app status disabled then app remove: enabled=false stops processing; remove deletes only a disabled application', 'testnet'],
+  ['ILC-004',  'B', 'Internal CLI',      'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'devnet'],
   ['ILC-004',  'B', 'Internal CLI',      'cartesi-rollups-cli validate — Merkle proof validated against on-chain contract, receipt returned', 'testnet'],
   ['ILC-005',  'B', 'Internal CLI',      'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'devnet'],
   ['ILC-005',  'B', 'Internal CLI',      'cartesi-rollups-cli execute — voucher executed on-chain via operator CLI, tx receipt returned', 'testnet'],
   ['ILC-006',  'B', 'Internal CLI',      'cartesi-rollups-cli send --hex --no-wait: payload accepted, returns without a receipt', 'devnet'],
   ['ILC-006',  'B', 'Internal CLI',      'cartesi-rollups-cli send --hex --no-wait: payload accepted, returns without a receipt', 'testnet'],
+  ['ILC-007',  'B', 'Internal CLI',      'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'devnet'],
   ['ILC-007',  'B', 'Internal CLI',      'cartesi-rollups-cli deploy quorum — quorum contract deployed and registered correctly', 'testnet'],
+  ['ILC-008',  'B', 'Internal CLI',      'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'devnet'],
   ['ILC-008',  'B', 'Internal CLI',      'cartesi-rollups-cli deploy application with v3 flags — claim staging period and withdrawal config validated', 'testnet'],
+  ['ILC-009',  'B', 'Internal CLI',      'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'devnet'],
   ['ILC-009',  'B', 'Internal CLI',      'cartesi-rollups-cli read epochs — staged/accepted/foreclosed states visible as lifecycle progresses', 'testnet'],
   ['ILC-010',  'B', 'Internal CLI',      'cartesi-rollups-cli app list and cartesi_getApplication show the v3 fields (enabled, status, withdrawal config, foreclose markers); contract shows the on-chain view only', 'devnet'],
   ['ILC-010',  'B', 'Internal CLI',      'cartesi-rollups-cli app list and cartesi_getApplication show the v3 fields (enabled, status, withdrawal config, foreclose markers); contract shows the on-chain view only', 'testnet'],
@@ -261,12 +291,14 @@ const TESTS = [
   ['ILC-013',  'B', 'Internal CLI',      'refund --input-file returns an unfinalized deposit after foreclosure; repeat rejected with RefundAlreadyIssued', 'testnet'],
   ['ILC-014',  'B', 'Internal CLI',      'foreclose / prove-drive-root / withdraw confirm before acting; prove-drive-root checks its event; app status explains FAILED', 'devnet'],
   ['ILC-014',  'B', 'Internal CLI',      'foreclose / prove-drive-root / withdraw confirm before acting; prove-drive-root checks its event; app status explains FAILED', 'testnet'],
+  ['ILC-015',  'B', 'Internal CLI',      'deploy application with a direct InputBox (Authority, Quorum, PRT); --no-wait requires --register=false', 'devnet'],
   ['ILC-015',  'B', 'Internal CLI',      'deploy application with a direct InputBox (Authority, Quorum, PRT); --no-wait requires --register=false', 'testnet'],
   ['ILC-016',  'B', 'Internal CLI',      'send and execute --proof-file by address without database; explicit --inputbox rejected; stdout is pipeable', 'devnet'],
   ['ILC-016',  'B', 'Internal CLI',      'send and execute --proof-file by address without database; explicit --inputbox rejected; stdout is pipeable', 'testnet'],
   ['ILC-017',  'B', 'Internal CLI',      'read shows PRT match advance events matching the chain', 'devnet'],
   ['ILC-019',  'B', 'Internal CLI',      'refund rejection paths: NotForeclosed, CannotRefundFinalizedInput, InvalidInputHash, UnknownInputSender', 'devnet'],
   ['ILC-019',  'B', 'Internal CLI',      'refund rejection paths: NotForeclosed, CannotRefundFinalizedInput, InvalidInputHash, UnknownInputSender', 'testnet'],
+  ['ILC-020',  'B', 'Internal CLI',      'Receipt wait timeout reports an unknown outcome with the signed hash, not a failure', 'devnet'],
   ['ILC-020',  'B', 'Internal CLI',      'Receipt wait timeout reports an unknown outcome with the signed hash, not a failure', 'testnet'],
   ['ILC-021',  'B', 'Internal CLI',      'deposit erc20 --approve checks Approval then InputAdded; rejects --no-wait; names the failing step', 'devnet'],
   ['ILC-021',  'B', 'Internal CLI',      'deposit erc20 --approve checks Approval then InputAdded; rejects --no-wait; names the failing step', 'testnet'],
@@ -356,6 +388,7 @@ const TESTS = [
   ['PRT-007',  'B', 'PRT',               'All sentries reporting the winner accelerate acceptance; with no sentries the full period applies', 'devnet'],
   ['PRT-008',  'B', 'PRT',               'A dissenting or missing sentry report does not block acceptance after the period', 'devnet'],
   ['PRT-009',  'B', 'PRT',               'Root with no winner: node only warns and consensus stalls; guardian foreclosure is the only way out', 'devnet'],
+  ['PRT-010',  'B', 'PRT',               'PRT transaction stuck pending: no fee replacement; tracking released after 64 blocks not found', 'devnet'],
   ['PRT-010',  'B', 'PRT',               'PRT transaction stuck pending: no fee replacement; tracking released after 64 blocks not found', 'testnet'],
   ['PRT-011',  'B', 'PRT',               'Reader mode: no broadcasts; reconciliation, observation and divergence diagnosis continue', 'devnet'],
 

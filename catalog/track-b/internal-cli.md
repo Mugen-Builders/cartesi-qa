@@ -10,7 +10,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** database integrity; CI always starts from a fresh schema, and the "refuse before acting" ordering across node startup and DB-backed CLI commands is not asserted.
 - **Steps:**
   1. Run `cartesi-rollups-cli db init` on a fresh database, then `cartesi-rollups-cli db check-version` and note the reported version.
@@ -25,7 +25,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** application management lifecycle used by operators.
 - **Steps:**
   1. Register a new application with `cartesi-rollups-cli app register`.
@@ -36,7 +36,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** operator decommission flow; CI doesn't manage app lifecycle via the operator CLI.
 - **Steps:**
   1. Register an application and send it an input.
@@ -49,7 +49,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** real on-chain proof verification via operator CLI; not covered by the developer CLI path.
 - **Steps:**
   1. Process an input that generates a notice.
@@ -83,7 +83,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** v3 Quorum factory deployment; CI uses pre-deployed contracts, not this command.
 - **Steps:**
   1. Run `cartesi-rollups-cli deploy quorum` with valid operator addresses and threshold.
@@ -94,7 +94,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** `--claim-staging-period` and `--withdrawal-config` flags are new; CI does not exercise them.
 - **Steps:**
   1. Deploy with `--claim-staging-period <N>`.
@@ -106,7 +106,7 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
+- **Environment:** devnet + testnet
 - **Why-not-CI:** new staged and foreclosed epoch states visible only after the lifecycle runs; CI does not inspect via the operator CLI.
 - **Steps:**
   1. Run a node through a normal staging cycle.
@@ -181,10 +181,10 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** H
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** new deploy path in alpha.13 (#798); CI deploys on anvil only. The CLI side of DEP-006.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** new deploy path in alpha.13 (#798); CI does not run `deploy application` against each consensus type with a direct InputBox. The CLI side of DEP-006.
 - **Steps:**
-  1. Deploy and register an Authority, a Quorum and a PRT application with `cartesi-rollups-cli deploy application` against the alpha.10 factories.
+  1. Deploy and register an Authority, a Quorum and a PRT application with `cartesi-rollups-cli deploy application` against the alpha.10 factories (on a devnet, one whose contracts come from rollups-contracts v3.0.0-alpha.10).
   2. Run one deploy with `--no-wait` and registration left on, then with `--no-wait --register=false`.
 - **Expected:** (1) each application is deployed, registered and processes an input. (2) `--no-wait` with registration is rejected; with `--register=false` the command prints the factory-predicted address only, without confirmed metadata.
 
@@ -230,11 +230,12 @@ Tests for the `cartesi-rollups-cli` operator tool: database management, applicat
 
 - **Risk:** M
 - **Last Scheduled Test:** v2-alpha13
-- **Environment:** testnet
-- **Why-not-CI:** alpha.13 waits for a mined receipt by default (2 minutes, `--wait-timeout`). On a slow chain a timeout does not mean failure; CI's anvil mines instantly.
+- **Environment:** devnet + testnet
+- **Why-not-CI:** alpha.13 waits for a mined receipt by default (2 minutes, `--wait-timeout`). On a slow chain a timeout does not mean failure; CI's anvil mines every transaction at once.
 - **Steps:**
-  1. Send a transaction with a fee low enough that it stays pending, and a short `--wait-timeout`.
-  2. Check stderr and the exit result, then watch the transaction on-chain.
+  1. Make the next transaction stay pending. On a devnet, turn off anvil's automine: `cast rpc evm_setAutomine false`. On a testnet, send it with a fee too low to be included.
+  2. Send a transaction with a short `--wait-timeout` (for example `cartesi-rollups-cli send $APP hi --yes --wait-timeout 10s`).
+  3. Check stderr and the exit result, then let the transaction mine (devnet: `cast rpc evm_mine`, then `cast rpc evm_setAutomine true`) and watch it on-chain.
 - **Expected:** the signed hash is printed to stderr before broadcast; the timeout is reported as an unknown outcome with that hash, not as a failed action. If the transaction later mines, nothing in the CLI output contradicted it.
 
 ## ILC-021 — `deposit erc20 --approve` checks both steps
